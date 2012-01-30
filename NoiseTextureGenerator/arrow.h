@@ -43,8 +43,7 @@
 
  #include <QGraphicsLineItem>
 
- #include "noisemodule.h"
-
+ class NoiseModule;
  class QGraphicsPolygonItem;
  class QGraphicsLineItem;
  class QGraphicsScene;

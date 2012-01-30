@@ -10,14 +10,15 @@ class NoiseModuleScene : public QGraphicsScene
 public:
     enum Mode { InsertItem, InsertLine, InsertText, MoveItem };
     explicit NoiseModuleScene(QObject *parent = 0);
+    void setLineColor(const QColor &color);
+    void setItemColor(const QColor &color);
 
 public slots:
     void setMode(Mode mode);
-    void setItemType(DiagramItem::DiagramType type);
-    void editorLostFocus(DiagramTextItem *item);
+    void setItemType(NoiseModule::ModuleType type);
 
 signals:
-    void itemInserted(DiagramItem *item);
+    void itemInserted(NoiseModule *item);
     void itemSelected(QGraphicsItem *item);
 
 protected:

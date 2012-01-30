@@ -42,10 +42,11 @@
 
 #include "arrow.h"
 #include <math.h>
+#include "noisemodule.h"
 
 const qreal Pi = 3.14;
 
-Arrow::Arrow(DiagramItem *startItem, DiagramItem *endItem,
+Arrow::Arrow(NoiseModule *startItem, NoiseModule *endItem,
 	 QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsLineItem(parent, scene)
 {

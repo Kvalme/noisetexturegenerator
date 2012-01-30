@@ -1,5 +1,6 @@
 #include "noisemodulescene.h"
 #include "arrow.h"
+#include <QGraphicsSceneMouseEvent>
 
 
 NoiseModuleScene::NoiseModuleScene(QObject *parent) :
@@ -26,23 +27,11 @@ void NoiseModuleScene::setLineColor(const QColor &color)
 void NoiseModuleScene::setItemColor(const QColor &color)
 {
     myItemColor = color;
-    if (isItemChange(DiagramItem::Type)) {
+    if (isItemChange(NoiseModule::Type)) {
 	NoiseModule *item = qgraphicsitem_cast<NoiseModule*>(selectedItems().first());
 	item->setBrush(myItemColor);
     }
 }
-void NoiseModuleScene::editorLostFocus(NoiseModule *item)
-{
-    QTextCursor cursor = item->textCursor();
-    cursor.clearSelection();
-    item->setTextCursor(cursor);
-
-    if (item->toPlainText().isEmpty()) {
-	removeItem(item);
-	item->deleteLater();
-    }
-}
-
 void NoiseModuleScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (mouseEvent->button() != Qt::LeftButton) return;
@@ -51,7 +40,7 @@ void NoiseModuleScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     switch (myMode)
     {
 	case InsertItem:
-	    item = new DiagramItem(myItemType, myItemMenu);
+	    item = new NoiseModule(myItemType, myItemMenu);
 	    item->setBrush(myItemColor);
 	    addItem(item);
 	    item->setPos(mouseEvent->scenePos());
@@ -91,12 +80,12 @@ void NoiseModuleScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 	 removeItem(line);
 	 delete line;
 	 if (startItems.count() > 0 && endItems.count() > 0 &&
-		   startItems.first()->type() == DiagramItem::Type &&
-		   endItems.first()->type() == DiagramItem::Type &&
+		   startItems.first()->type() == NoiseModule::Type &&
+		   endItems.first()->type() == NoiseModule::Type &&
 		   startItems.first() != endItems.first())
 	 {
-		   NoiseModule *startItem = qgraphicsitem_cast<DiagramItem *>(startItems.first());
-		   NoiseModule *endItem = qgraphicsitem_cast<DiagramItem *>(endItems.first());
+		   NoiseModule *startItem = qgraphicsitem_cast<NoiseModule*>(startItems.first());
+		   NoiseModule *endItem = qgraphicsitem_cast<NoiseModule*>(endItems.first());
 		   Arrow *arrow = new Arrow(startItem, endItem);
 		   arrow->setColor(myLineColor);
 		   startItem->addArrow(arrow);
@@ -117,4 +106,12 @@ bool NoiseModuleScene::isItemChange(int type)
     }
     return false;
 }
+void NoiseModuleScene::setMode(Mode mode)
+{
+    myMode = mode;
+}
 
+void NoiseModuleScene::setItemType(NoiseModule::ModuleType type)
+{
+    myItemType = type;
+}
