@@ -46,3 +46,20 @@ void MainWindow::itemSelected(NoiseModule *)
 {
 
 }
+
+void MainWindow::on_placeModifier_released()
+{
+    nmScene->setMode(NoiseModuleScene::InsertItem);
+    nmScene->setItemType(NoiseModule::NoiseModificator);
+}
+
+void MainWindow::on_placeOutput_released()
+{
+    nmScene->setMode(NoiseModuleScene::InsertItem);
+    nmScene->setItemType(NoiseModule::NoiseOutput);
+}
+
+void MainWindow::on_connectModules_released()
+{
+    nmScene->setMode(NoiseModuleScene::InsertLine);
+}

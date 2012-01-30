@@ -29,6 +29,12 @@ private slots:
     void on_pushButton_released();
 
 
+    void on_placeModifier_released();
+
+    void on_placeOutput_released();
+
+    void on_connectModules_released();
+
 private:
     Ui::MainWindow *ui;
     NoiseModuleScene *nmScene;

@@ -40,16 +40,23 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="placeModifier">
           <property name="text">
            <string>Modifier</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="placeOutput">
           <property name="text">
            <string>Output</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="connectModules">
+          <property name="text">
+           <string>Connect</string>
           </property>
          </widget>
         </item>

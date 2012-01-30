@@ -58,14 +58,14 @@ NoiseModule::NoiseModule(NoiseModule::ModuleType moduleType, QMenu *contextMenu,
 		  << QPointF(-50, -15);
 	    break;
 	case NoiseModificator:
-	    myPolygon << QPointF(-100, 0) << QPointF(0, 100)
-		      << QPointF(100, 0) << QPointF(0, -100)
-		      << QPointF(-100, 0);
+	    myPolygon << QPointF(-50, 0) << QPointF(0, 25)
+			       << QPointF(50, 0) << QPointF(0, -25)
+			       << QPointF(-50, 0);
 	    break;
 	case NoiseOutput:
-	    myPolygon << QPointF(-100, -100) << QPointF(100, -100)
-		      << QPointF(100, 100) << QPointF(-100, 100)
-		      << QPointF(-100, -100);
+	    myPolygon << QPointF(-50, -15) << QPointF(50, -15)
+		      << QPointF(50, 15) << QPointF(-50, 15)
+		      << QPointF(-50, -15);
 	    break;
 	default:
 
