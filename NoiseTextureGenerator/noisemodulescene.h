@@ -8,10 +8,9 @@ class NoiseModuleScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    enum Mode { InsertItem, InsertLine, InsertText, MoveItem };
+    enum Mode { InsertLine, MoveItem };
     explicit NoiseModuleScene(QObject *parent = 0);
-    void setLineColor(const QColor &color);
-    void setItemColor(const QColor &color);
+    void addModule(NoiseModule::ModuleType type);
 
 public slots:
     void setMode(Mode mode);
@@ -28,6 +27,7 @@ protected:
 
 private:
     bool isItemChange(int type);
+    NoiseModule* createModule(NoiseModule::ModuleType type);
 
     NoiseModule::ModuleType myItemType;
     QMenu *myItemMenu;

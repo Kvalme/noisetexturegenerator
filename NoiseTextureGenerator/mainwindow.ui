@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1115</width>
-    <height>768</height>
+    <width>1087</width>
+    <height>521</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,73 +16,65 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QWidget" name="widget" native="true">
-      <property name="minimumSize">
-       <size>
-        <width>1024</width>
-        <height>512</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QGraphicsView" name="graphicsView"/>
+       <widget class="QGraphicsView" name="graphicsView">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>Source</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="placeModifier">
-          <property name="text">
-           <string>Modifier</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="placeOutput">
-          <property name="text">
-           <string>Output</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="connectModules">
-          <property name="text">
-           <string>Connect</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="QGroupBox" name="moduleOptions">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="title">
          <string>Module options</string>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <layout class="QGridLayout" name="moduleOptionsLayout"/>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Module type:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="moduleType"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QFrame" name="moduleOptionsFrame">
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>
@@ -96,20 +88,107 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1115</width>
+     <width>1087</width>
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menu_Add">
+    <property name="title">
+     <string>&amp;Create module</string>
+    </property>
+    <addaction name="actionNoise_generator"/>
+    <addaction name="separator"/>
+    <addaction name="actionModifier"/>
+    <addaction name="actionCombiner"/>
+    <addaction name="actionSelector"/>
+    <addaction name="actionTransformer"/>
+    <addaction name="separator"/>
+    <addaction name="actionOutput"/>
+    <addaction name="separator"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Add"/>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>0</width>
+     <height>22</height>
+    </size>
+   </property>
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNoise_generator"/>
+   <addaction name="separator"/>
+   <addaction name="actionModifier"/>
+   <addaction name="actionCombiner"/>
+   <addaction name="actionSelector"/>
+   <addaction name="actionTransformer"/>
+   <addaction name="separator"/>
+   <addaction name="actionOutput"/>
+   <addaction name="separator"/>
+   <addaction name="actionConnect"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionNoise_generator">
+   <property name="text">
+    <string>Generator</string>
+   </property>
+  </action>
+  <action name="actionModifier">
+   <property name="text">
+    <string>Modifier</string>
+   </property>
+  </action>
+  <action name="actionCombiner">
+   <property name="text">
+    <string>Combiner</string>
+   </property>
+  </action>
+  <action name="actionSelector">
+   <property name="text">
+    <string>Selector</string>
+   </property>
+  </action>
+  <action name="actionTransformer">
+   <property name="text">
+    <string>Transformer</string>
+   </property>
+  </action>
+  <action name="actionOutput">
+   <property name="text">
+    <string>Output</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Connect</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

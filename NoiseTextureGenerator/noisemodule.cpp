@@ -50,28 +50,6 @@ NoiseModule::NoiseModule(NoiseModule::ModuleType moduleType, QMenu *contextMenu,
     myModuleType = moduleType;
     myContextMenu = contextMenu;
 
-    QPainterPath path;
-    switch (myModuleType) {
-	case NoiseGenerator:
-	    myPolygon << QPointF(-50, -15) << QPointF(50, -15)
-		  << QPointF(50, 15) << QPointF(-50, 15)
-		  << QPointF(-50, -15);
-	    break;
-	case NoiseModificator:
-	    myPolygon << QPointF(-50, 0) << QPointF(0, 25)
-			       << QPointF(50, 0) << QPointF(0, -25)
-			       << QPointF(-50, 0);
-	    break;
-	case NoiseOutput:
-	    myPolygon << QPointF(-50, -15) << QPointF(50, -15)
-		      << QPointF(50, 15) << QPointF(-50, 15)
-		      << QPointF(-50, -15);
-	    break;
-	default:
-
-	    break;
-    }
-    setPolygon(myPolygon);
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);

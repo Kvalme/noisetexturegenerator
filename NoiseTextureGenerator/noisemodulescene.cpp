@@ -1,13 +1,14 @@
 #include "noisemodulescene.h"
 #include "arrow.h"
 #include <QGraphicsSceneMouseEvent>
-
+#include "noisegenerator.h"
+#include "noiseoutput.h"
 
 NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     QGraphicsScene(parent)
 {
     myMode = MoveItem;
-    myItemType = NoiseModule::NoiseGenerator;
+    myItemType = NoiseModule::Generator;
     line = 0;
     myItemColor = Qt::white;
     myTextColor = Qt::black;
@@ -15,37 +16,35 @@ NoiseModuleScene::NoiseModuleScene(QObject *parent) :
 
 }
 
-void NoiseModuleScene::setLineColor(const QColor &color)
+NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type)
 {
-    myLineColor = color;
-    if (isItemChange(Arrow::Type)) {
-	Arrow *item = qgraphicsitem_cast<Arrow *>(selectedItems().first());
-	item->setColor(myLineColor);
-	update();
+    switch(type)
+    {
+	case NoiseModule::Generator:
+	    return new NoiseGeneratorModule(myItemMenu);
+	case NoiseModule::Output:
+	    return new NoiseOutputModule(myItemMenu);
+	default:
+	    return 0;
     }
+    return 0;
 }
-void NoiseModuleScene::setItemColor(const QColor &color)
+void NoiseModuleScene::addModule(NoiseModule::ModuleType type)
 {
-    myItemColor = color;
-    if (isItemChange(NoiseModule::Type)) {
-	NoiseModule *item = qgraphicsitem_cast<NoiseModule*>(selectedItems().first());
-	item->setBrush(myItemColor);
-    }
+    NoiseModule *item= createModule(type);
+    if(!item)return;
+    item->setBrush(myItemColor);
+    addItem(item);
+    item->setPos(0, 0);
+    emit itemInserted(item);
 }
+
 void NoiseModuleScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (mouseEvent->button() != Qt::LeftButton) return;
 
-    NoiseModule *item;
     switch (myMode)
     {
-	case InsertItem:
-	    item = new NoiseModule(myItemType, myItemMenu);
-	    item->setBrush(myItemColor);
-	    addItem(item);
-	    item->setPos(mouseEvent->scenePos());
-	    emit itemInserted(item);
-	    break;
 	case InsertLine:
 	    line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
 	    line->setPen(QPen(myLineColor, 2));

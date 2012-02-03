@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QGraphicsItem>
 
 class NoiseModuleScene;
 class NoiseModule;
@@ -19,25 +20,33 @@ public:
 
 protected:
     void changeEvent(QEvent *e);
+    void fillModuleType(NoiseModule *module);
+
+    void fillGeneratorModuleType(NoiseModule *module);
+    void generatorSelected(NoiseModule *module, int index);
+
+    void fillOutputModuleType(NoiseModule *module);
+    void outputSelected(NoiseModule *module, int index);
+
 
 
 public slots:
     void itemInserted(NoiseModule *);
-    void itemSelected(NoiseModule *);
+    void itemSelected();
 
 private slots:
-    void on_pushButton_released();
+    void on_actionNoise_generator_triggered(bool checked);
+    void on_moduleType_currentIndexChanged(int index);
 
+    void on_actionOutput_triggered(bool checked);
 
-    void on_placeModifier_released();
-
-    void on_placeOutput_released();
-
-    void on_connectModules_released();
+    void on_actionConnect_triggered(bool checked);
 
 private:
     Ui::MainWindow *ui;
     NoiseModuleScene *nmScene;
+    bool blockCurrentIndexChange;
+    QWidget *opt;
 
 };
 

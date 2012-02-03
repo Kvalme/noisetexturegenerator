@@ -9,7 +9,7 @@ class NoiseModule : public QGraphicsPolygonItem
 public:
     NoiseModule();
     enum { Type = UserType + 15 };
-    enum ModuleType { NoiseGenerator, NoiseModificator, NoiseOutput};
+    enum ModuleType { Generator, Modifier, Combiner, Selector, Transformer, Output};
 
     NoiseModule(ModuleType moduleType, QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
 
@@ -20,12 +20,12 @@ public:
     void addArrow(Arrow *arrow);
     QPixmap image() const;
     int type() const { return Type;}
+    QList<Arrow*> getArrows() const { return arrows;}
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
-private:
     ModuleType myModuleType;
     QPolygonF myPolygon;
     QMenu *myContextMenu;
