@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     NoiseOutput/sphereoptions.cpp \
     NoiseOutput/cylinderoutput.cpp \
     Generation/generation.cpp \
-    PreviewRenderer/previewrenderer.cpp
+    PreviewRenderer/previewrenderer.cpp \
+    Generation/noisexmlbuilder.cpp
 
 HEADERS  += mainwindow.h \
     noisemodulescene.h \
@@ -63,7 +64,8 @@ HEADERS  += mainwindow.h \
     NoiseOutput/sphereoptions.h \
     NoiseOutput/cylinderoutput.h \
     Generation/generation.h \
-    PreviewRenderer/previewrenderer.h
+    PreviewRenderer/previewrenderer.h \
+    Generation/noisexmlbuilder.h
 
 FORMS    += mainwindow.ui \
     NoiseGenerators/billowoptions.ui \

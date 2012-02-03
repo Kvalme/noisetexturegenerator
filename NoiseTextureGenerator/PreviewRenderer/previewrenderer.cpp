@@ -1,14 +1,16 @@
 #include "previewrenderer.h"
 #include "ui_previewrenderer.h"
 
-PreviewRenderer::PreviewRenderer(int w, int h, TiXmlDocument *doc, QWidget *parent):
+
+PreviewRenderer::PreviewRenderer(TiXmlDocument *doc, QWidget *parent):
     QMainWindow(parent),
     ui(new Ui::PreviewRenderer)
 {
     ui->setupUi(this);
-    textureWidth = w;
-    textureHeight = h;
     source = doc;
+
+    xmlBuilder = new NoiseXMLBuilder;
+    xmlBuilder->load(source);
 
     QPixmap pix(textureWidth, textureHeight);
     pix.fill(Qt::black);

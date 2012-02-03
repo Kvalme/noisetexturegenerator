@@ -1,8 +1,6 @@
 #include "planeoptions.h"
 #include "ui_planeoptions.h"
-#include "Generation/generation.h"
 #include "tinyXml/tinyxml.h"
-#include "PreviewRenderer/previewrenderer.h"
 
 PlaneOptions::PlaneOptions(NoiseOutputModule *m, QWidget *parent):
     QWidget(parent),
@@ -98,10 +96,3 @@ void PlaneOptions::on_seamless_toggled(bool checked)
     mod->EnableSeamless(checked);
 }
 
-void PlaneOptions::on_generate_released()
-{
-    noise::utils::NoiseMapBuilderPlane *mod = dynamic_cast<noise::utils::NoiseMapBuilderPlane*>(module->getModule());
-    TiXmlDocument *doc = generateXmlFromOutputModule(module);
-    PreviewRenderer *p = new PreviewRenderer((int)mod->GetDestWidth(), (int)mod->GetDestHeight(), doc);
-    p->show();
-}

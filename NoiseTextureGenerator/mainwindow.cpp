@@ -1,3 +1,5 @@
+#include <iostream>
+#include <set>
 #include <QLayout>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -18,7 +20,11 @@
 #include "NoiseOutput/cylinderoutput.h"
 #include "NoiseOutput/planeoptions.h"
 #include "NoiseOutput/sphereoptions.h"
-#include <iostream>
+
+#include "Generation/generation.h"
+
+#include "PreviewRenderer/previewrenderer.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -216,4 +222,22 @@ void MainWindow::on_actionConnect_triggered(bool checked)
 {
     if(checked)nmScene->setMode(NoiseModuleScene::InsertLine);
     else nmScene->setMode(NoiseModuleScene::MoveItem);
+}
+
+void MainWindow::on_generateImage_released()
+{
+    NoiseXMLGenerator generator;
+
+    QList<QGraphicsItem*> items = nmScene->items();
+    QGraphicsItem* item;
+    std::set<NoiseModule*> modules;
+    foreach(item, items)
+    {
+	if(item->type()!=NoiseModule::Type)continue;
+	NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
+	modules.insert(mod);
+    }
+
+    TiXmlDocument *doc = generator.generate(modules);
+    PreviewRenderer *p = new PreviewRenderer(doc);
 }

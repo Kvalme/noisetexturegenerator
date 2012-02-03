@@ -34,8 +34,6 @@ private slots:
 
     void on_seamless_toggled(bool checked);
 
-    void on_generate_released();
-
 private:
     Ui::PlaneOptions *ui;
     NoiseOutputModule *module;

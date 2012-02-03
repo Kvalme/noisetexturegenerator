@@ -42,6 +42,8 @@ private slots:
 
     void on_actionConnect_triggered(bool checked);
 
+    void on_generateImage_released();
+
 private:
     Ui::MainWindow *ui;
     NoiseModuleScene *nmScene;
