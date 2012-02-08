@@ -46,6 +46,7 @@ void NoiseXMLGenerator::writeGenerators()
 	TiXmlElement *generator = new TiXmlElement("Generator");
 	generators->LinkEndChild(generator);
 	generator->SetAttribute("id", id);
+	generator->SetAttribute("type", m->getGeneratorType());
 	writeGenerator(m, generator);
     }
 }
@@ -110,6 +111,8 @@ void NoiseXMLGenerator::writeOutputs()
 	TiXmlElement *output = new TiXmlElement("Output");
 	outputs->LinkEndChild(output);
 	output->SetAttribute("id", id);
+	output->SetAttribute("type", m->getOutputType());
+
 	writeOutput(m, output);
     }
 }

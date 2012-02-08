@@ -38,7 +38,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(nmScene, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
     blockCurrentIndexChange = false;
     opt = 0;
-
+    previewRenderer = new PreviewRenderer(this);
+    previewRenderer->show();
 }
 
 MainWindow::~MainWindow()
@@ -239,5 +240,6 @@ void MainWindow::on_generateImage_released()
     }
 
     TiXmlDocument *doc = generator.generate(modules);
-    PreviewRenderer *p = new PreviewRenderer(doc);
+    doc->SaveFile("/tmp/gen.xml");
+    previewRenderer->showTexture(doc);
 }

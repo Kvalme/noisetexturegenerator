@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QGraphicsItem>
+#include "PreviewRenderer/previewrenderer.h"
 
 class NoiseModuleScene;
 class NoiseModule;
@@ -49,6 +50,7 @@ private:
     NoiseModuleScene *nmScene;
     bool blockCurrentIndexChange;
     QWidget *opt;
+    PreviewRenderer *previewRenderer;
 
 };
 

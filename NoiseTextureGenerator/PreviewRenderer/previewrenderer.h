@@ -14,7 +14,8 @@ class PreviewRenderer : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit PreviewRenderer(TiXmlDocument *doc, QWidget *parent = 0);
+    explicit PreviewRenderer(QWidget *parent = 0);
+    void showTexture(TiXmlDocument *doc);
     ~PreviewRenderer();
 
 protected:
