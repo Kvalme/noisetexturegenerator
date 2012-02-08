@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>199</width>
-    <height>170</height>
+    <height>184</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -78,13 +78,25 @@
     <widget class="QSpinBox" name="octaveCount"/>
    </item>
    <item row="2" column="1">
-    <widget class="QDoubleSpinBox" name="frequency"/>
+    <widget class="QDoubleSpinBox" name="frequency">
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+    </widget>
    </item>
    <item row="3" column="1">
-    <widget class="QDoubleSpinBox" name="lancunarity"/>
+    <widget class="QDoubleSpinBox" name="lancunarity">
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+    </widget>
    </item>
    <item row="5" column="1">
-    <widget class="QDoubleSpinBox" name="persistance"/>
+    <widget class="QDoubleSpinBox" name="persistance">
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+    </widget>
    </item>
    <item row="6" column="1">
     <spacer name="verticalSpacer">

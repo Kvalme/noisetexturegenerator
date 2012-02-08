@@ -22,7 +22,11 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QDoubleSpinBox" name="frequency"/>
+    <widget class="QDoubleSpinBox" name="frequency">
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+    </widget>
    </item>
    <item row="2" column="0">
     <spacer name="verticalSpacer">
