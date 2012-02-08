@@ -1,6 +1,8 @@
 #include <iostream>
 #include <set>
 #include <QLayout>
+#include <QFileDialog>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "noisemodulescene.h"
@@ -22,6 +24,7 @@
 #include "NoiseOutput/sphereoptions.h"
 
 #include "Generation/generation.h"
+#include "Generation/ntgploader.h"
 
 #include "PreviewRenderer/previewrenderer.h"
 
@@ -239,7 +242,85 @@ void MainWindow::on_generateImage_released()
 	modules.insert(mod);
     }
 
-    TiXmlDocument *doc = generator.generate(modules);
+    TiXmlDocument *doc = generator.generateExport(modules);
     doc->SaveFile("/tmp/gen.xml");
     previewRenderer->showTexture(doc);
+}
+
+void MainWindow::on_action_Save_project_triggered()
+{
+    QFileDialog dialog;
+    dialog.setDefaultSuffix("ntgp");
+    dialog.setNameFilter(tr("NoiseTextureGenerator project (*.ntgp)"));
+    dialog.setLabelText(QFileDialog::Accept, tr("Save"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setViewMode(QFileDialog::Detail);
+    QString saveFileName;
+    if(dialog.exec())
+    {
+	QStringList saveFileNames = dialog.selectedFiles();
+	saveFileName = saveFileNames.at(0);
+
+	exportSceneData(saveFileName.toUtf8().data());
+    }
+
+}
+
+void MainWindow::on_action_Load_project_triggered()
+{
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    QString fileName = dialog.getOpenFileName(this, tr("Open project"), "", tr("NoiseTextureGenerator project (*.ntgp)"));
+    if(fileName.isEmpty())return;
+
+    NTGPLoader loader;
+    TiXmlDocument doc;
+    doc.LoadFile(fileName.toUtf8().data());
+    loader.load(&doc, nmScene);
+}
+
+void MainWindow::on_action_Export_noise_description_triggered()
+{
+    QFileDialog dialog;
+    dialog.setDefaultSuffix("xml");
+    dialog.setNameFilter(tr("noise description (*.xml)"));
+    dialog.setLabelText(QFileDialog::Accept, tr("Save"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setViewMode(QFileDialog::Detail);
+    QString saveFileName;
+    if(dialog.exec())
+    {
+	QStringList saveFileNames = dialog.selectedFiles();
+	saveFileName = saveFileNames.at(0);
+
+	NoiseXMLGenerator generator;
+
+	QList<QGraphicsItem*> items = nmScene->items();
+	QGraphicsItem* item;
+	std::set<NoiseModule*> modules;
+	foreach(item, items)
+	{
+	    if(item->type()!=NoiseModule::Type)continue;
+	    NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
+	    modules.insert(mod);
+	}
+	TiXmlDocument *doc = generator.generateExport(modules);
+	doc->SaveFile(saveFileName.toUtf8().data());
+    }
+}
+void MainWindow::exportSceneData(const char *fname)
+{
+    NoiseXMLGenerator generator;
+
+    QList<QGraphicsItem*> items = nmScene->items();
+    QGraphicsItem* item;
+    std::set<NoiseModule*> modules;
+    foreach(item, items)
+    {
+	if(item->type()!=NoiseModule::Type)continue;
+	NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
+	modules.insert(mod);
+    }
+    TiXmlDocument *doc = generator.generateSave(modules);
+    doc->SaveFile(fname);
 }

@@ -10,13 +10,14 @@
 class NoiseXMLGenerator
 {
     public:
-	TiXmlDocument* generate(std::set<NoiseModule*>);
+	TiXmlDocument* generateExport(std::set<NoiseModule*>);
+	TiXmlDocument* generateSave(std::set<NoiseModule*>);
 
     private:
-	void writeGenerators();
+	void writeGenerators(bool savePosition = false);
 	void writeGenerator(NoiseGeneratorModule *m, TiXmlElement *generator);
 
-	void writeOutputs();
+	void writeOutputs(bool savePosition = false);
 	void writeOutput(NoiseOutputModule *m, TiXmlElement *output);
 
 

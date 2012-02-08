@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     NoiseOutput/cylinderoutput.cpp \
     Generation/generation.cpp \
     PreviewRenderer/previewrenderer.cpp \
-    Generation/noisexmlbuilder.cpp
+    Generation/noisexmlbuilder.cpp \
+    Generation/ntgploader.cpp
 
 HEADERS  += mainwindow.h \
     noisemodulescene.h \
@@ -65,7 +66,8 @@ HEADERS  += mainwindow.h \
     NoiseOutput/cylinderoutput.h \
     Generation/generation.h \
     PreviewRenderer/previewrenderer.h \
-    Generation/noisexmlbuilder.h
+    Generation/noisexmlbuilder.h \
+    Generation/ntgploader.h
 
 FORMS    += mainwindow.ui \
     NoiseGenerators/billowoptions.ui \
@@ -84,3 +86,6 @@ FORMS    += mainwindow.ui \
 unix|win32: LIBS += -lnoise
 
 INCLUDEPATH += /usr/local/include/noise
+
+RESOURCES += \
+    base.qrc

@@ -103,6 +103,10 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="action_Save_project"/>
+    <addaction name="action_Load_project"/>
+    <addaction name="separator"/>
+    <addaction name="action_Export_noise_description"/>
    </widget>
    <widget class="QMenu" name="menu_Add">
     <property name="title">
@@ -194,6 +198,30 @@
    </property>
    <property name="text">
     <string>Connect</string>
+   </property>
+  </action>
+  <action name="action_Save_project">
+   <property name="text">
+    <string>&amp;Save project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_Load_project">
+   <property name="text">
+    <string>&amp;Load project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="action_Export_noise_description">
+   <property name="text">
+    <string>&amp;Export noise description</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
  </widget>

@@ -17,6 +17,8 @@ public:
     GeneratorType getGeneratorType() const { return genType;}
     std::string getGeneratorName(GeneratorType type);
     noise::module::Module* getModule() { return module;}
+    void setModule(noise::module::Module *mod) { module = mod;}
+
 protected:
     GeneratorType genType;
     QGraphicsTextItem text;

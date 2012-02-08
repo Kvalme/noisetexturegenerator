@@ -28,6 +28,7 @@ protected:
 
     void fillOutputModuleType(NoiseModule *module);
     void outputSelected(NoiseModule *module, int index);
+    void exportSceneData(const char *fname);
 
 
 
@@ -44,6 +45,12 @@ private slots:
     void on_actionConnect_triggered(bool checked);
 
     void on_generateImage_released();
+
+    void on_action_Save_project_triggered();
+
+    void on_action_Load_project_triggered();
+
+    void on_action_Export_noise_description_triggered();
 
 private:
     Ui::MainWindow *ui;

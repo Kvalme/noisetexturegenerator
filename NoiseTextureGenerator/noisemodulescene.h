@@ -10,7 +10,7 @@ class NoiseModuleScene : public QGraphicsScene
 public:
     enum Mode { InsertLine, MoveItem };
     explicit NoiseModuleScene(QObject *parent = 0);
-    void addModule(NoiseModule::ModuleType type);
+    NoiseModule* addModule(NoiseModule::ModuleType type);
 
 public slots:
     void setMode(Mode mode);

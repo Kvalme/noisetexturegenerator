@@ -29,14 +29,15 @@ NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type)
     }
     return 0;
 }
-void NoiseModuleScene::addModule(NoiseModule::ModuleType type)
+NoiseModule* NoiseModuleScene::addModule(NoiseModule::ModuleType type)
 {
     NoiseModule *item= createModule(type);
-    if(!item)return;
+    if(!item)return 0;
     item->setBrush(myItemColor);
     addItem(item);
     item->setPos(0, 0);
     emit itemInserted(item);
+    return item;
 }
 
 void NoiseModuleScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)

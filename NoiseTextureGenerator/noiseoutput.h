@@ -17,6 +17,7 @@ public:
     OutputType getOutputType() const { return oType;}
     std::string getOutputName(OutputType type);
     noise::utils::NoiseMapBuilder* getModule() { return builder;}
+    void setModule(noise::utils::NoiseMapBuilder *mod) { builder = mod;}
 protected:
     OutputType oType;
     QGraphicsTextItem text;
