@@ -52,6 +52,8 @@ private slots:
 
     void on_action_Export_noise_description_triggered();
 
+    void on_actionModifier_triggered();
+
 private:
     Ui::MainWindow *ui;
     NoiseModuleScene *nmScene;

@@ -100,7 +100,7 @@ void NoiseXMLGenerator::writeGenerator(NoiseGeneratorModule *m, TiXmlElement *ge
 	generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
 	generator->SetDoubleAttribute("Lacunarity", mod->GetLacunarity());
 	generator->SetDoubleAttribute("Persistance", mod->GetPersistence());
-	generator->SetAttribute("NoiseQuality", mod->GetNoiseQuality());
+	generator->SetAttribute("NoiseQuality", (int)mod->GetNoiseQuality());
     }
     else if(m->getGeneratorType() == NoiseGeneratorModule::Const)
     {
@@ -119,7 +119,7 @@ void NoiseXMLGenerator::writeGenerator(NoiseGeneratorModule *m, TiXmlElement *ge
 	generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
 	generator->SetDoubleAttribute("Lacunarity", mod->GetLacunarity());
 	generator->SetDoubleAttribute("Persistance", mod->GetPersistence());
-	generator->SetAttribute("NoiseQuality", mod->GetNoiseQuality());
+	generator->SetAttribute("NoiseQuality", (int)mod->GetNoiseQuality());
     }
     else if(m->getGeneratorType() == NoiseGeneratorModule::RidgedMulti)
     {
@@ -127,7 +127,7 @@ void NoiseXMLGenerator::writeGenerator(NoiseGeneratorModule *m, TiXmlElement *ge
 	generator->SetAttribute("OctaveCount", mod->GetOctaveCount());
 	generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
 	generator->SetDoubleAttribute("Lacunarity", mod->GetLacunarity());
-	generator->SetAttribute("NoiseQuality", mod->GetNoiseQuality());
+	generator->SetAttribute("NoiseQuality", (int)mod->GetNoiseQuality());
     }
     else if(m->getGeneratorType() == NoiseGeneratorModule::Spheres)
     {

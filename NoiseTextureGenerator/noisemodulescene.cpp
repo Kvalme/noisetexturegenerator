@@ -3,6 +3,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include "noisegenerator.h"
 #include "noiseoutput.h"
+#include "noisemodifier.h"
 
 NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     QGraphicsScene(parent)
@@ -24,6 +25,8 @@ NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type)
 	    return new NoiseGeneratorModule(myItemMenu);
 	case NoiseModule::Output:
 	    return new NoiseOutputModule(myItemMenu);
+	case NoiseModule::Modifier:
+	    return new NoiseModifierModule(myItemMenu);
 	default:
 	    return 0;
     }

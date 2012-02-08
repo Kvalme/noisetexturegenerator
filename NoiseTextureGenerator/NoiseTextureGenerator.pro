@@ -39,7 +39,26 @@ SOURCES += main.cpp\
     Generation/generation.cpp \
     PreviewRenderer/previewrenderer.cpp \
     Generation/noisexmlbuilder.cpp \
-    Generation/ntgploader.cpp
+    Generation/ntgploader.cpp \
+    NoiseModifiers/modifierabs.cpp \
+    NoiseModifiers/modifierclamp.cpp \
+    NoiseModifiers/modifiercurve.cpp \
+    NoiseModifiers/modifierexponent.cpp \
+    NoiseModifiers/modifierinvert.cpp \
+    NoiseModifiers/modifierscalebias.cpp \
+    NoiseModifiers/modifierterrace.cpp \
+    NoiseCombiner/combineradd.cpp \
+    NoiseCombiner/combinermax.cpp \
+    NoiseCombiner/combinermin.cpp \
+    NoiseCombiner/combinermultiply.cpp \
+    NoiseCombiner/combinerpower.cpp \
+    NoiseSelector/selectorblend.cpp \
+    NoiseSelector/selectorselect.cpp \
+    NoiseTransformer/transformerdisplace.cpp \
+    NoiseTransformer/transformerrotatepoint.cpp \
+    NoiseTransformer/transformerscalepoint.cpp \
+    NoiseTransformer/transformertranslatepoint.cpp \
+    NoiseTransformer/transformerturbulence.cpp
 
 HEADERS  += mainwindow.h \
     noisemodulescene.h \
@@ -67,7 +86,26 @@ HEADERS  += mainwindow.h \
     Generation/generation.h \
     PreviewRenderer/previewrenderer.h \
     Generation/noisexmlbuilder.h \
-    Generation/ntgploader.h
+    Generation/ntgploader.h \
+    NoiseModifiers/modifierabs.h \
+    NoiseModifiers/modifierclamp.h \
+    NoiseModifiers/modifiercurve.h \
+    NoiseModifiers/modifierexponent.h \
+    NoiseModifiers/modifierinvert.h \
+    NoiseModifiers/modifierscalebias.h \
+    NoiseModifiers/modifierterrace.h \
+    NoiseCombiner/combineradd.h \
+    NoiseCombiner/combinermax.h \
+    NoiseCombiner/combinermin.h \
+    NoiseCombiner/combinermultiply.h \
+    NoiseCombiner/combinerpower.h \
+    NoiseSelector/selectorblend.h \
+    NoiseSelector/selectorselect.h \
+    NoiseTransformer/transformerdisplace.h \
+    NoiseTransformer/transformerrotatepoint.h \
+    NoiseTransformer/transformerscalepoint.h \
+    NoiseTransformer/transformertranslatepoint.h \
+    NoiseTransformer/transformerturbulence.h
 
 FORMS    += mainwindow.ui \
     NoiseGenerators/billowoptions.ui \
@@ -81,7 +119,26 @@ FORMS    += mainwindow.ui \
     NoiseOutput/planeoptions.ui \
     NoiseOutput/sphereoptions.ui \
     NoiseOutput/cylinderoutput.ui \
-    PreviewRenderer/previewrenderer.ui
+    PreviewRenderer/previewrenderer.ui \
+    NoiseModifiers/modifierabs.ui \
+    NoiseModifiers/modifierclamp.ui \
+    NoiseModifiers/modifiercurve.ui \
+    NoiseModifiers/modifierexponent.ui \
+    NoiseModifiers/modifierinvert.ui \
+    NoiseModifiers/modifierscalebias.ui \
+    NoiseModifiers/modifierterrace.ui \
+    NoiseCombiner/combineradd.ui \
+    NoiseCombiner/combinermax.ui \
+    NoiseCombiner/combinermin.ui \
+    NoiseCombiner/combinermultiply.ui \
+    NoiseCombiner/combinerpower.ui \
+    NoiseSelector/selectorblend.ui \
+    NoiseSelector/selectorselect.ui \
+    NoiseTransformer/transformerdisplace.ui \
+    NoiseTransformer/transformerrotatepoint.ui \
+    NoiseTransformer/transformerscalepoint.ui \
+    NoiseTransformer/transformertranslatepoint.ui \
+    NoiseTransformer/transformerturbulence.ui
 
 unix|win32: LIBS += -lnoise
 

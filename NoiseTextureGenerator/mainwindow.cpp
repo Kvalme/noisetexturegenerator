@@ -85,7 +85,10 @@ void MainWindow::on_actionOutput_triggered(bool checked)
 {
     nmScene->addModule(NoiseModule::Output);
 }
-
+void MainWindow::on_actionModifier_triggered()
+{
+    nmScene->addModule(NoiseModule::Modifier);
+}
 void MainWindow::on_moduleType_currentIndexChanged(int index)
 {
     std::cerr<<"Block:"<<blockCurrentIndexChange<<" index:"<<index<<std::endl;
@@ -324,3 +327,5 @@ void MainWindow::exportSceneData(const char *fname)
     TiXmlDocument *doc = generator.generateSave(modules);
     doc->SaveFile(fname);
 }
+
+
