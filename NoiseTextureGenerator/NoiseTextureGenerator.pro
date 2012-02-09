@@ -47,11 +47,6 @@ SOURCES += main.cpp\
     NoiseModifiers/modifierinvert.cpp \
     NoiseModifiers/modifierscalebias.cpp \
     NoiseModifiers/modifierterrace.cpp \
-    NoiseCombiner/combineradd.cpp \
-    NoiseCombiner/combinermax.cpp \
-    NoiseCombiner/combinermin.cpp \
-    NoiseCombiner/combinermultiply.cpp \
-    NoiseCombiner/combinerpower.cpp \
     NoiseSelector/selectorblend.cpp \
     NoiseSelector/selectorselect.cpp \
     NoiseTransformer/transformerdisplace.cpp \
@@ -94,11 +89,6 @@ HEADERS  += mainwindow.h \
     NoiseModifiers/modifierinvert.h \
     NoiseModifiers/modifierscalebias.h \
     NoiseModifiers/modifierterrace.h \
-    NoiseCombiner/combineradd.h \
-    NoiseCombiner/combinermax.h \
-    NoiseCombiner/combinermin.h \
-    NoiseCombiner/combinermultiply.h \
-    NoiseCombiner/combinerpower.h \
     NoiseSelector/selectorblend.h \
     NoiseSelector/selectorselect.h \
     NoiseTransformer/transformerdisplace.h \
@@ -127,11 +117,6 @@ FORMS    += mainwindow.ui \
     NoiseModifiers/modifierinvert.ui \
     NoiseModifiers/modifierscalebias.ui \
     NoiseModifiers/modifierterrace.ui \
-    NoiseCombiner/combineradd.ui \
-    NoiseCombiner/combinermax.ui \
-    NoiseCombiner/combinermin.ui \
-    NoiseCombiner/combinermultiply.ui \
-    NoiseCombiner/combinerpower.ui \
     NoiseSelector/selectorblend.ui \
     NoiseSelector/selectorselect.ui \
     NoiseTransformer/transformerdisplace.ui \
