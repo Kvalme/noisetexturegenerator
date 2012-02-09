@@ -2,6 +2,7 @@
 #define MODIFIERTERRACE_H
 
 #include <QWidget>
+#include "noisemodifier.h"
 
 namespace Ui {
     class ModifierTerrace;
@@ -12,11 +13,12 @@ class ModifierTerrace : public QWidget
     Q_OBJECT
 
 public:
-    explicit ModifierTerrace(QWidget *parent = 0);
+    explicit ModifierTerrace(NoiseModifierModule *mod, QWidget *parent = 0);
     ~ModifierTerrace();
 
 protected:
     void changeEvent(QEvent *e);
+    NoiseModifierModule *module;
 
 private:
     Ui::ModifierTerrace *ui;

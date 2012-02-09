@@ -23,6 +23,14 @@
 #include "NoiseOutput/planeoptions.h"
 #include "NoiseOutput/sphereoptions.h"
 
+#include "NoiseModifiers/modifierabs.h"
+#include "NoiseModifiers/modifierclamp.h"
+#include "NoiseModifiers/modifiercurve.h"
+#include "NoiseModifiers/modifierexponent.h"
+#include "NoiseModifiers/modifierinvert.h"
+#include "NoiseModifiers/modifierscalebias.h"
+#include "NoiseModifiers/modifierterrace.h"
+
 #include "Generation/generation.h"
 #include "Generation/ntgploader.h"
 
@@ -101,6 +109,8 @@ void MainWindow::on_moduleType_currentIndexChanged(int index)
 	    break;
 	case NoiseModule::Output: outputSelected(module, index);
 	    break;
+	case NoiseModule::Modifier: modifierSelected(module, index);
+	    break;
     }
 }
 
@@ -111,6 +121,8 @@ void MainWindow::fillModuleType(NoiseModule *module)
 	case NoiseModule::Generator: fillGeneratorModuleType(module);
 	    break;
 	case NoiseModule::Output: fillOutputModuleType(module);
+	    break;
+	case NoiseModule::Modifier: fillModifierModuleType(module);
 	    break;
     }
 }
@@ -329,3 +341,62 @@ void MainWindow::exportSceneData(const char *fname)
 }
 
 
+void MainWindow::fillModifierModuleType(NoiseModule *module)
+{
+    std::cerr<<__FUNCTION__<<std::endl;
+    NoiseModifierModule *m = dynamic_cast<NoiseModifierModule*>(module);
+    blockCurrentIndexChange = true;
+    std::cerr<<__FUNCTION__<<" Start blocking"<<std::endl;
+    ui->moduleType->clear();
+    int curIndex = 0;
+    for(int a=NoiseModifierModule::Abs; a<=NoiseModifierModule::Terrace; ++a)
+    {
+	ui->moduleType->addItem(m->getName((NoiseModifierModule::ModifierType)a).c_str());
+	if((NoiseModifierModule::ModifierType)a == m->getType())curIndex = a;
+
+    }
+    blockCurrentIndexChange = false;
+    std::cerr<<__FUNCTION__<<" End blocking"<<std::endl;
+    ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
+    ui->moduleType->setCurrentIndex(curIndex);
+}
+void MainWindow::modifierSelected(NoiseModule *module, int index)
+{
+    std::cerr<<__FUNCTION__<<std::endl;
+    NoiseModifierModule *m = dynamic_cast<NoiseModifierModule*>(module);
+    m->setType((NoiseModifierModule::ModifierType)index);
+    if(opt)
+    {
+	delete opt;
+	QLayout *layout = ui->moduleOptionsFrame->layout();
+	delete layout;
+    }
+
+    switch((NoiseModifierModule::ModifierType)index)
+    {
+	case NoiseModifierModule::Abs:
+	    opt = new ModifierAbs(m);
+	    break;
+	case NoiseModifierModule::Clamp:
+	    opt = new ModifierClamp(m);
+	    break;
+	case NoiseModifierModule::Curve:
+	    opt = new ModifierCurve(m);
+	    break;
+	case NoiseModifierModule::Exponent:
+	    opt = new ModifierExponent(m);
+	    break;
+	case NoiseModifierModule::Invert:
+	    opt = new ModifierInvert(m);
+	    break;
+	case NoiseModifierModule::ScaleBias:
+	    opt = new ModifierScaleBias(m);
+	    break;
+	case NoiseModifierModule::Terrace:
+	    opt = new ModifierTerrace(m);
+	    break;
+    }
+    ui->moduleOptionsFrame->setLayout(new QVBoxLayout());
+    ui->moduleOptionsFrame->layout()->addWidget(opt);
+
+}

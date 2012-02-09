@@ -1,8 +1,9 @@
 #include "modifierterrace.h"
 #include "ui_modifierterrace.h"
 
-ModifierTerrace::ModifierTerrace(QWidget *parent) :
+ModifierTerrace::ModifierTerrace(NoiseModifierModule *m, QWidget *parent) :
     QWidget(parent),
+    module(m),
     ui(new Ui::ModifierTerrace)
 {
     ui->setupUi(this);

@@ -8,8 +8,10 @@ TiXmlDocument* NoiseXMLGenerator::generateExport(std::set<NoiseModule*> modules)
     doc->LinkEndChild(root);
     generators = new TiXmlElement("Generators");
     outputs = new TiXmlElement("Outputs");
+    modifiers = new TiXmlElement("Modifiers");
     root->LinkEndChild(generators);
     root->LinkEndChild(outputs);
+    root->LinkEndChild(modifiers);
 
     std::cerr<<"Modules count:"<<modules.size()<<std::endl;
 
@@ -29,9 +31,15 @@ TiXmlDocument* NoiseXMLGenerator::generateExport(std::set<NoiseModule*> modules)
 	    NoiseOutputModule *m = dynamic_cast<NoiseOutputModule*>(module);
 	    outputModules.insert(std::make_pair(m, id));
 	}
+	else if(module->moduleType() == NoiseModule::Modifier)
+	{
+	    NoiseModifierModule *m = dynamic_cast<NoiseModifierModule*>(module);
+	    modifierModules.insert(std::make_pair(m, id));
+	}
 	allModules.insert(std::make_pair(module, id));
     }
     writeGenerators();
+    writeModifiers();
     writeOutputs();
     return doc;
 }
@@ -63,9 +71,15 @@ TiXmlDocument* NoiseXMLGenerator::generateSave(std::set<NoiseModule*> modules)
 	    NoiseOutputModule *m = dynamic_cast<NoiseOutputModule*>(module);
 	    outputModules.insert(std::make_pair(m, id));
 	}
+	else if(module->moduleType() == NoiseModule::Modifier)
+	{
+	    NoiseModifierModule *m = dynamic_cast<NoiseModifierModule*>(module);
+	    modifierModules.insert(std::make_pair(m, id));
+	}
 	allModules.insert(std::make_pair(module, id));
     }
     writeGenerators(true);
+    writeModifiers(true);
     writeOutputs(true);
     return doc;
 }
@@ -197,6 +211,70 @@ void NoiseXMLGenerator::writeOutput(NoiseOutputModule *m, TiXmlElement *output)
     Arrow* arrow;
     TiXmlElement *sources = new TiXmlElement("Sources");
     output->LinkEndChild(sources);
+    foreach(arrow, arrows)
+    {
+	if(arrow->endItem()!=m)continue;
+	std::map<NoiseModule*, int>::iterator it = allModules.find(arrow->startItem());
+	if(it==allModules.end())continue;
+	TiXmlElement *source = new TiXmlElement("Source");
+	int id = it->second;
+	source->SetAttribute("sourceId", id);
+	sources->LinkEndChild(source);
+    }
+}
+void NoiseXMLGenerator::writeModifiers(bool savePosition)
+{
+    std::cerr<<__FUNCTION__<<std::endl;
+    for(std::map<NoiseModifierModule*, int>::iterator it = modifierModules.begin(); it!=modifierModules.end(); ++it)
+    {
+	NoiseModifierModule *m = it->first;
+	int id = it->second;
+	TiXmlElement *modifier= new TiXmlElement("Modifier");
+	modifiers->LinkEndChild(modifier);
+	modifier->SetAttribute("id", id);
+	modifier->SetAttribute("type", m->getType());
+	if(savePosition)
+	{
+	    modifier->SetAttribute("PosX", m->pos().x());
+	    modifier->SetAttribute("PosY", m->pos().y());
+	}
+	writeModifier(m, modifier);
+    }
+}
+void NoiseXMLGenerator::writeModifier(NoiseModifierModule *m, TiXmlElement *modifier)
+{
+    std::cerr<<__FUNCTION__<<std::endl;
+    if(m->getType() == NoiseModifierModule::Clamp)
+    {
+	noise::module::Clamp *mod = dynamic_cast<noise::module::Clamp*>(m->getModule());
+	modifier->SetDoubleAttribute("LowerBound", mod->GetLowerBound());
+	modifier->SetDoubleAttribute("UpperBound", mod->GetUpperBound());
+    }
+    else if(m->getType() == NoiseModifierModule::Curve)
+    {
+	///@TODO Implement curve
+    }
+    else if(m->getType() == NoiseModifierModule::Exponent)
+    {
+	noise::module::Exponent *mod = dynamic_cast<noise::module::Exponent*>(m->getModule());
+	modifier->SetDoubleAttribute("Exponent", mod->GetExponent());
+    }
+    else if(m->getType() == NoiseModifierModule::ScaleBias)
+    {
+	noise::module::ScaleBias *mod = dynamic_cast<noise::module::ScaleBias*>(m->getModule());
+	modifier->SetDoubleAttribute("Scale", mod->GetScale());
+	modifier->SetDoubleAttribute("Bias", mod->GetBias());
+    }
+    else if(m->getType() == NoiseModifierModule::Terrace)
+    {
+	///@TODO Implement terrace
+    }
+
+    QList<Arrow*> arrows = m->getArrows();
+    if(arrows.empty())return;
+    Arrow* arrow;
+    TiXmlElement *sources = new TiXmlElement("Sources");
+    modifier->LinkEndChild(sources);
     foreach(arrow, arrows)
     {
 	if(arrow->endItem()!=m)continue;

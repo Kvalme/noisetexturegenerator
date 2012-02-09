@@ -8,8 +8,10 @@ void NoiseXMLBuilder::load(TiXmlDocument *doc)
     TiXmlElement *root = doc->RootElement();
     TiXmlElement *generators = root->FirstChildElement("Generators");
     TiXmlElement *outputs = root->FirstChildElement("Outputs");
+    TiXmlElement *modifiers = root->FirstChildElement("Modifiers");
 
     readGenerators(generators);
+    readModifiers(modifiers);
     readOutputs(outputs);
 }
 void NoiseXMLBuilder::readGenerators(TiXmlElement *src)
@@ -51,6 +53,28 @@ void NoiseXMLBuilder::readOutputs(TiXmlElement *src)
 	}
 	if(!module)continue;
 	mapBuilders.insert(std::make_pair(id, module));
+    }
+}
+void NoiseXMLBuilder::readModifiers(TiXmlElement *src)
+{
+    for(TiXmlElement *modifier = src->FirstChildElement("Modifier"); modifier; modifier = modifier->NextSiblingElement("Modifier"))
+    {
+	noise::module::Module* module;
+	ModifierType type = (ModifierType)atol(modifier->Attribute("type"));
+	int id = atol(modifier->Attribute("id"));
+	switch(type)
+	{
+	    case Abs: module = readModifierAbs(modifier); break;
+	    case Clamp: module = readModifierClamp(modifier); break;
+	    case Curve: module = readModifierCurve(modifier); break;
+	    case Exponent: module = readModifierExponent(modifier); break;
+	    case Invert: module = readModifierInvert(modifier); break;
+	    case ScaleBias: module = readModifierScaleBias(modifier); break;
+	    case Terrace: module = readModifierTerrace(modifier); break;
+	    default: module = 0;
+	}
+	if(!module)continue;
+	modules.insert(std::make_pair(id, module));
     }
 }
 noise::module::Module* NoiseXMLBuilder::readGeneratorBillow(TiXmlElement *src)
@@ -184,6 +208,18 @@ void NoiseXMLBuilder::connectOutputSources(noise::utils::NoiseMapBuilder *mod, T
 	mod->SetSourceModule(*module);
     }
 }
+void NoiseXMLBuilder::connectSources(noise::module::Module *mod, TiXmlElement *src)
+{
+    TiXmlElement *sources = src->FirstChildElement("Sources");
+    int index = 0;
+    for(TiXmlElement *source = sources->FirstChildElement("Source"); source; source = source->NextSiblingElement("Source"))
+    {
+	int id = atoi(source->Attribute("sourceId"));
+	noise::module::Module *module = modules[id];
+	mod->SetSourceModule(index, *module);
+	++index;
+    }
+}
 
 noise::utils::Image* NoiseXMLBuilder::getImage()
 {
@@ -198,4 +234,56 @@ noise::utils::Image* NoiseXMLBuilder::getImage()
     renderer.SetDestImage(*img);
     renderer.Render();
     return img;
+}
+
+noise::module::Module* NoiseXMLBuilder::readModifierAbs(TiXmlElement *src)
+{
+    noise::module::Abs *mod = new noise::module::Abs;
+    connectSources(mod, src);
+    return mod;
+}
+
+noise::module::Module* NoiseXMLBuilder::readModifierClamp(TiXmlElement *src)
+{
+    noise::module::Clamp *mod = new noise::module::Clamp;
+    float lb, ub;
+    lb = atof(src->Attribute("LowerBound"));
+    ub = atof(src->Attribute("UpperBound"));
+    mod->SetBounds(lb, ub);
+    connectSources(mod, src);
+    return mod;
+}
+
+noise::module::Module* NoiseXMLBuilder::readModifierCurve(TiXmlElement *src)
+{
+    return 0;
+}
+
+noise::module::Module* NoiseXMLBuilder::readModifierExponent(TiXmlElement *src)
+{
+    noise::module::Exponent *mod = new noise::module::Exponent;
+    mod->SetExponent(atof(src->Attribute("Exponent")));
+    connectSources(mod, src);
+    return mod;
+}
+
+noise::module::Module* NoiseXMLBuilder::readModifierInvert(TiXmlElement *src)
+{
+    noise::module::Invert *mod = new noise::module::Invert;
+    connectSources(mod, src);
+    return mod;
+}
+
+noise::module::Module* NoiseXMLBuilder::readModifierScaleBias(TiXmlElement *src)
+{
+    noise::module::ScaleBias *mod = new noise::module::ScaleBias;
+    mod->SetScale(atof(src->Attribute("Scale")));
+    mod->SetBias(atof(src->Attribute("Bias")));
+    connectSources(mod, src);
+    return mod;
+}
+
+noise::module::Module* NoiseXMLBuilder::readModifierTerrace(TiXmlElement *src)
+{
+    return 0;
 }

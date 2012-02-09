@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "noisemodifier.h"
+
 namespace Ui {
     class ModifierAbs;
 }
@@ -12,11 +14,12 @@ class ModifierAbs : public QWidget
     Q_OBJECT
 
 public:
-    explicit ModifierAbs(QWidget *parent = 0);
+    explicit ModifierAbs(NoiseModifierModule *mod, QWidget *parent = 0);
     ~ModifierAbs();
 
 protected:
     void changeEvent(QEvent *e);
+    NoiseModifierModule *module;
 
 private:
     Ui::ModifierAbs *ui;

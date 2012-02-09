@@ -1,8 +1,9 @@
 #include "modifierinvert.h"
 #include "ui_modifierinvert.h"
 
-ModifierInvert::ModifierInvert(QWidget *parent) :
+ModifierInvert::ModifierInvert(NoiseModifierModule *mod, QWidget *parent) :
     QWidget(parent),
+    module(mod),
     ui(new Ui::ModifierInvert)
 {
     ui->setupUi(this);

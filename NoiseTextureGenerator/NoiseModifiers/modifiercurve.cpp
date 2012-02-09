@@ -1,8 +1,9 @@
 #include "modifiercurve.h"
 #include "ui_modifiercurve.h"
 
-ModifierCurve::ModifierCurve(QWidget *parent) :
+ModifierCurve::ModifierCurve(NoiseModifierModule *mod, QWidget *parent) :
     QWidget(parent),
+    module(mod),
     ui(new Ui::ModifierCurve)
 {
     ui->setupUi(this);

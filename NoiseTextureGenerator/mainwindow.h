@@ -28,6 +28,11 @@ protected:
 
     void fillOutputModuleType(NoiseModule *module);
     void outputSelected(NoiseModule *module, int index);
+
+    void fillModifierModuleType(NoiseModule *module);
+    void modifierSelected(NoiseModule *module, int index);
+
+
     void exportSceneData(const char *fname);
 
 

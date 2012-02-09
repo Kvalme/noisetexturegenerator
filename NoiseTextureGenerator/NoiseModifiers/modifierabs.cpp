@@ -1,8 +1,9 @@
 #include "modifierabs.h"
 #include "ui_modifierabs.h"
 
-ModifierAbs::ModifierAbs(QWidget *parent) :
+ModifierAbs::ModifierAbs(NoiseModifierModule *mod, QWidget *parent) :
     QWidget(parent),
+    module(mod),
     ui(new Ui::ModifierAbs)
 {
     ui->setupUi(this);
