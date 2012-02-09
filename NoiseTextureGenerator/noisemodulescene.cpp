@@ -4,6 +4,7 @@
 #include "noisegenerator.h"
 #include "noiseoutput.h"
 #include "noisemodifier.h"
+#include "noisecombiner.h"
 
 NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     QGraphicsScene(parent)
@@ -27,6 +28,8 @@ NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type)
 	    return new NoiseOutputModule(myItemMenu);
 	case NoiseModule::Modifier:
 	    return new NoiseModifierModule(myItemMenu);
+	case NoiseModule::Combiner:
+	    return new NoiseCombinerModule(myItemMenu);
 	default:
 	    return 0;
     }

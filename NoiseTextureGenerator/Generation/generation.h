@@ -5,16 +5,19 @@
 #include "noisegenerator.h"
 #include "noiseoutput.h"
 #include "noisemodifier.h"
+#include "noisecombiner.h"
 #include <set>
 #include <map>
 
 class NoiseXMLGenerator
 {
     public:
-	TiXmlDocument* generateExport(std::set<NoiseModule*>);
-	TiXmlDocument* generateSave(std::set<NoiseModule*>);
+	TiXmlDocument* generateExport(const std::set<NoiseModule*>&);
+	TiXmlDocument* generateSave(const std::set<NoiseModule*>&);
 
     private:
+	void prepareModules(const std::set<NoiseModule*>&);
+
 	void writeGenerators(bool savePosition = false);
 	void writeGenerator(NoiseGeneratorModule *m, TiXmlElement *generator);
 
@@ -24,13 +27,20 @@ class NoiseXMLGenerator
 	void writeModifiers(bool savePosition = false);
 	void writeModifier(NoiseModifierModule *m, TiXmlElement *output);
 
+	void writeCombiners(bool savePosition = false);
+	void writeCombiner(NoiseCombinerModule *m, TiXmlElement *output);
+
+
+
 	TiXmlDocument *doc;
 	TiXmlElement *generators;
 	TiXmlElement *outputs;
 	TiXmlElement *modifiers;
+	TiXmlElement *combiners;
 	std::map<NoiseGeneratorModule*, int> generatorModules;
 	std::map<NoiseOutputModule*, int> outputModules;
 	std::map<NoiseModifierModule*, int> modifierModules;
+	std::map<NoiseCombinerModule*, int> combinerModules;
 	std::map<NoiseModule*, int> allModules;
 
 };

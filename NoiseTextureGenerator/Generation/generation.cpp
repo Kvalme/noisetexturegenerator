@@ -1,7 +1,42 @@
 #include "generation.h"
 #include <iostream>
+void NoiseXMLGenerator::prepareModules(const std::set<NoiseModule*> &modules)
+{
+    std::cerr<<"Modules count:"<<modules.size()<<std::endl;
+    generatorModules.clear();
+    outputModules.clear();
+    combinerModules.clear();
+    modifierModules.clear();
 
-TiXmlDocument* NoiseXMLGenerator::generateExport(std::set<NoiseModule*> modules)
+    int id=0;
+    for(std::set<NoiseModule*>::iterator it = modules.begin(); it!= modules.end(); ++it, ++id)
+    {
+	NoiseModule *module = *it;
+	if(module->moduleType() == NoiseModule::Generator)
+	{
+	    NoiseGeneratorModule *m = dynamic_cast<NoiseGeneratorModule*>(module);
+	    generatorModules.insert(std::make_pair(m, id));
+	}
+	else if(module->moduleType() == NoiseModule::Output)
+	{
+	    NoiseOutputModule *m = dynamic_cast<NoiseOutputModule*>(module);
+	    outputModules.insert(std::make_pair(m, id));
+	}
+	else if(module->moduleType() == NoiseModule::Modifier)
+	{
+	    NoiseModifierModule *m = dynamic_cast<NoiseModifierModule*>(module);
+	    modifierModules.insert(std::make_pair(m, id));
+	}
+	else if(module->moduleType() == NoiseModule::Combiner)
+	{
+	    NoiseCombinerModule *m = dynamic_cast<NoiseCombinerModule*>(module);
+	    combinerModules.insert(std::make_pair(m, id));
+	}
+	allModules.insert(std::make_pair(module, id));
+    }
+}
+
+TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &modules)
 {
     doc = new TiXmlDocument();
     TiXmlElement *root = new TiXmlElement("NoiseMap");
@@ -9,77 +44,41 @@ TiXmlDocument* NoiseXMLGenerator::generateExport(std::set<NoiseModule*> modules)
     generators = new TiXmlElement("Generators");
     outputs = new TiXmlElement("Outputs");
     modifiers = new TiXmlElement("Modifiers");
+    combiners = new TiXmlElement("Combiners");
     root->LinkEndChild(generators);
     root->LinkEndChild(outputs);
     root->LinkEndChild(modifiers);
+    root->LinkEndChild(combiners);
 
-    std::cerr<<"Modules count:"<<modules.size()<<std::endl;
+    prepareModules(modules);
 
-    generatorModules.clear();
-    outputModules.clear();
-    int id=0;
-    for(std::set<NoiseModule*>::iterator it = modules.begin(); it!= modules.end(); ++it, ++id)
-    {
-	NoiseModule *module = *it;
-	if(module->moduleType() == NoiseModule::Generator)
-	{
-	    NoiseGeneratorModule *m = dynamic_cast<NoiseGeneratorModule*>(module);
-	    generatorModules.insert(std::make_pair(m, id));
-	}
-	else if(module->moduleType() == NoiseModule::Output)
-	{
-	    NoiseOutputModule *m = dynamic_cast<NoiseOutputModule*>(module);
-	    outputModules.insert(std::make_pair(m, id));
-	}
-	else if(module->moduleType() == NoiseModule::Modifier)
-	{
-	    NoiseModifierModule *m = dynamic_cast<NoiseModifierModule*>(module);
-	    modifierModules.insert(std::make_pair(m, id));
-	}
-	allModules.insert(std::make_pair(module, id));
-    }
     writeGenerators();
     writeModifiers();
+    writeCombiners();
     writeOutputs();
     return doc;
 }
-TiXmlDocument* NoiseXMLGenerator::generateSave(std::set<NoiseModule*> modules)
+TiXmlDocument* NoiseXMLGenerator::generateSave(const std::set<NoiseModule*> &modules)
 {
     doc = new TiXmlDocument();
     TiXmlElement *root = new TiXmlElement("NoiseTextureGeneratorProject");
     doc->LinkEndChild(root);
     generators = new TiXmlElement("Generators");
     outputs = new TiXmlElement("Outputs");
+    modifiers = new TiXmlElement("Modifiers");
+    combiners = new TiXmlElement("Combiners");
     root->LinkEndChild(generators);
     root->LinkEndChild(outputs);
+    root->LinkEndChild(modifiers);
+    root->LinkEndChild(combiners);
 
     std::cerr<<"Modules count:"<<modules.size()<<std::endl;
 
-    generatorModules.clear();
-    outputModules.clear();
-    int id=0;
-    for(std::set<NoiseModule*>::iterator it = modules.begin(); it!= modules.end(); ++it, ++id)
-    {
-	NoiseModule *module = *it;
-	if(module->moduleType() == NoiseModule::Generator)
-	{
-	    NoiseGeneratorModule *m = dynamic_cast<NoiseGeneratorModule*>(module);
-	    generatorModules.insert(std::make_pair(m, id));
-	}
-	else if(module->moduleType() == NoiseModule::Output)
-	{
-	    NoiseOutputModule *m = dynamic_cast<NoiseOutputModule*>(module);
-	    outputModules.insert(std::make_pair(m, id));
-	}
-	else if(module->moduleType() == NoiseModule::Modifier)
-	{
-	    NoiseModifierModule *m = dynamic_cast<NoiseModifierModule*>(module);
-	    modifierModules.insert(std::make_pair(m, id));
-	}
-	allModules.insert(std::make_pair(module, id));
-    }
+    prepareModules(modules);
+
     writeGenerators(true);
     writeModifiers(true);
+    writeCombiners(true);
     writeOutputs(true);
     return doc;
 }
@@ -275,6 +274,46 @@ void NoiseXMLGenerator::writeModifier(NoiseModifierModule *m, TiXmlElement *modi
     Arrow* arrow;
     TiXmlElement *sources = new TiXmlElement("Sources");
     modifier->LinkEndChild(sources);
+    foreach(arrow, arrows)
+    {
+	if(arrow->endItem()!=m)continue;
+	std::map<NoiseModule*, int>::iterator it = allModules.find(arrow->startItem());
+	if(it==allModules.end())continue;
+	TiXmlElement *source = new TiXmlElement("Source");
+	int id = it->second;
+	source->SetAttribute("sourceId", id);
+	sources->LinkEndChild(source);
+    }
+}
+
+void NoiseXMLGenerator::writeCombiners(bool savePosition)
+{
+    std::cerr<<__FUNCTION__<<std::endl;
+    for(std::map<NoiseCombinerModule*, int>::iterator it = combinerModules.begin(); it!=combinerModules.end(); ++it)
+    {
+	NoiseCombinerModule *m = it->first;
+	int id = it->second;
+	TiXmlElement *combiner= new TiXmlElement("Combiner");
+	combiners->LinkEndChild(combiner);
+	combiner->SetAttribute("id", id);
+	combiner->SetAttribute("type", m->getType());
+	if(savePosition)
+	{
+	    combiner->SetAttribute("PosX", m->pos().x());
+	    combiner->SetAttribute("PosY", m->pos().y());
+	}
+	writeCombiner(m, combiner);
+    }
+}
+void NoiseXMLGenerator::writeCombiner(NoiseCombinerModule *m, TiXmlElement *combiner)
+{
+    std::cerr<<__FUNCTION__<<std::endl;
+
+    QList<Arrow*> arrows = m->getArrows();
+    if(arrows.empty())return;
+    Arrow* arrow;
+    TiXmlElement *sources = new TiXmlElement("Sources");
+    combiner->LinkEndChild(sources);
     foreach(arrow, arrows)
     {
 	if(arrow->endItem()!=m)continue;

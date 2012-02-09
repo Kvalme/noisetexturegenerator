@@ -9,8 +9,10 @@ void NoiseXMLBuilder::load(TiXmlDocument *doc)
     TiXmlElement *generators = root->FirstChildElement("Generators");
     TiXmlElement *outputs = root->FirstChildElement("Outputs");
     TiXmlElement *modifiers = root->FirstChildElement("Modifiers");
+    TiXmlElement *combiners = root->FirstChildElement("Combiners");
 
     readGenerators(generators);
+    readCombiners(combiners);
     readModifiers(modifiers);
     readOutputs(outputs);
 }
@@ -71,6 +73,26 @@ void NoiseXMLBuilder::readModifiers(TiXmlElement *src)
 	    case Invert: module = readModifierInvert(modifier); break;
 	    case ScaleBias: module = readModifierScaleBias(modifier); break;
 	    case Terrace: module = readModifierTerrace(modifier); break;
+	    default: module = 0;
+	}
+	if(!module)continue;
+	modules.insert(std::make_pair(id, module));
+    }
+}
+void NoiseXMLBuilder::readCombiners(TiXmlElement *src)
+{
+    for(TiXmlElement *combiner = src->FirstChildElement("Combiner"); combiner; combiner = combiner->NextSiblingElement("Combiner"))
+    {
+	noise::module::Module* module;
+	CombinerType type = (CombinerType)atol(combiner->Attribute("type"));
+	int id = atol(combiner->Attribute("id"));
+	switch(type)
+	{
+	    case Add: module = readCombinerAdd(combiner); break;
+	    case Max: module = readCombinerMax(combiner); break;
+	    case Min: module = readCombinerMin(combiner); break;
+	    case Multiply: module = readCombinerMultiply(combiner); break;
+	    case Power: module = readCombinerPower(combiner); break;
 	    default: module = 0;
 	}
 	if(!module)continue;
@@ -266,7 +288,6 @@ noise::module::Module* NoiseXMLBuilder::readModifierExponent(TiXmlElement *src)
     connectSources(mod, src);
     return mod;
 }
-
 noise::module::Module* NoiseXMLBuilder::readModifierInvert(TiXmlElement *src)
 {
     noise::module::Invert *mod = new noise::module::Invert;
@@ -282,8 +303,38 @@ noise::module::Module* NoiseXMLBuilder::readModifierScaleBias(TiXmlElement *src)
     connectSources(mod, src);
     return mod;
 }
-
 noise::module::Module* NoiseXMLBuilder::readModifierTerrace(TiXmlElement *src)
 {
     return 0;
+}
+
+noise::module::Module* NoiseXMLBuilder::readCombinerAdd(TiXmlElement *src)
+{
+    noise::module::Add *mod = new noise::module::Add;
+    connectSources(mod, src);
+    return mod;
+}
+noise::module::Module* NoiseXMLBuilder::readCombinerMax(TiXmlElement *src)
+{
+    noise::module::Max *mod = new noise::module::Max;
+    connectSources(mod, src);
+    return mod;
+}
+noise::module::Module* NoiseXMLBuilder::readCombinerMin(TiXmlElement *src)
+{
+    noise::module::Min *mod = new noise::module::Min;
+    connectSources(mod, src);
+    return mod;
+}
+noise::module::Module* NoiseXMLBuilder::readCombinerMultiply(TiXmlElement *src)
+{
+    noise::module::Multiply *mod = new noise::module::Multiply;
+    connectSources(mod, src);
+    return mod;
+}
+noise::module::Module* NoiseXMLBuilder::readCombinerPower(TiXmlElement *src)
+{
+    noise::module::Power *mod = new noise::module::Power;
+    connectSources(mod, src);
+    return mod;
 }

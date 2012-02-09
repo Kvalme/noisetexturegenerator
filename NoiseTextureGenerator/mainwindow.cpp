@@ -9,6 +9,8 @@
 #include "noisemodule.h"
 #include "noisegenerator.h"
 #include "noiseoutput.h"
+#include "noisecombiner.h"
+#include "noisemodifier.h"
 
 #include "NoiseGenerators/billowoptions.h"
 #include "NoiseGenerators/checkerboardoptions.h"
@@ -97,6 +99,11 @@ void MainWindow::on_actionModifier_triggered()
 {
     nmScene->addModule(NoiseModule::Modifier);
 }
+void MainWindow::on_actionCombiner_triggered()
+{
+    nmScene->addModule(NoiseModule::Combiner);
+}
+
 void MainWindow::on_moduleType_currentIndexChanged(int index)
 {
     std::cerr<<"Block:"<<blockCurrentIndexChange<<" index:"<<index<<std::endl;
@@ -111,6 +118,8 @@ void MainWindow::on_moduleType_currentIndexChanged(int index)
 	    break;
 	case NoiseModule::Modifier: modifierSelected(module, index);
 	    break;
+	case NoiseModule::Combiner: combinerSelected(module, index);
+	    break;
     }
 }
 
@@ -123,6 +132,8 @@ void MainWindow::fillModuleType(NoiseModule *module)
 	case NoiseModule::Output: fillOutputModuleType(module);
 	    break;
 	case NoiseModule::Modifier: fillModifierModuleType(module);
+	    break;
+	case NoiseModule::Combiner: fillCombinerModuleType(module);
 	    break;
     }
 }
@@ -399,4 +410,28 @@ void MainWindow::modifierSelected(NoiseModule *module, int index)
     ui->moduleOptionsFrame->setLayout(new QVBoxLayout());
     ui->moduleOptionsFrame->layout()->addWidget(opt);
 
+}
+
+void MainWindow::fillCombinerModuleType(NoiseModule *module)
+{
+    std::cerr<<__FUNCTION__<<std::endl;
+    NoiseCombinerModule *m = dynamic_cast<NoiseCombinerModule*>(module);
+    blockCurrentIndexChange = true;
+    ui->moduleType->clear();
+    int curIndex = 0;
+    for(int a=NoiseCombinerModule::Add; a<=NoiseCombinerModule::Power; ++a)
+    {
+	ui->moduleType->addItem(m->getName((NoiseCombinerModule::CombinerType)a).c_str());
+	if((NoiseCombinerModule::CombinerType)a == m->getType())curIndex = a;
+
+    }
+    blockCurrentIndexChange = false;
+    ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
+    ui->moduleType->setCurrentIndex(curIndex);
+}
+void MainWindow::combinerSelected(NoiseModule *module, int index)
+{
+    std::cerr<<__FUNCTION__<<std::endl;
+    NoiseCombinerModule *m = dynamic_cast<NoiseCombinerModule*>(module);
+    m->setType((NoiseCombinerModule::CombinerType)index);
 }
