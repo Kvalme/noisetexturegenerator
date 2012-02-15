@@ -6,6 +6,7 @@
 #include "noiseoutput.h"
 #include "noisemodifier.h"
 #include "noisecombiner.h"
+#include "noiseselector.h"
 #include <set>
 #include <map>
 
@@ -30,6 +31,9 @@ class NoiseXMLGenerator
 	void writeCombiners(bool savePosition = false);
 	void writeCombiner(NoiseCombinerModule *m, TiXmlElement *output);
 
+	void writeSelectors(bool savePosition = false);
+	void writeSelector(NoiseSelectorModule *m, TiXmlElement *output);
+
 
 
 	TiXmlDocument *doc;
@@ -37,10 +41,12 @@ class NoiseXMLGenerator
 	TiXmlElement *outputs;
 	TiXmlElement *modifiers;
 	TiXmlElement *combiners;
+	TiXmlElement *selectors;
 	std::map<NoiseGeneratorModule*, int> generatorModules;
 	std::map<NoiseOutputModule*, int> outputModules;
 	std::map<NoiseModifierModule*, int> modifierModules;
 	std::map<NoiseCombinerModule*, int> combinerModules;
+	std::map<NoiseSelectorModule*, int> selectorModules;
 	std::map<NoiseModule*, int> allModules;
 
 };

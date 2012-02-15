@@ -151,6 +151,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="action_Save_project"/>
+   <addaction name="action_Load_project"/>
+   <addaction name="action_Export_noise_description"/>
+   <addaction name="separator"/>
    <addaction name="actionNoise_generator"/>
    <addaction name="separator"/>
    <addaction name="actionModifier"/>
@@ -210,10 +214,13 @@
   </action>
   <action name="action_Load_project">
    <property name="text">
-    <string>&amp;Load project</string>
+    <string>&amp;Open project</string>
+   </property>
+   <property name="toolTip">
+    <string>Open project</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+L</string>
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="action_Export_noise_description">

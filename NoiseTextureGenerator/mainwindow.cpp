@@ -11,6 +11,7 @@
 #include "noiseoutput.h"
 #include "noisecombiner.h"
 #include "noisemodifier.h"
+#include "noiseselector.h"
 
 #include "NoiseGenerators/billowoptions.h"
 #include "NoiseGenerators/checkerboardoptions.h"
@@ -32,6 +33,9 @@
 #include "NoiseModifiers/modifierinvert.h"
 #include "NoiseModifiers/modifierscalebias.h"
 #include "NoiseModifiers/modifierterrace.h"
+
+#include "NoiseSelector/selectorblend.h"
+#include "NoiseSelector/selectorselect.h"
 
 #include "Generation/generation.h"
 #include "Generation/ntgploader.h"
@@ -103,6 +107,10 @@ void MainWindow::on_actionCombiner_triggered()
 {
     nmScene->addModule(NoiseModule::Combiner);
 }
+void MainWindow::on_actionSelector_triggered()
+{
+    nmScene->addModule(NoiseModule::Selector);
+}
 
 void MainWindow::on_moduleType_currentIndexChanged(int index)
 {
@@ -120,6 +128,8 @@ void MainWindow::on_moduleType_currentIndexChanged(int index)
 	    break;
 	case NoiseModule::Combiner: combinerSelected(module, index);
 	    break;
+	case NoiseModule::Selector: selectorSelected(module, index);
+	    break;
     }
 }
 
@@ -134,6 +144,8 @@ void MainWindow::fillModuleType(NoiseModule *module)
 	case NoiseModule::Modifier: fillModifierModuleType(module);
 	    break;
 	case NoiseModule::Combiner: fillCombinerModuleType(module);
+	    break;
+	case NoiseModule::Selector: fillSelectorModuleType(module);
 	    break;
     }
 }
@@ -434,4 +446,47 @@ void MainWindow::combinerSelected(NoiseModule *module, int index)
     std::cerr<<__FUNCTION__<<std::endl;
     NoiseCombinerModule *m = dynamic_cast<NoiseCombinerModule*>(module);
     m->setType((NoiseCombinerModule::CombinerType)index);
+}
+
+void MainWindow::fillSelectorModuleType(NoiseModule *module)
+{
+    std::cerr<<__FUNCTION__<<std::endl;
+    NoiseSelectorModule *m = dynamic_cast<NoiseSelectorModule*>(module);
+    blockCurrentIndexChange = true;
+    ui->moduleType->clear();
+    int curIndex = 0;
+    for(int a=NoiseSelectorModule::Blend; a<=NoiseSelectorModule::Select; ++a)
+    {
+	ui->moduleType->addItem(m->getName((NoiseSelectorModule::SelectorType)a).c_str());
+	if((NoiseSelectorModule::ModuleType)a == m->getType())curIndex = a;
+
+    }
+    blockCurrentIndexChange = false;
+    ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
+    ui->moduleType->setCurrentIndex(curIndex);
+}
+
+void MainWindow::selectorSelected(NoiseModule *module, int index)
+{
+    std::cerr<<__FUNCTION__<<std::endl;
+    NoiseSelectorModule *m = dynamic_cast<NoiseSelectorModule*>(module);
+    m->setType((NoiseSelectorModule::SelectorType)index);
+    if(opt)
+    {
+	delete opt;
+	QLayout *layout = ui->moduleOptionsFrame->layout();
+	delete layout;
+    }
+
+    switch((NoiseSelectorModule::SelectorType)index)
+    {
+	case NoiseSelectorModule::Blend:
+	    opt = new SelectorBlend(m);
+	    break;
+	case NoiseSelectorModule::Select:
+	    opt = new SelectorSelect(m);
+	    break;
+    }
+    ui->moduleOptionsFrame->setLayout(new QVBoxLayout());
+    ui->moduleOptionsFrame->layout()->addWidget(opt);
 }

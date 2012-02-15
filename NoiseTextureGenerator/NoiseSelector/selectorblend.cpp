@@ -1,8 +1,9 @@
 #include "selectorblend.h"
 #include "ui_selectorblend.h"
 
-SelectorBlend::SelectorBlend(QWidget *parent) :
+SelectorBlend::SelectorBlend(NoiseSelectorModule *mod, QWidget *parent) :
     QWidget(parent),
+    module(mod),
     ui(new Ui::SelectorBlend)
 {
     ui->setupUi(this);

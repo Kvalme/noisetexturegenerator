@@ -10,10 +10,12 @@ void NoiseXMLBuilder::load(TiXmlDocument *doc)
     TiXmlElement *outputs = root->FirstChildElement("Outputs");
     TiXmlElement *modifiers = root->FirstChildElement("Modifiers");
     TiXmlElement *combiners = root->FirstChildElement("Combiners");
+    TiXmlElement *selectors = root->FirstChildElement("Selectors");
 
     readGenerators(generators);
     readCombiners(combiners);
     readModifiers(modifiers);
+    readSelectors(selectors);
     readOutputs(outputs);
 }
 void NoiseXMLBuilder::readGenerators(TiXmlElement *src)
@@ -99,6 +101,24 @@ void NoiseXMLBuilder::readCombiners(TiXmlElement *src)
 	modules.insert(std::make_pair(id, module));
     }
 }
+void NoiseXMLBuilder::readSelectors(TiXmlElement *src)
+{
+    for(TiXmlElement *selector= src->FirstChildElement("Selector"); selector; selector= selector->NextSiblingElement("Selector"))
+    {
+	noise::module::Module* module;
+	SelectorType type = (SelectorType)atol(selector->Attribute("type"));
+	int id = atol(selector->Attribute("id"));
+	switch(type)
+	{
+	    case Blend: module = readSelectorBlend(selector); break;
+	    case Select: module = readSelectorSelect(selector); break;
+	    default: module = 0;
+	}
+	if(!module)continue;
+	modules.insert(std::make_pair(id, module));
+    }
+}
+
 noise::module::Module* NoiseXMLBuilder::readGeneratorBillow(TiXmlElement *src)
 {
     noise::module::Billow *mod = new noise::module::Billow;
@@ -335,6 +355,23 @@ noise::module::Module* NoiseXMLBuilder::readCombinerMultiply(TiXmlElement *src)
 noise::module::Module* NoiseXMLBuilder::readCombinerPower(TiXmlElement *src)
 {
     noise::module::Power *mod = new noise::module::Power;
+    connectSources(mod, src);
+    return mod;
+}
+noise::module::Module* NoiseXMLBuilder::readSelectorBlend(TiXmlElement *src)
+{
+    noise::module::Blend *mod = new noise::module::Blend;
+    connectSources(mod, src);
+    return mod;
+}
+noise::module::Module* NoiseXMLBuilder::readSelectorSelect(TiXmlElement *src)
+{
+    noise::module::Select *mod = new noise::module::Select;
+    double lb, ub;
+    lb = atof(src->Attribute("LowerBound"));
+    ub = atof(src->Attribute("UpperBound"));
+    mod->SetEdgeFalloff(atof(src->Attribute("EdgeFalloff")));
+    mod->SetBounds(lb, ub);
     connectSources(mod, src);
     return mod;
 }

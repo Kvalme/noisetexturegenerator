@@ -2,6 +2,7 @@
 #define SELECTORBLEND_H
 
 #include <QWidget>
+#include "noiseselector.h"
 
 namespace Ui {
     class SelectorBlend;
@@ -12,7 +13,7 @@ class SelectorBlend : public QWidget
     Q_OBJECT
 
 public:
-    explicit SelectorBlend(QWidget *parent = 0);
+    explicit SelectorBlend(NoiseSelectorModule *mod, QWidget *parent = 0);
     ~SelectorBlend();
 
 protected:
@@ -20,6 +21,7 @@ protected:
 
 private:
     Ui::SelectorBlend *ui;
+    NoiseSelectorModule *module;
 };
 
 #endif // SELECTORBLEND_H

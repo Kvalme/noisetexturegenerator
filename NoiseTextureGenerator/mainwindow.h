@@ -35,6 +35,9 @@ protected:
     void fillCombinerModuleType(NoiseModule *module);
     void combinerSelected(NoiseModule *module, int index);
 
+    void fillSelectorModuleType(NoiseModule *module);
+    void selectorSelected(NoiseModule *module, int index);
+
     void exportSceneData(const char *fname);
 
 
@@ -62,6 +65,8 @@ private slots:
     void on_actionModifier_triggered();
 
     void on_actionCombiner_triggered();
+
+    void on_actionSelector_triggered();
 
 private:
     Ui::MainWindow *ui;

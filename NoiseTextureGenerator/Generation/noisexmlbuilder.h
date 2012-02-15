@@ -14,6 +14,7 @@ public:
     enum OutputType { Cylinder, Plane, Sphere};
     enum ModifierType { Abs, Clamp, Curve, Exponent, Invert, ScaleBias, Terrace};
     enum CombinerType { Add, Max, Min, Multiply, Power};
+    enum SelectorType { Blend, Select};
 
     NoiseXMLBuilder();
     void load(TiXmlDocument *doc);
@@ -25,6 +26,7 @@ private:
     void readOutputs(TiXmlElement *src);
     void readModifiers(TiXmlElement *src);
     void readCombiners(TiXmlElement *src);
+    void readSelectors(TiXmlElement *src);
 
 
     noise::module::Module* readGeneratorBillow(TiXmlElement *src);
@@ -50,9 +52,13 @@ private:
     noise::module::Module* readCombinerMultiply(TiXmlElement *src);
     noise::module::Module* readCombinerPower(TiXmlElement *src);
 
+    noise::module::Module* readSelectorBlend(TiXmlElement *src);
+    noise::module::Module* readSelectorSelect(TiXmlElement *src);
+
     noise::utils::NoiseMapBuilder* readOutputCylinder(TiXmlElement *src);
     noise::utils::NoiseMapBuilder* readOutputPlane(TiXmlElement *src);
     noise::utils::NoiseMapBuilder* readOutputSphere(TiXmlElement *src);
+
 
 
     void connectOutputSources(noise::utils::NoiseMapBuilder *mod, TiXmlElement *src);
