@@ -51,11 +51,14 @@ TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &m
     modifiers = new TiXmlElement("Modifiers");
     combiners = new TiXmlElement("Combiners");
     selectors = new TiXmlElement("Selectors");
+    xmlLinks = new TiXmlElement("Links");
+
     root->LinkEndChild(generators);
     root->LinkEndChild(outputs);
     root->LinkEndChild(modifiers);
     root->LinkEndChild(combiners);
     root->LinkEndChild(selectors);
+    root->LinkEndChild(xmlLinks);
 
     prepareModules(modules);
 
@@ -64,6 +67,9 @@ TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &m
     writeCombiners();
     writeSelectors();
     writeOutputs();
+
+    writeLinks();
+
     return doc;
 }
 TiXmlDocument* NoiseXMLGenerator::generateSave(const std::set<NoiseModule*> &modules)
@@ -76,11 +82,14 @@ TiXmlDocument* NoiseXMLGenerator::generateSave(const std::set<NoiseModule*> &mod
     modifiers = new TiXmlElement("Modifiers");
     combiners = new TiXmlElement("Combiners");
     selectors = new TiXmlElement("Selectors");
+    xmlLinks = new TiXmlElement("Links");
+
     root->LinkEndChild(generators);
     root->LinkEndChild(outputs);
     root->LinkEndChild(modifiers);
     root->LinkEndChild(combiners);
     root->LinkEndChild(selectors);
+    root->LinkEndChild(xmlLinks);
 
     prepareModules(modules);
 
@@ -89,6 +98,9 @@ TiXmlDocument* NoiseXMLGenerator::generateSave(const std::set<NoiseModule*> &mod
     writeCombiners(true);
     writeSelectors();
     writeOutputs(true);
+
+    writeLinks();
+
     return doc;
 }
 
@@ -97,19 +109,19 @@ void NoiseXMLGenerator::writeGenerators(bool savePosition)
     std::cerr<<__FUNCTION__<<std::endl;
     for(std::map<NoiseGeneratorModule*, int>::iterator it = generatorModules.begin(); it!=generatorModules.end(); ++it)
     {
-	NoiseGeneratorModule *m = it->first;
-	int id = it->second;
-	TiXmlElement *generator = new TiXmlElement("Generator");
-	generators->LinkEndChild(generator);
-	generator->SetAttribute("id", id);
-	generator->SetAttribute("type", m->getGeneratorType());
-	if(savePosition)
-	{
-	    generator->SetAttribute("PosX", m->pos().x());
-	    generator->SetAttribute("PosY", m->pos().y());
-	}
+        NoiseGeneratorModule *m = it->first;
+        int id = it->second;
+        TiXmlElement *generator = new TiXmlElement("Generator");
+        generators->LinkEndChild(generator);
+        generator->SetAttribute("id", id);
+        generator->SetAttribute("type", m->getGeneratorType());
+        if(savePosition)
+        {
+            generator->SetAttribute("PosX", m->pos().x());
+            generator->SetAttribute("PosY", m->pos().y());
+        }
 
-	writeGenerator(m, generator);
+        writeGenerator(m, generator);
     }
 }
 void NoiseXMLGenerator::writeGenerator(NoiseGeneratorModule *m, TiXmlElement *generator)
@@ -117,50 +129,50 @@ void NoiseXMLGenerator::writeGenerator(NoiseGeneratorModule *m, TiXmlElement *ge
     std::cerr<<__FUNCTION__<<std::endl;
     if(m->getGeneratorType() == NoiseGeneratorModule::Billow)
     {
-	noise::module::Billow *mod = dynamic_cast<noise::module::Billow*>(m->getModule());
-	generator->SetAttribute("OctaveCount", mod->GetOctaveCount());
-	generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
-	generator->SetDoubleAttribute("Lacunarity", mod->GetLacunarity());
-	generator->SetDoubleAttribute("Persistance", mod->GetPersistence());
-	generator->SetAttribute("NoiseQuality", (int)mod->GetNoiseQuality());
+        noise::module::Billow *mod = dynamic_cast<noise::module::Billow*>(m->getModule());
+        generator->SetAttribute("OctaveCount", mod->GetOctaveCount());
+        generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
+        generator->SetDoubleAttribute("Lacunarity", mod->GetLacunarity());
+        generator->SetDoubleAttribute("Persistance", mod->GetPersistence());
+        generator->SetAttribute("NoiseQuality", (int)mod->GetNoiseQuality());
     }
     else if(m->getGeneratorType() == NoiseGeneratorModule::Const)
     {
-	noise::module::Const *mod = dynamic_cast<noise::module::Const*>(m->getModule());
-	generator->SetDoubleAttribute("ConstValue", mod->GetConstValue());
+        noise::module::Const *mod = dynamic_cast<noise::module::Const*>(m->getModule());
+        generator->SetDoubleAttribute("ConstValue", mod->GetConstValue());
     }
     else if(m->getGeneratorType() == NoiseGeneratorModule::Cylinders)
     {
-	noise::module::Cylinders *mod = dynamic_cast<noise::module::Cylinders*>(m->getModule());
-	generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
+        noise::module::Cylinders *mod = dynamic_cast<noise::module::Cylinders*>(m->getModule());
+        generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
     }
     else if(m->getGeneratorType() == NoiseGeneratorModule::Perlin)
     {
-	noise::module::Perlin *mod = dynamic_cast<noise::module::Perlin*>(m->getModule());
-	generator->SetAttribute("OctaveCount", mod->GetOctaveCount());
-	generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
-	generator->SetDoubleAttribute("Lacunarity", mod->GetLacunarity());
-	generator->SetDoubleAttribute("Persistance", mod->GetPersistence());
-	generator->SetAttribute("NoiseQuality", (int)mod->GetNoiseQuality());
+        noise::module::Perlin *mod = dynamic_cast<noise::module::Perlin*>(m->getModule());
+        generator->SetAttribute("OctaveCount", mod->GetOctaveCount());
+        generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
+        generator->SetDoubleAttribute("Lacunarity", mod->GetLacunarity());
+        generator->SetDoubleAttribute("Persistance", mod->GetPersistence());
+        generator->SetAttribute("NoiseQuality", (int)mod->GetNoiseQuality());
     }
     else if(m->getGeneratorType() == NoiseGeneratorModule::RidgedMulti)
     {
-	noise::module::RidgedMulti *mod = dynamic_cast<noise::module::RidgedMulti*>(m->getModule());
-	generator->SetAttribute("OctaveCount", mod->GetOctaveCount());
-	generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
-	generator->SetDoubleAttribute("Lacunarity", mod->GetLacunarity());
-	generator->SetAttribute("NoiseQuality", (int)mod->GetNoiseQuality());
+        noise::module::RidgedMulti *mod = dynamic_cast<noise::module::RidgedMulti*>(m->getModule());
+        generator->SetAttribute("OctaveCount", mod->GetOctaveCount());
+        generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
+        generator->SetDoubleAttribute("Lacunarity", mod->GetLacunarity());
+        generator->SetAttribute("NoiseQuality", (int)mod->GetNoiseQuality());
     }
     else if(m->getGeneratorType() == NoiseGeneratorModule::Spheres)
     {
-	noise::module::Spheres *mod = dynamic_cast<noise::module::Spheres*>(m->getModule());
-	generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
+        noise::module::Spheres *mod = dynamic_cast<noise::module::Spheres*>(m->getModule());
+        generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
     }
     else if(m->getGeneratorType() == NoiseGeneratorModule::Voronoi)
     {
-	noise::module::Voronoi *mod = dynamic_cast<noise::module::Voronoi*>(m->getModule());
-	generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
-	generator->SetDoubleAttribute("Displacement", mod->GetDisplacement());
+        noise::module::Voronoi *mod = dynamic_cast<noise::module::Voronoi*>(m->getModule());
+        generator->SetDoubleAttribute("Frequency", mod->GetFrequency());
+        generator->SetDoubleAttribute("Displacement", mod->GetDisplacement());
     }
 }
 void NoiseXMLGenerator::writeOutputs(bool savePosition)
@@ -168,19 +180,19 @@ void NoiseXMLGenerator::writeOutputs(bool savePosition)
     std::cerr<<__FUNCTION__<<std::endl;
     for(std::map<NoiseOutputModule*, int>::iterator it = outputModules.begin(); it!=outputModules.end(); ++it)
     {
-	NoiseOutputModule *m = it->first;
-	int id = it->second;
-	TiXmlElement *output = new TiXmlElement("Output");
-	outputs->LinkEndChild(output);
-	output->SetAttribute("id", id);
-	output->SetAttribute("type", m->getOutputType());
-	if(savePosition)
-	{
-	    output->SetAttribute("PosX", m->pos().x());
-	    output->SetAttribute("PosY", m->pos().y());
-	}
+        NoiseOutputModule *m = it->first;
+        int id = it->second;
+        TiXmlElement *output = new TiXmlElement("Output");
+        outputs->LinkEndChild(output);
+        output->SetAttribute("id", id);
+        output->SetAttribute("type", m->getOutputType());
+        if(savePosition)
+        {
+            output->SetAttribute("PosX", m->pos().x());
+            output->SetAttribute("PosY", m->pos().y());
+        }
 
-	writeOutput(m, output);
+        writeOutput(m, output);
     }
 }
 void NoiseXMLGenerator::writeOutput(NoiseOutputModule *m, TiXmlElement *output)
@@ -191,62 +203,66 @@ void NoiseXMLGenerator::writeOutput(NoiseOutputModule *m, TiXmlElement *output)
     std::cerr<<"Output type:"<<m->getOutputType()<<std::endl;
     if(m->getOutputType() == NoiseOutputModule::Cylinder)
     {
-	noise::utils::NoiseMapBuilderCylinder *mod = dynamic_cast<noise::utils::NoiseMapBuilderCylinder*>(m->getModule());
-	output->SetDoubleAttribute("LowerAngleBound", mod->GetLowerAngleBound());
-	output->SetDoubleAttribute("UpperAngleBound", mod->GetUpperAngleBound());
-	output->SetDoubleAttribute("LowerHeightBound", mod->GetLowerHeightBound());
-	output->SetDoubleAttribute("UpperHeightBound", mod->GetUpperHeightBound());
+        noise::utils::NoiseMapBuilderCylinder *mod = dynamic_cast<noise::utils::NoiseMapBuilderCylinder*>(m->getModule());
+        output->SetDoubleAttribute("LowerAngleBound", mod->GetLowerAngleBound());
+        output->SetDoubleAttribute("UpperAngleBound", mod->GetUpperAngleBound());
+        output->SetDoubleAttribute("LowerHeightBound", mod->GetLowerHeightBound());
+        output->SetDoubleAttribute("UpperHeightBound", mod->GetUpperHeightBound());
     }
     else if(m->getOutputType() == NoiseOutputModule::Plane)
     {
-	noise::utils::NoiseMapBuilderPlane *mod = dynamic_cast<noise::utils::NoiseMapBuilderPlane*>(m->getModule());
-	output->SetDoubleAttribute("LowerXBound", mod->GetLowerXBound());
-	output->SetDoubleAttribute("UpperXBound", mod->GetUpperXBound());
-	output->SetDoubleAttribute("LowerZBound", mod->GetLowerZBound());
-	output->SetDoubleAttribute("UpperZBound", mod->GetUpperZBound());
-	output->SetDoubleAttribute("Seamless", mod->IsSeamlessEnabled());
+        noise::utils::NoiseMapBuilderPlane *mod = dynamic_cast<noise::utils::NoiseMapBuilderPlane*>(m->getModule());
+        output->SetDoubleAttribute("LowerXBound", mod->GetLowerXBound());
+        output->SetDoubleAttribute("UpperXBound", mod->GetUpperXBound());
+        output->SetDoubleAttribute("LowerZBound", mod->GetLowerZBound());
+        output->SetDoubleAttribute("UpperZBound", mod->GetUpperZBound());
+        output->SetDoubleAttribute("Seamless", mod->IsSeamlessEnabled());
     }
     else if(m->getOutputType() == NoiseOutputModule::Sphere)
     {
-	noise::utils::NoiseMapBuilderSphere *mod = dynamic_cast<noise::utils::NoiseMapBuilderSphere*>(m->getModule());
-	output->SetDoubleAttribute("EastLonBound", mod->GetEastLonBound());
-	output->SetDoubleAttribute("WestLonBound", mod->GetWestLonBound());
-	output->SetDoubleAttribute("NorthLonBound", mod->GetNorthLatBound());
-	output->SetDoubleAttribute("SouthLonBound", mod->GetSouthLatBound());
+        noise::utils::NoiseMapBuilderSphere *mod = dynamic_cast<noise::utils::NoiseMapBuilderSphere*>(m->getModule());
+        output->SetDoubleAttribute("EastLonBound", mod->GetEastLonBound());
+        output->SetDoubleAttribute("WestLonBound", mod->GetWestLonBound());
+        output->SetDoubleAttribute("NorthLonBound", mod->GetNorthLatBound());
+        output->SetDoubleAttribute("SouthLonBound", mod->GetSouthLatBound());
     }
+
+    generateLinks(m);
+}
+
+void NoiseXMLGenerator::generateLinks(NoiseModule *m)
+{
     QList<Arrow*> arrows = m->getArrows();
     if(arrows.empty())return;
-    Arrow* arrow;
-    TiXmlElement *sources = new TiXmlElement("Sources");
-    output->LinkEndChild(sources);
-    foreach(arrow, arrows)
+    foreach(Arrow *arrow, arrows)
     {
-	if(arrow->endItem()!=m)continue;
-	std::map<NoiseModule*, int>::iterator it = allModules.find(arrow->startItem());
-	if(it==allModules.end())continue;
-	TiXmlElement *source = new TiXmlElement("Source");
-	int id = it->second;
-	source->SetAttribute("sourceId", id);
-	sources->LinkEndChild(source);
+        if(arrow->endItem()!=m)continue;
+        std::map<NoiseModule*, int>::iterator it = allModules.find(arrow->startItem());
+        std::map<NoiseModule*, int>::iterator itEnd = allModules.find(arrow->endItem());
+        if(it==allModules.end())continue;
+        if(itEnd == allModules.end())continue;
+
+        links.insert(std::make_pair(it->second, itEnd->second));
     }
 }
+
 void NoiseXMLGenerator::writeModifiers(bool savePosition)
 {
     std::cerr<<__FUNCTION__<<std::endl;
     for(std::map<NoiseModifierModule*, int>::iterator it = modifierModules.begin(); it!=modifierModules.end(); ++it)
     {
-	NoiseModifierModule *m = it->first;
-	int id = it->second;
-	TiXmlElement *modifier= new TiXmlElement("Modifier");
-	modifiers->LinkEndChild(modifier);
-	modifier->SetAttribute("id", id);
-	modifier->SetAttribute("type", m->getType());
-	if(savePosition)
-	{
-	    modifier->SetAttribute("PosX", m->pos().x());
-	    modifier->SetAttribute("PosY", m->pos().y());
-	}
-	writeModifier(m, modifier);
+        NoiseModifierModule *m = it->first;
+        int id = it->second;
+        TiXmlElement *modifier= new TiXmlElement("Modifier");
+        modifiers->LinkEndChild(modifier);
+        modifier->SetAttribute("id", id);
+        modifier->SetAttribute("type", m->getType());
+        if(savePosition)
+        {
+            modifier->SetAttribute("PosX", m->pos().x());
+            modifier->SetAttribute("PosY", m->pos().y());
+        }
+        writeModifier(m, modifier);
     }
 }
 void NoiseXMLGenerator::writeModifier(NoiseModifierModule *m, TiXmlElement *modifier)
@@ -254,45 +270,31 @@ void NoiseXMLGenerator::writeModifier(NoiseModifierModule *m, TiXmlElement *modi
     std::cerr<<__FUNCTION__<<std::endl;
     if(m->getType() == NoiseModifierModule::Clamp)
     {
-	noise::module::Clamp *mod = dynamic_cast<noise::module::Clamp*>(m->getModule());
-	modifier->SetDoubleAttribute("LowerBound", mod->GetLowerBound());
-	modifier->SetDoubleAttribute("UpperBound", mod->GetUpperBound());
+        noise::module::Clamp *mod = dynamic_cast<noise::module::Clamp*>(m->getModule());
+        modifier->SetDoubleAttribute("LowerBound", mod->GetLowerBound());
+        modifier->SetDoubleAttribute("UpperBound", mod->GetUpperBound());
     }
     else if(m->getType() == NoiseModifierModule::Curve)
     {
-	///@TODO Implement curve
+        ///@TODO Implement curve
     }
     else if(m->getType() == NoiseModifierModule::Exponent)
     {
-	noise::module::Exponent *mod = dynamic_cast<noise::module::Exponent*>(m->getModule());
-	modifier->SetDoubleAttribute("Exponent", mod->GetExponent());
+        noise::module::Exponent *mod = dynamic_cast<noise::module::Exponent*>(m->getModule());
+        modifier->SetDoubleAttribute("Exponent", mod->GetExponent());
     }
     else if(m->getType() == NoiseModifierModule::ScaleBias)
     {
-	noise::module::ScaleBias *mod = dynamic_cast<noise::module::ScaleBias*>(m->getModule());
-	modifier->SetDoubleAttribute("Scale", mod->GetScale());
-	modifier->SetDoubleAttribute("Bias", mod->GetBias());
+        noise::module::ScaleBias *mod = dynamic_cast<noise::module::ScaleBias*>(m->getModule());
+        modifier->SetDoubleAttribute("Scale", mod->GetScale());
+        modifier->SetDoubleAttribute("Bias", mod->GetBias());
     }
     else if(m->getType() == NoiseModifierModule::Terrace)
     {
-	///@TODO Implement terrace
+        ///@TODO Implement terrace
     }
 
-    QList<Arrow*> arrows = m->getArrows();
-    if(arrows.empty())return;
-    Arrow* arrow;
-    TiXmlElement *sources = new TiXmlElement("Sources");
-    modifier->LinkEndChild(sources);
-    foreach(arrow, arrows)
-    {
-	if(arrow->endItem()!=m)continue;
-	std::map<NoiseModule*, int>::iterator it = allModules.find(arrow->startItem());
-	if(it==allModules.end())continue;
-	TiXmlElement *source = new TiXmlElement("Source");
-	int id = it->second;
-	source->SetAttribute("sourceId", id);
-	sources->LinkEndChild(source);
-    }
+    generateLinks(m);
 }
 
 void NoiseXMLGenerator::writeCombiners(bool savePosition)
@@ -300,57 +302,43 @@ void NoiseXMLGenerator::writeCombiners(bool savePosition)
     std::cerr<<__FUNCTION__<<std::endl;
     for(std::map<NoiseCombinerModule*, int>::iterator it = combinerModules.begin(); it!=combinerModules.end(); ++it)
     {
-	NoiseCombinerModule *m = it->first;
-	int id = it->second;
-	TiXmlElement *combiner= new TiXmlElement("Combiner");
-	combiners->LinkEndChild(combiner);
-	combiner->SetAttribute("id", id);
-	combiner->SetAttribute("type", m->getType());
-	if(savePosition)
-	{
-	    combiner->SetAttribute("PosX", m->pos().x());
-	    combiner->SetAttribute("PosY", m->pos().y());
-	}
-	writeCombiner(m, combiner);
+        NoiseCombinerModule *m = it->first;
+        int id = it->second;
+        TiXmlElement *combiner= new TiXmlElement("Combiner");
+        combiners->LinkEndChild(combiner);
+        combiner->SetAttribute("id", id);
+        combiner->SetAttribute("type", m->getType());
+        if(savePosition)
+        {
+            combiner->SetAttribute("PosX", m->pos().x());
+            combiner->SetAttribute("PosY", m->pos().y());
+        }
+        writeCombiner(m, combiner);
     }
 }
 void NoiseXMLGenerator::writeCombiner(NoiseCombinerModule *m, TiXmlElement *combiner)
 {
     std::cerr<<__FUNCTION__<<std::endl;
 
-    QList<Arrow*> arrows = m->getArrows();
-    if(arrows.empty())return;
-    Arrow* arrow;
-    TiXmlElement *sources = new TiXmlElement("Sources");
-    combiner->LinkEndChild(sources);
-    foreach(arrow, arrows)
-    {
-	if(arrow->endItem()!=m)continue;
-	std::map<NoiseModule*, int>::iterator it = allModules.find(arrow->startItem());
-	if(it==allModules.end())continue;
-	TiXmlElement *source = new TiXmlElement("Source");
-	int id = it->second;
-	source->SetAttribute("sourceId", id);
-	sources->LinkEndChild(source);
-    }
+    generateLinks(m);
 }
 void NoiseXMLGenerator::writeSelectors(bool savePosition)
 {
     std::cerr<<__FUNCTION__<<std::endl;
     for(std::map<NoiseSelectorModule*, int>::iterator it = selectorModules.begin(); it!=selectorModules.end(); ++it)
     {
-	NoiseSelectorModule *m = it->first;
-	int id = it->second;
-	TiXmlElement *selector= new TiXmlElement("Selector");
-	selectors->LinkEndChild(selector);
-	selector->SetAttribute("id", id);
-	selector->SetAttribute("type", m->getType());
-	if(savePosition)
-	{
-	    selector->SetAttribute("PosX", m->pos().x());
-	    selector->SetAttribute("PosY", m->pos().y());
-	}
-	writeSelector(m, selector);
+        NoiseSelectorModule *m = it->first;
+        int id = it->second;
+        TiXmlElement *selector= new TiXmlElement("Selector");
+        selectors->LinkEndChild(selector);
+        selector->SetAttribute("id", id);
+        selector->SetAttribute("type", m->getType());
+        if(savePosition)
+        {
+            selector->SetAttribute("PosX", m->pos().x());
+            selector->SetAttribute("PosY", m->pos().y());
+        }
+        writeSelector(m, selector);
     }
 
 }
@@ -359,26 +347,22 @@ void NoiseXMLGenerator::writeSelector(NoiseSelectorModule *m, TiXmlElement *outp
     std::cerr<<__FUNCTION__<<std::endl;
     if(m->getType() == NoiseSelectorModule::Select)
     {
-	noise::module::Select *mod = dynamic_cast<noise::module::Select*>(m->getModule());
-	output->SetDoubleAttribute("LowerBound", mod->GetLowerBound());
-	output->SetDoubleAttribute("UpperBound", mod->GetUpperBound());
-	output->SetDoubleAttribute("EdgeFalloff", mod->GetEdgeFalloff());
-
+        noise::module::Select *mod = dynamic_cast<noise::module::Select*>(m->getModule());
+        output->SetDoubleAttribute("LowerBound", mod->GetLowerBound());
+        output->SetDoubleAttribute("UpperBound", mod->GetUpperBound());
+        output->SetDoubleAttribute("EdgeFalloff", mod->GetEdgeFalloff());
     }
 
-    QList<Arrow*> arrows = m->getArrows();
-    if(arrows.empty())return;
-    Arrow* arrow;
-    TiXmlElement *sources = new TiXmlElement("Sources");
-    output->LinkEndChild(sources);
-    foreach(arrow, arrows)
+    generateLinks(m);
+}
+
+void NoiseXMLGenerator::writeLinks()
+{
+    for(std::map<int, int>::iterator it = links.begin(); it != links.end(); ++it)
     {
-	if(arrow->endItem()!=m)continue;
-	std::map<NoiseModule*, int>::iterator it = allModules.find(arrow->startItem());
-	if(it==allModules.end())continue;
-	TiXmlElement *source = new TiXmlElement("Source");
-	int id = it->second;
-	source->SetAttribute("sourceId", id);
-	sources->LinkEndChild(source);
+        TiXmlElement *xmlLink = new TiXmlElement("Link");
+        xmlLink->SetAttribute("source", it->first);
+        xmlLink->SetAttribute("destination", it->second);
+        xmlLinks->LinkEndChild(xmlLink);
     }
 }

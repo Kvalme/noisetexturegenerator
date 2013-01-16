@@ -53,6 +53,7 @@ Arrow::Arrow(NoiseModule *startItem, NoiseModule *endItem,
     myStartItem = startItem;
     myEndItem = endItem;
     setFlag(QGraphicsItem::ItemIsSelectable, true);
+    setFlag(QGraphicsItem::ItemIsFocusable, true);
     myColor = Qt::black;
     setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 }
@@ -98,14 +99,15 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     QPointF p2;
     QPointF intersectPoint;
     QLineF polyLine;
-    for (int i = 1; i < endPolygon.count(); ++i) {
-    p2 = endPolygon.at(i) + myEndItem->pos();
-    polyLine = QLineF(p1, p2);
-    QLineF::IntersectType intersectType =
-	polyLine.intersect(centerLine, &intersectPoint);
-    if (intersectType == QLineF::BoundedIntersection)
-	break;
-	p1 = p2;
+    for (int i = 1; i < endPolygon.count(); ++i)
+    {
+        p2 = endPolygon.at(i) + myEndItem->pos();
+        polyLine = QLineF(p1, p2);
+        QLineF::IntersectType intersectType =
+        polyLine.intersect(centerLine, &intersectPoint);
+        if (intersectType == QLineF::BoundedIntersection)
+        break;
+        p1 = p2;
     }
 
     setLine(QLineF(intersectPoint, myStartItem->pos()));
@@ -130,5 +132,16 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 	painter->drawLine(myLine);
 	myLine.translate(0,-8.0);
 	painter->drawLine(myLine);
+    }
+}
+
+void Arrow::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->matches(QKeySequence::Delete))
+    {
+        myStartItem->removeArrow(this);
+        myEndItem->removeArrow(this);
+        scene()->removeItem(this);
+        delete this;
     }
 }

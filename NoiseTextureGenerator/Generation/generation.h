@@ -34,7 +34,8 @@ class NoiseXMLGenerator
 	void writeSelectors(bool savePosition = false);
 	void writeSelector(NoiseSelectorModule *m, TiXmlElement *output);
 
-
+    void generateLinks(NoiseModule *m);
+    void writeLinks();
 
 	TiXmlDocument *doc;
 	TiXmlElement *generators;
@@ -42,12 +43,14 @@ class NoiseXMLGenerator
 	TiXmlElement *modifiers;
 	TiXmlElement *combiners;
 	TiXmlElement *selectors;
+    TiXmlElement *xmlLinks;
 	std::map<NoiseGeneratorModule*, int> generatorModules;
 	std::map<NoiseOutputModule*, int> outputModules;
 	std::map<NoiseModifierModule*, int> modifierModules;
 	std::map<NoiseCombinerModule*, int> combinerModules;
 	std::map<NoiseSelectorModule*, int> selectorModules;
 	std::map<NoiseModule*, int> allModules;
+    std::multimap<int, int> links;
 
 };
 

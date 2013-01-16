@@ -89,12 +89,20 @@ QPixmap NoiseModule::image() const
 
     return pixmap;
 }
-
 void NoiseModule::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     scene()->clearSelection();
     setSelected(true);
-    myContextMenu->exec(event->screenPos());
+    if (myContextMenu)
+    {
+        QAction *act = myContextMenu->exec(event->screenPos());
+        if(act->text() == "Delete")
+        {
+            removeArrows();
+            scene()->removeItem(this);
+            delete this;
+        }
+    }
 }
 
 QVariant NoiseModule::itemChange(GraphicsItemChange change,

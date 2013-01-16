@@ -12,6 +12,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
+    noiseutils.cpp \
     noisemodulescene.cpp \
     noisemodule.cpp \
     arrow.cpp \
@@ -53,7 +54,8 @@ SOURCES += main.cpp\
     NoiseTransformer/transformerrotatepoint.cpp \
     NoiseTransformer/transformerscalepoint.cpp \
     NoiseTransformer/transformertranslatepoint.cpp \
-    NoiseTransformer/transformerturbulence.cpp
+    NoiseTransformer/transformerturbulence.cpp \
+    GradientEditor/gradienteditor.cpp
 
 HEADERS  += mainwindow.h \
     noisemodulescene.h \
@@ -95,7 +97,8 @@ HEADERS  += mainwindow.h \
     NoiseTransformer/transformerrotatepoint.h \
     NoiseTransformer/transformerscalepoint.h \
     NoiseTransformer/transformertranslatepoint.h \
-    NoiseTransformer/transformerturbulence.h
+    NoiseTransformer/transformerturbulence.h \
+    GradientEditor/gradienteditor.h
 
 FORMS    += mainwindow.ui \
     NoiseGenerators/billowoptions.ui \
@@ -123,11 +126,12 @@ FORMS    += mainwindow.ui \
     NoiseTransformer/transformerrotatepoint.ui \
     NoiseTransformer/transformerscalepoint.ui \
     NoiseTransformer/transformertranslatepoint.ui \
-    NoiseTransformer/transformerturbulence.ui
+    NoiseTransformer/transformerturbulence.ui \
+    GradientEditor/gradienteditor.ui
 
 unix|win32: LIBS += -lnoise
 
-INCLUDEPATH += /usr/local/include/noise
+INCLUDEPATH += /usr/include/libnoise
 
 RESOURCES += \
     base.qrc

@@ -3,6 +3,7 @@
 
 #include "tinyXml/tinyxml.h"
 #include <map>
+#include <vector>
 
 #include "noise.h"
 #include "noiseutils.h"
@@ -16,9 +17,18 @@ public:
     enum CombinerType { Add, Max, Min, Multiply, Power};
     enum SelectorType { Blend, Select};
 
+    struct GradientPoint
+    {
+        double pos;
+        unsigned char r;
+        unsigned char g;
+        unsigned char b;
+        unsigned char a;
+    };
+
     NoiseXMLBuilder();
     void load(TiXmlDocument *doc);
-    noise::utils::Image* getImage();
+    noise::utils::Image* getImage(std::vector<GradientPoint> *gradient);
 
 private:
 
@@ -60,12 +70,14 @@ private:
     noise::utils::NoiseMapBuilder* readOutputSphere(TiXmlElement *src);
 
 
+    void readLinks(TiXmlElement *src);
 
-    void connectOutputSources(noise::utils::NoiseMapBuilder *mod, TiXmlElement *src);
-    void connectSources(noise::module::Module *mod, TiXmlElement *src);
+    void connectOutputSources(noise::utils::NoiseMapBuilder *mod, int dstId);
+    void connectSources(noise::module::Module *mod, int dstId);
 
     std::map<int, noise::module::Module*> modules;
     std::map<int, noise::utils::NoiseMapBuilder*> mapBuilders;
+    std::map<noise::module::Module*, int> moduleIndexes;
 
 
 };

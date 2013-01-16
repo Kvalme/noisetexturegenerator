@@ -2,6 +2,7 @@
 #define NOISEMODULESCENE_H
 
 #include <QGraphicsScene>
+#include <QAction>
 #include "noisemodule.h"
 
 class NoiseModuleScene : public QGraphicsScene
@@ -39,6 +40,7 @@ private:
     QColor myTextColor;
     QColor myItemColor;
     QColor myLineColor;
+    QAction *deleteAction;
 
 };
 

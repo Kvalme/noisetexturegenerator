@@ -75,6 +75,7 @@
  protected:
      void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 		QWidget *widget = 0);
+     void keyReleaseEvent ( QKeyEvent *event );
 
  private:
      NoiseModule *myStartItem;

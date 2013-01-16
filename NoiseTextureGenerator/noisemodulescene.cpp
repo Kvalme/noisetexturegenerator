@@ -6,6 +6,7 @@
 #include "noisemodifier.h"
 #include "noisecombiner.h"
 #include "noiseselector.h"
+#include <QMenu>
 
 NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     QGraphicsScene(parent)
@@ -17,6 +18,8 @@ NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     myTextColor = Qt::black;
     myLineColor = Qt::black;
 
+    myItemMenu = new QMenu;
+    deleteAction = myItemMenu->addAction(QIcon(), "Delete");
 }
 
 NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type)
