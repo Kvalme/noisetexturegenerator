@@ -15,10 +15,12 @@ class NoiseXMLGenerator
 {
     public:
     TiXmlDocument* generateExport(const std::set<NoiseModule*>&, const QVector<GradientEditor::GradientPoint> &gradientPoints);
-	TiXmlDocument* generateSave(const std::set<NoiseModule*>&);
+    TiXmlDocument* generateSave(const std::set<NoiseModule*>&, const QVector<GradientEditor::GradientPoint> &gradientPoints);
 
     private:
-	void prepareModules(const std::set<NoiseModule*>&);
+    TiXmlDocument* generate(const std::set<NoiseModule*>&, const QVector<GradientEditor::GradientPoint> &gradientPoints, TiXmlElement *root, bool isSave);
+
+    void prepareModules(const std::set<NoiseModule*>&);
 
 	void writeGenerators(bool savePosition = false);
 	void writeGenerator(NoiseGeneratorModule *m, TiXmlElement *generator);

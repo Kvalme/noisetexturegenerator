@@ -126,8 +126,7 @@ FORMS    += mainwindow.ui \
     NoiseTransformer/transformerrotatepoint.ui \
     NoiseTransformer/transformerscalepoint.ui \
     NoiseTransformer/transformertranslatepoint.ui \
-    NoiseTransformer/transformerturbulence.ui \
-    GradientEditor/gradienteditor.ui
+    NoiseTransformer/transformerturbulence.ui
 
 unix|win32: LIBS += -lnoise
 

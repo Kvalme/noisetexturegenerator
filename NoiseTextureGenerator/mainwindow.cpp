@@ -56,7 +56,6 @@ MainWindow::MainWindow(QWidget *parent) :
     blockCurrentIndexChange = false;
     opt = 0;
     previewRenderer = new PreviewRenderer(this);
-    previewRenderer->show();
 
     foreach (QAction *action, ui->menu_File->actions())
     {
@@ -289,6 +288,8 @@ void MainWindow::on_generateImage_released()
     }
 
     TiXmlDocument *doc = generator.generateExport(modules, ui->gradientEditor->getGradientPoints());
+
+    previewRenderer->show();
     previewRenderer->showTexture(doc);
 }
 
@@ -368,7 +369,7 @@ void MainWindow::exportSceneData(const char *fname)
 	NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
 	modules.insert(mod);
     }
-    TiXmlDocument *doc = generator.generateSave(modules);
+    TiXmlDocument *doc = generator.generateSave(modules, ui->gradientEditor->getGradientPoints());
     doc->SaveFile(fname);
 }
 

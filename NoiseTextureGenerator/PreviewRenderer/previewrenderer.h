@@ -5,10 +5,32 @@
 #include "tinyXml/tinyxml.h"
 #include "Generation/noisexmlbuilder.h"
 #include "QLinearGradient"
+#include "QProgressBar"
 
 namespace Ui {
     class PreviewRenderer;
 }
+
+class ImageRenderer : public QObject
+{
+    Q_OBJECT
+public:
+    ImageRenderer(NoiseXMLBuilder *xmlBuilder) : builder(xmlBuilder), QObject(0){};
+    static void onLineReady(int row);
+    void lineReadySignalSender(int row);
+
+public slots:
+    void renderImage();
+
+signals:
+    void imageRendered(noise::utils::Image*);
+    void lineReady(int);
+    void finished();
+
+private:
+    static ImageRenderer *current;
+    NoiseXMLBuilder *builder;
+};
 
 class PreviewRenderer : public QMainWindow
 {
@@ -23,9 +45,9 @@ protected:
     void changeEvent(QEvent *e);
 
 private slots:
-    void on_refreshImage_released();
-
     void on_action_Save_triggered();
+    void imageRendered(noise::utils::Image *image);
+    void lineReady(int);
 
 private:
     void drawImage();
@@ -34,6 +56,9 @@ private:
     int textureWidth;
     int textureHeight;
     NoiseXMLBuilder *xmlBuilder;
+
+    bool isWorkerStarted;
+    QProgressBar progressBar;
 };
 
 #endif // PREVIEWRENDERER_H

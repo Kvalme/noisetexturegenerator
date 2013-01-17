@@ -46,6 +46,28 @@ TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &m
     doc = new TiXmlDocument();
     TiXmlElement *root = new TiXmlElement("NoiseMap");
     doc->LinkEndChild(root);
+
+    generate(modules, gradientPoints, root, false);
+
+    return doc;
+}
+TiXmlDocument* NoiseXMLGenerator::generateSave(const std::set<NoiseModule*> &modules, const QVector<GradientEditor::GradientPoint> &gradientPoints)
+{
+    doc = new TiXmlDocument();
+    TiXmlElement *root = new TiXmlElement("NoiseTextureGeneratorProject");
+    doc->LinkEndChild(root);
+
+    generate(modules, gradientPoints, root, true);
+
+    return doc;
+}
+
+TiXmlDocument* NoiseXMLGenerator::generate(
+        const std::set<NoiseModule*> &modules,
+        const QVector<GradientEditor::GradientPoint> &gradientPoints,
+        TiXmlElement *root,
+        bool isSave)
+{
     generators = new TiXmlElement("Generators");
     outputs = new TiXmlElement("Outputs");
     modifiers = new TiXmlElement("Modifiers");
@@ -64,48 +86,16 @@ TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &m
 
     prepareModules(modules);
 
-    writeGenerators();
-    writeModifiers();
-    writeCombiners();
-    writeSelectors();
-    writeOutputs();
+    writeGenerators(isSave);
+    writeModifiers(isSave);
+    writeCombiners(isSave);
+    writeSelectors(isSave);
+    writeOutputs(isSave);
 
     writeLinks();
 
     writeGradientPoints(gradientPoints);
 
-    return doc;
-}
-TiXmlDocument* NoiseXMLGenerator::generateSave(const std::set<NoiseModule*> &modules)
-{
-    doc = new TiXmlDocument();
-    TiXmlElement *root = new TiXmlElement("NoiseTextureGeneratorProject");
-    doc->LinkEndChild(root);
-    generators = new TiXmlElement("Generators");
-    outputs = new TiXmlElement("Outputs");
-    modifiers = new TiXmlElement("Modifiers");
-    combiners = new TiXmlElement("Combiners");
-    selectors = new TiXmlElement("Selectors");
-    xmlLinks = new TiXmlElement("Links");
-
-    root->LinkEndChild(generators);
-    root->LinkEndChild(outputs);
-    root->LinkEndChild(modifiers);
-    root->LinkEndChild(combiners);
-    root->LinkEndChild(selectors);
-    root->LinkEndChild(xmlLinks);
-
-    prepareModules(modules);
-
-    writeGenerators(true);
-    writeModifiers(true);
-    writeCombiners(true);
-    writeSelectors();
-    writeOutputs(true);
-
-    writeLinks();
-
-    return doc;
 }
 
 void NoiseXMLGenerator::writeGenerators(bool savePosition)
@@ -376,7 +366,9 @@ void NoiseXMLGenerator::writeGradientPoints(const QVector<GradientEditor::Gradie
     foreach (GradientEditor::GradientPoint point, gradientPoints)
     {
         TiXmlElement *xmlPoint = new TiXmlElement("Point");
-        xmlPoint->SetAttribute("pos", point.pos);
+        char buf[20];
+        sprintf(buf, "%f", point.pos);
+        xmlPoint->SetAttribute("pos", buf);
         xmlPoint->SetAttribute("r", point.color.red());
         xmlPoint->SetAttribute("g", point.color.green());
         xmlPoint->SetAttribute("b", point.color.blue());

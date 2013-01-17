@@ -13,14 +13,16 @@ void NoiseXMLBuilder::load(TiXmlDocument *doc)
     TiXmlElement *combiners = root->FirstChildElement("Combiners");
     TiXmlElement *selectors = root->FirstChildElement("Selectors");
     TiXmlElement *xmlLinks = root->FirstChildElement("Links");
+    TiXmlElement *xmlGradient = root->FirstChildElement("Gradient");
 
     readGenerators(generators);
     readCombiners(combiners);
     readModifiers(modifiers);
     readSelectors(selectors);
     readOutputs(outputs);
-
     readLinks(xmlLinks);
+
+    readGradient(xmlGradient);
 }
 void NoiseXMLBuilder::readGenerators(TiXmlElement *src)
 {
@@ -272,7 +274,13 @@ void NoiseXMLBuilder::connectSources(noise::module::Module *mod, int dstId)
     mod->SetSourceModule(index, *module);
 }
 
-noise::utils::Image* NoiseXMLBuilder::getImage(std::vector<GradientPoint> *gradient)
+void NoiseXMLBuilder::setLineReadyCallback(noise::utils::NoiseMapCallback callback)
+{
+    noise::utils::NoiseMapBuilder *builder = mapBuilders.begin()->second;
+    builder->SetCallback(callback);
+}
+
+noise::utils::Image* NoiseXMLBuilder::getImage()
 {
     utils::NoiseMap noiseMap;
     noise::utils::NoiseMapBuilder *builder = mapBuilders.begin()->second;
@@ -283,18 +291,29 @@ noise::utils::Image* NoiseXMLBuilder::getImage(std::vector<GradientPoint> *gradi
     utils::RendererImage renderer;
     renderer.SetSourceNoiseMap(noiseMap);
     renderer.SetDestImage(*img);
-    if(gradient)
+    if(!gradient.empty())
     {
         renderer.ClearGradient();
-        for(std::vector<GradientPoint>::iterator it = gradient->begin(); it != gradient->end(); ++it)
+        for(std::vector<GradientPoint>::iterator it = gradient.begin(); it != gradient.end(); ++it)
         {
 
             noise::utils::Color color(it->r, it->g, it->b, it->a);
             renderer.AddGradientPoint(it->pos, color);
         }
     }
+    else
+    {
+//        renderer.BuildGrayscaleGradient();
+    }
+
     renderer.Render();
     return img;
+}
+
+int NoiseXMLBuilder::getLineCount()
+{
+    noise::utils::NoiseMapBuilder *builder = mapBuilders.begin()->second;
+    return builder->GetDestHeight();
 }
 
 noise::module::Module* NoiseXMLBuilder::readModifierAbs(TiXmlElement *src)
@@ -403,3 +422,21 @@ void NoiseXMLBuilder::readLinks(TiXmlElement *src)
         }
     }
 }
+
+void NoiseXMLBuilder::readGradient(TiXmlElement *src)
+{
+    gradient.clear();
+    for(TiXmlElement *point = src->FirstChildElement("Point"); point; point = point->NextSiblingElement("Point"))
+    {
+        float pos = (float)atof(point->Attribute("pos"));
+        int r = atoi(point->Attribute("r"));
+        int g = atoi(point->Attribute("g"));
+        int b = atoi(point->Attribute("b"));
+        int a = atoi(point->Attribute("a"));
+
+        GradientPoint p = {pos, r, g, b, a};
+
+        gradient.push_back(p);
+    }
+}
+

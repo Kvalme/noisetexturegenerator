@@ -17,18 +17,12 @@ public:
     enum CombinerType { Add, Max, Min, Multiply, Power};
     enum SelectorType { Blend, Select};
 
-    struct GradientPoint
-    {
-        double pos;
-        unsigned char r;
-        unsigned char g;
-        unsigned char b;
-        unsigned char a;
-    };
-
     NoiseXMLBuilder();
     void load(TiXmlDocument *doc);
-    noise::utils::Image* getImage(std::vector<GradientPoint> *gradient);
+    noise::utils::Image* getImage();
+    int getLineCount();
+
+    void setLineReadyCallback(noise::utils::NoiseMapCallback callback);
 
 private:
 
@@ -37,6 +31,7 @@ private:
     void readModifiers(TiXmlElement *src);
     void readCombiners(TiXmlElement *src);
     void readSelectors(TiXmlElement *src);
+    void readGradient(TiXmlElement *src);
 
 
     noise::module::Module* readGeneratorBillow(TiXmlElement *src);
@@ -79,7 +74,15 @@ private:
     std::map<int, noise::utils::NoiseMapBuilder*> mapBuilders;
     std::map<noise::module::Module*, int> moduleIndexes;
 
-
+    struct GradientPoint
+    {
+        double pos;
+        unsigned char r;
+        unsigned char g;
+        unsigned char b;
+        unsigned char a;
+    };
+    std::vector<GradientPoint> gradient;
 };
 
 #endif // NOISEXMLBUILDER_H
