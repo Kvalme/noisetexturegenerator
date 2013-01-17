@@ -65,7 +65,7 @@ void PreviewRenderer::imageRendered(noise::utils::Image *img)
             painter.drawPoint(x, y);
             c++;
         }
-        lineReady(h+y);
+        if((h+y)%10 == 0)lineReady(h+y);
     }
     ui->previewPixmap->setPixmap(pix);
     isWorkerStarted = false;
@@ -114,7 +114,7 @@ void PreviewRenderer::lineReady(int value)
 ImageRenderer *ImageRenderer::current = 0;
 void ImageRenderer::onLineReady(int row)
 {
-    ImageRenderer::current->lineReadySignalSender(row);
+    if(row%10 == 0)ImageRenderer::current->lineReadySignalSender(row);
 }
 void ImageRenderer::lineReadySignalSender(int row)
 {
