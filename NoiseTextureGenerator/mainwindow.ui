@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1087</width>
-    <height>521</height>
+    <height>558</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -88,6 +88,19 @@
       </item>
      </layout>
     </item>
+    <item>
+     <widget class="GradientEditor" name="gradientEditor">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>39</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -100,6 +113,9 @@
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
+    <property name="tearOffEnabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>&amp;File</string>
     </property>
@@ -233,6 +249,13 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>GradientEditor</class>
+   <extends>QLabel</extends>
+   <header>GradientEditor/gradienteditor.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

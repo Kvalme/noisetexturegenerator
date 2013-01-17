@@ -3,167 +3,206 @@
 #include "QPainter"
 #include <iostream>
 #include "QColorDialog"
+#include <QMouseEvent>
 
 GradientEditor::GradientEditor(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::GradientEditor)
+    QLabel(parent)
 {
-    ui->setupUi(this);
-    gradient = new QLinearGradient(QPointF(0, 0), QPointF(ui->gradientPreview->width(), 0/*ui->gradientPreview->height()*/));
-    gradient->setColorAt(0, QColor(0, 0, 0));
-    gradient->setColorAt(1, QColor(255, 255, 255));
-    gradientPoints.insert(0, QColor(0, 0, 0));
-    gradientPoints.insert(1, QColor(255, 255, 255));
+    gradient = 0;
 
-    QList<QVariant> l;
-    l.push_back(-1.0);
-    l.push_back(0);
-    l.push_back(0);
-    l.push_back(0);
+    gradientPoints.push_back(GradientPoint(-1.0, QColor(0, 0, 0)));
+    gradientPoints.push_back(GradientPoint(1.0, QColor(255, 255, 255)));
 
-    ui->gradientPoints->addItem(QString("%1").arg(-1.0), QVariant(l));
+    selectedGradientPoint = -1;
+    menuPoint = -1;
 
-    l.clear();
-    l.push_back(1.0);
-    l.push_back(255);
-    l.push_back(255);
-    l.push_back(255);
-    ui->gradientPoints->addItem(QString("%1").arg(1.0), QVariant(l));
-    rebuildGradient();
+    pointContextMenu = new QMenu("Point", this);
+    pointContextMenu->addAction(QIcon::fromTheme("edit-delete"), tr("Remove"), this, SLOT(removePoint()));
+    pointContextMenu->addAction(tr("Change color"), this, SLOT(changePointColor()));
+
+    mainContextMenu = new QMenu("Gradient", this);
+    mainContextMenu->addAction(QIcon::fromTheme("edit-delete"), tr("Clear"), this, SLOT(clearGradient()));
+    QMenu *mainSubMenu = mainContextMenu->addMenu(QIcon::fromTheme("folder-open"), tr("Load preset"));
+    mainSubMenu->addAction(tr("Terrain (libnoise)"), this, SLOT(loadTerrainLibNoiseGradient()));
+
 }
 
 GradientEditor::~GradientEditor()
 {
-    delete ui;
 }
 
-void GradientEditor::changeEvent(QEvent *e)
+void GradientEditor::paintEvent ( QPaintEvent *event )
 {
-    QWidget::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
+    rebuildGradient();
+    QLabel::paintEvent(event);
+}
+
+void GradientEditor::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if(event->button() != Qt::LeftButton)
+    {
+        QLabel::mouseDoubleClickEvent(event);
+        return;
+    }
+
+    QPoint pos = event->pos();
+    float xPos = ((float)pos.x() / (float)width()) * 2.0 - 1.0;
+    gradientPoints.push_back(GradientPoint(xPos, QColor(255, 255, 255)));
+}
+
+int GradientEditor::findGradientPoint(float pos)
+{
+    float workZone = (float)arrowSize / (float)width();
+
+    for(int a = 0; a<gradientPoints.size(); ++a)
+    {
+        GradientPoint &point = gradientPoints[a];
+        if (pos > point.pos - workZone && pos < point.pos + workZone) return a;
+    }
+    return -1;
+}
+
+void GradientEditor::mousePressEvent(QMouseEvent *event)
+{
+    QPoint pos = event->pos();
+    float xPos = ((float)pos.x() / (float)width()) * 2.0 - 1.0;
+
+    int point = findGradientPoint(xPos);
+
+    if(event->button() == Qt::LeftButton && point != -1)
+    {
+        GradientPoint &gp = gradientPoints[point];
+        if (gp.pos == -1.0 || gp.pos == 1.0) return;
+        selectedGradientPoint = point;
+    }
+    else
+    {
+        QLabel::mousePressEvent(event);
     }
 }
-void GradientEditor::showEvent ( QShowEvent * event )
-{
-    QWidget::showEvent(event);
-    ui->gradientPreview->setMinimumWidth(ui->addGradientPoint->width());
-    ui->gradientPreview->setFixedWidth(ui->addGradientPoint->width());
 
-    gradient->setFinalStop(ui->gradientPreview->width(), 0);
-    QPixmap pix(ui->gradientPreview->width(), ui->gradientPreview->height());
-    pix.fill(Qt::black);
-    QPainter painter(&pix);
-    QBrush brush(*gradient);
-    painter.fillRect(0, 0, ui->gradientPreview->width(), ui->gradientPreview->height(), brush);
-    ui->gradientPreview->setPixmap(pix);
+void GradientEditor::contextMenuEvent(QContextMenuEvent *event)
+{
+    QPoint pos = event->pos();
+    float xPos = ((float)pos.x() / (float)width()) * 2.0 - 1.0;
+
+    int point = findGradientPoint(xPos);
+
+    if(point != -1)
+    {
+        menuPoint = point;
+        pointContextMenu->exec(event->globalPos());
+        menuPoint = -1;
+    }
+    else
+    {
+        QAction *action = mainContextMenu->exec(event->globalPos());
+    }
+
 }
 
-void GradientEditor::on_gradientPoints_currentIndexChanged(int index)
+void GradientEditor::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(index<0)return;
-    QVariant data = ui->gradientPoints->itemData(index);
-    float pos = data.toList().at(0).toFloat();
-    int r = data.toList().at(1).toInt();
-    int g = data.toList().at(2).toInt();
-    int b = data.toList().at(3).toInt();
-
-    ui->gradientPointPosition->setValue(pos);
-    rebuildGradient();
+    selectedGradientPoint = -1;
 }
 
-void GradientEditor::on_deleteGradientPoint_released()
+void GradientEditor::mouseMoveEvent(QMouseEvent *ev)
 {
-    int index = ui->gradientPoints->currentIndex();
-
-    ui->gradientPoints->removeItem(index);
-    rebuildGradient();
-}
-
-void GradientEditor::on_gradientColor_released()
-{
-    QVariant data = ui->gradientPoints->itemData(ui->gradientPoints->currentIndex());
-    QList<QVariant> l = data.toList();
-    QList<QVariant> newList;
-
-    QColor newColor = QColorDialog::getColor(QColor(l.at(1).toInt(), l.at(2).toInt(), l.at(3).toInt()));
-
-    newList.push_back(l.at(0).toFloat());
-    newList.push_back(newColor.red());
-    newList.push_back(newColor.green());
-    newList.push_back(newColor.blue());
-    ui->gradientPoints->setItemData(ui->gradientPoints->currentIndex(), newList);
-    rebuildGradient();
-}
-
-void GradientEditor::on_addGradientPoint_released()
-{
-    QList<QVariant> newList;
-    newList.push_back(0.0);
-    newList.push_back(255);
-    newList.push_back(255);
-    newList.push_back(255);
-    ui->gradientPoints->insertItem(ui->gradientPoints->count(),"0.0", newList);
-    ui->gradientPoints->setCurrentIndex(ui->gradientPoints->count()-1);
-    rebuildGradient();
-}
-
-void GradientEditor::on_gradientPointPosition_valueChanged(double arg1)
-{
-    QVariant data = ui->gradientPoints->itemData(ui->gradientPoints->currentIndex());
-    QList<QVariant> l = data.toList();
-    QList<QVariant> newList;
-
-    newList.push_back(arg1);
-    newList.push_back(l.at(1));
-    newList.push_back(l.at(2));
-    newList.push_back(l.at(3));
-    ui->gradientPoints->setItemData(ui->gradientPoints->currentIndex(), newList);
-    ui->gradientPoints->setItemText(ui->gradientPoints->currentIndex(), QString("%1").arg(arg1));
-
-    rebuildGradient();
+    if (selectedGradientPoint != -1)
+    {
+        QPoint pos = ev->pos();
+        float xPos = ((float)pos.x() / (float)width()) * 2.0 - 1.0;
+        gradientPoints[selectedGradientPoint].pos = xPos;
+    }
+    else
+    {
+        QLabel::mouseMoveEvent(ev);
+    }
 }
 
 void GradientEditor::rebuildGradient()
 {
-    delete gradient;
-    gradient = new QLinearGradient(QPointF(0, 0), QPointF(ui->gradientPreview->width(), 0));
-    gradientPoints.clear();
-    for(int a=0; a<ui->gradientPoints->count(); ++a)
-    {
-        QVariant data = ui->gradientPoints->itemData(a);
-        float pos = data.toList().at(0).toFloat();
-        int r = data.toList().at(1).toFloat();
-        int g = data.toList().at(2).toFloat();
-        int b = data.toList().at(3).toFloat();
+    if(gradient)delete gradient;
+    gradient = new QLinearGradient(QPointF(0, 0), QPointF(width(), 0));
 
-        gradientPoints.insert(pos, QColor(r, g, b));
-
-        gradient->setColorAt((pos+1.0)/2.0, QColor(r, g, b));
-    }
-    QPixmap pix(ui->gradientPreview->width(), ui->gradientPreview->height());
-    pix.fill(Qt::black);
+    QPixmap pix(width(), height());
+    pix.fill(Qt::transparent);
     QPainter painter(&pix);
-    QBrush brush(*gradient);
-    painter.fillRect(0, 0, ui->gradientPreview->width(), ui->gradientPreview->height(), brush);
-    ui->gradientPreview->setPixmap(pix);}
 
-void GradientEditor::on_pushButton_released()
+    int xs = 0;
+    int ys = 0;
+    int xe = width();
+    int ye = height();
+    arrowSize = height()/3;
+
+    foreach (GradientPoint p, gradientPoints)
+    {
+
+        float pos = (p.pos + 1.0)/2.0;
+        int r = p.color.red();
+        int g = p.color.green();
+        int b = p.color.blue();
+
+        gradient->setColorAt(pos, QColor(r, g, b));
+
+        int xc = (xe - xs) * pos;
+
+        painter.setPen(QColor(r, g, b));
+        painter.setBrush(QBrush(QColor(r, g, b), Qt::SolidPattern));
+
+        QPoint points[3];
+        points[0] = QPoint(xc, ys + arrowSize);
+        points[1] = QPoint(xc + arrowSize/2, ys);
+        points[2] = QPoint(xc - arrowSize/2, ys);
+
+        painter.drawPolygon(points, 3);
+
+        points[0] = QPoint(xc, ye - arrowSize);
+        points[1] = QPoint(xc + arrowSize/2, ye);
+        points[2] = QPoint(xc - arrowSize/2, ye);
+
+        painter.drawPolygon(points, 3);
+    }
+
+    QBrush brush(*gradient);
+    painter.fillRect(0, height()/3, width(), height()/3, brush);
+
+    setPixmap(pix);
+
+}
+
+void GradientEditor::removePoint()
 {
-    ui->gradientPoints->clear();
+    if (menuPoint == -1) return;
+    GradientPoint &point = gradientPoints[menuPoint];
+    if(point.pos == -1.0 || point.pos == 1.0)return;
+
+    gradientPoints.remove(menuPoint);
+}
+
+void GradientEditor::changePointColor()
+{
+    if (menuPoint == -1) return;
+    GradientPoint &point = gradientPoints[menuPoint];
+
+    point.color = QColorDialog::getColor(point.color);
+}
+
+void GradientEditor::clearGradient()
+{
+    gradientPoints.clear();
+    gradientPoints.push_back(GradientPoint(-1.0, QColor(0, 0, 0)));
+    gradientPoints.push_back(GradientPoint(1.0, QColor(255, 255, 255)));
+}
+
+
+void GradientEditor::loadTerrainLibNoiseGradient()
+{
+    gradientPoints.clear();
 
 #define AddGradientPoint(pos, r, g, b) \
     { \
-        QList<QVariant> newList; \
-        newList.push_back(pos); \
-        newList.push_back(r); \
-        newList.push_back(g); \
-        newList.push_back(b); \
-        ui->gradientPoints->insertItem(ui->gradientPoints->count(),QString("%1").arg(pos), newList); \
+        gradientPoints.push_back(GradientPoint(pos, QColor(r, g, b))); \
     }
 
 

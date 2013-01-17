@@ -4,6 +4,7 @@
 #include "noisemodulescene.h"
 #include "noisemodule.h"
 #include "noiseoutput.h"
+#include "GradientEditor/gradienteditor.h"
 #include <map>
 
 #include "noise.h"
@@ -19,7 +20,7 @@ public:
     enum SelectorType { Blend, Select};
 
     NTGPLoader();
-    void load(TiXmlDocument *doc, NoiseModuleScene *scene);
+    void load(TiXmlDocument *doc, NoiseModuleScene *scene, QVector<GradientEditor::GradientPoint> *gradientPoints);
 
 private:
 
@@ -28,6 +29,7 @@ private:
     void readModifiers(TiXmlElement *src, NoiseModuleScene *scene);
     void readCombiners(TiXmlElement *src, NoiseModuleScene *scene);
     void readSelectors(TiXmlElement *src, NoiseModuleScene *scene);
+    void readGradient(TiXmlElement *src, QVector<GradientEditor::GradientPoint> *gradientPoints);
 
 
     noise::module::Module* readGeneratorBillow(TiXmlElement *src);

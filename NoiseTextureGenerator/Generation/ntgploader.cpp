@@ -9,7 +9,7 @@
 NTGPLoader::NTGPLoader()
 {
 }
-void NTGPLoader::load(TiXmlDocument *doc, NoiseModuleScene *scene)
+void NTGPLoader::load(TiXmlDocument *doc, NoiseModuleScene *scene, QVector<GradientEditor::GradientPoint> *gradientPoints)
 {
     TiXmlElement *root = doc->RootElement();
     TiXmlElement *generators = root->FirstChildElement("Generators");
@@ -18,14 +18,31 @@ void NTGPLoader::load(TiXmlDocument *doc, NoiseModuleScene *scene)
     TiXmlElement *combiners = root->FirstChildElement("Combiners");
     TiXmlElement *selectors = root->FirstChildElement("Selectors");
     TiXmlElement *xmlLinks = root->FirstChildElement("Links");
+    TiXmlElement *gradient = root->FirstChildElement("Gradient");
 
     if(generators)readGenerators(generators, scene);
     if(outputs)readOutputs(outputs, scene);
     if(modifiers)readModifiers(modifiers, scene);
     if(combiners)readCombiners(combiners, scene);
     if(selectors)readSelectors(selectors, scene);
-
     if(xmlLinks)readLinks(xmlLinks, scene);
+
+    if(gradient)readGradient(gradient, gradientPoints);
+}
+
+void NTGPLoader::readGradient(TiXmlElement *src, QVector<GradientEditor::GradientPoint> *gradientPoints)
+{
+    gradientPoints->clear();
+    for(TiXmlElement *point = src->FirstChildElement("Point"); point; point = point->NextSiblingElement("Point"))
+    {
+        float pos = (float)atof(point->Attribute("pos"));
+        int r = atoi(point->Attribute("r"));
+        int g = atoi(point->Attribute("g"));
+        int b = atoi(point->Attribute("b"));
+        int a = atoi(point->Attribute("a"));
+
+        gradientPoints->push_back(GradientEditor::GradientPoint(pos, QColor(r, g, b, a)));
+    }
 }
 
 void NTGPLoader::readGenerators(TiXmlElement *src, NoiseModuleScene *scene)

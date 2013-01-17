@@ -9,11 +9,12 @@
 #include "noiseselector.h"
 #include <set>
 #include <map>
+#include "GradientEditor/gradienteditor.h"
 
 class NoiseXMLGenerator
 {
     public:
-	TiXmlDocument* generateExport(const std::set<NoiseModule*>&);
+    TiXmlDocument* generateExport(const std::set<NoiseModule*>&, const QVector<GradientEditor::GradientPoint> &gradientPoints);
 	TiXmlDocument* generateSave(const std::set<NoiseModule*>&);
 
     private:
@@ -37,6 +38,8 @@ class NoiseXMLGenerator
     void generateLinks(NoiseModule *m);
     void writeLinks();
 
+    void writeGradientPoints(const QVector<GradientEditor::GradientPoint> &gradientPoints);
+
 	TiXmlDocument *doc;
 	TiXmlElement *generators;
 	TiXmlElement *outputs;
@@ -44,6 +47,8 @@ class NoiseXMLGenerator
 	TiXmlElement *combiners;
 	TiXmlElement *selectors;
     TiXmlElement *xmlLinks;
+    TiXmlElement *gradient;
+
 	std::map<NoiseGeneratorModule*, int> generatorModules;
 	std::map<NoiseOutputModule*, int> outputModules;
 	std::map<NoiseModifierModule*, int> modifierModules;

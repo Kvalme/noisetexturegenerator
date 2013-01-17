@@ -41,7 +41,7 @@ void NoiseXMLGenerator::prepareModules(const std::set<NoiseModule*> &modules)
     }
 }
 
-TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &modules)
+TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &modules, const QVector<GradientEditor::GradientPoint> &gradientPoints)
 {
     doc = new TiXmlDocument();
     TiXmlElement *root = new TiXmlElement("NoiseMap");
@@ -52,6 +52,7 @@ TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &m
     combiners = new TiXmlElement("Combiners");
     selectors = new TiXmlElement("Selectors");
     xmlLinks = new TiXmlElement("Links");
+    gradient = new TiXmlElement("Gradient");
 
     root->LinkEndChild(generators);
     root->LinkEndChild(outputs);
@@ -59,6 +60,7 @@ TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &m
     root->LinkEndChild(combiners);
     root->LinkEndChild(selectors);
     root->LinkEndChild(xmlLinks);
+    root->LinkEndChild(gradient);
 
     prepareModules(modules);
 
@@ -69,6 +71,8 @@ TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &m
     writeOutputs();
 
     writeLinks();
+
+    writeGradientPoints(gradientPoints);
 
     return doc;
 }
@@ -364,5 +368,20 @@ void NoiseXMLGenerator::writeLinks()
         xmlLink->SetAttribute("source", it->first);
         xmlLink->SetAttribute("destination", it->second);
         xmlLinks->LinkEndChild(xmlLink);
+    }
+}
+
+void NoiseXMLGenerator::writeGradientPoints(const QVector<GradientEditor::GradientPoint> &gradientPoints)
+{
+    foreach (GradientEditor::GradientPoint point, gradientPoints)
+    {
+        TiXmlElement *xmlPoint = new TiXmlElement("Point");
+        xmlPoint->SetAttribute("pos", point.pos);
+        xmlPoint->SetAttribute("r", point.color.red());
+        xmlPoint->SetAttribute("g", point.color.green());
+        xmlPoint->SetAttribute("b", point.color.blue());
+        xmlPoint->SetAttribute("a", 255);
+
+        gradient->LinkEndChild(xmlPoint);
     }
 }

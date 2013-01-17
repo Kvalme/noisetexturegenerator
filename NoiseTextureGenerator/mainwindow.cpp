@@ -57,6 +57,14 @@ MainWindow::MainWindow(QWidget *parent) :
     opt = 0;
     previewRenderer = new PreviewRenderer(this);
     previewRenderer->show();
+
+    foreach (QAction *action, ui->menu_File->actions())
+    {
+        QString name = action->text();
+        if(action->text() == "&Save project")action->setIcon(QIcon::fromTheme("document-save"));
+        if(action->text() == "&Open project")action->setIcon(QIcon::fromTheme("document-open"));
+        if(action->text() == "&Export noise description")action->setIcon(QIcon::fromTheme("text-x-script"));
+    }
 }
 
 MainWindow::~MainWindow()
@@ -275,13 +283,12 @@ void MainWindow::on_generateImage_released()
     std::set<NoiseModule*> modules;
     foreach(item, items)
     {
-	if(item->type()!=NoiseModule::Type)continue;
-	NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
-	modules.insert(mod);
+        if(item->type()!=NoiseModule::Type)continue;
+        NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
+        modules.insert(mod);
     }
 
-    TiXmlDocument *doc = generator.generateExport(modules);
-    doc->SaveFile("/tmp/gen.xml");
+    TiXmlDocument *doc = generator.generateExport(modules, ui->gradientEditor->getGradientPoints());
     previewRenderer->showTexture(doc);
 }
 
@@ -314,7 +321,9 @@ void MainWindow::on_action_Load_project_triggered()
     NTGPLoader loader;
     TiXmlDocument doc;
     doc.LoadFile(fileName.toUtf8().data());
-    loader.load(&doc, nmScene);
+    QVector<GradientEditor::GradientPoint> gradient;
+    loader.load(&doc, nmScene, &gradient);
+    ui->gradientEditor->setGradient(gradient);
 }
 
 void MainWindow::on_action_Export_noise_description_triggered()
@@ -328,22 +337,22 @@ void MainWindow::on_action_Export_noise_description_triggered()
     QString saveFileName;
     if(dialog.exec())
     {
-	QStringList saveFileNames = dialog.selectedFiles();
-	saveFileName = saveFileNames.at(0);
+        QStringList saveFileNames = dialog.selectedFiles();
+        saveFileName = saveFileNames.at(0);
 
-	NoiseXMLGenerator generator;
+        NoiseXMLGenerator generator;
 
-	QList<QGraphicsItem*> items = nmScene->items();
-	QGraphicsItem* item;
-	std::set<NoiseModule*> modules;
-	foreach(item, items)
-	{
-	    if(item->type()!=NoiseModule::Type)continue;
-	    NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
-	    modules.insert(mod);
-	}
-	TiXmlDocument *doc = generator.generateExport(modules);
-	doc->SaveFile(saveFileName.toUtf8().data());
+        QList<QGraphicsItem*> items = nmScene->items();
+        QGraphicsItem* item;
+        std::set<NoiseModule*> modules;
+        foreach(item, items)
+        {
+            if(item->type()!=NoiseModule::Type)continue;
+            NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
+            modules.insert(mod);
+        }
+        TiXmlDocument *doc = generator.generateExport(modules, ui->gradientEditor->getGradientPoints());
+        doc->SaveFile(saveFileName.toUtf8().data());
     }
 }
 void MainWindow::exportSceneData(const char *fname)

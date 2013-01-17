@@ -1,46 +1,58 @@
 #ifndef GRADIENTEDITOR_H
 #define GRADIENTEDITOR_H
 
-#include <QWidget>
+#include <QLabel>
 #include <QMap>
 #include <QColor>
 #include "QLinearGradient"
+#include <QMenu>
 
-namespace Ui {
-    class GradientEditor;
-}
-class GradientEditor : public QWidget
+class GradientEditor : public QLabel
 {
     Q_OBJECT
 
 public:
     explicit GradientEditor(QWidget *parent = 0);
     ~GradientEditor();
-    QLinearGradient* getGradient() { return gradient;}
 
+    struct GradientPoint
+    {
+        float pos;
+        QColor color;
 
+        GradientPoint(float p, QColor c) : pos(p), color(c){};
+        GradientPoint() : pos(0.0) {};
+    };
 
-    const QMap<float, QColor>& getGradientPoints() const { return gradientPoints;}
-
+    const QVector<GradientPoint>& getGradientPoints() const { return gradientPoints; }
+    void setGradient(const QVector<GradientPoint> &gradient) { gradientPoints = gradient;}
 
 protected:
-    void changeEvent(QEvent *e);
-    void showEvent ( QShowEvent * event );
+    virtual void paintEvent ( QPaintEvent * );
+    virtual void mouseDoubleClickEvent ( QMouseEvent * event );
+    virtual void mousePressEvent ( QMouseEvent * event );
+    virtual void mouseReleaseEvent ( QMouseEvent * event );
+    virtual void mouseMoveEvent (QMouseEvent *event );
+    virtual void contextMenuEvent ( QContextMenuEvent * event );
 
-private slots:
-    void on_gradientPoints_currentIndexChanged(int index);
-    void on_deleteGradientPoint_released();
-    void on_gradientColor_released();
-    void on_addGradientPoint_released();
-    void on_gradientPointPosition_valueChanged(double arg1);
-
-    void on_pushButton_released();
+public slots:
+    void removePoint();
+    void changePointColor();
+    void loadTerrainLibNoiseGradient();
+    void clearGradient();
 
 private:
+    int findGradientPoint(float pos);
     void rebuildGradient();
-    Ui::GradientEditor *ui;
     QLinearGradient *gradient;
-    QMap<float, QColor> gradientPoints;
+    QVector<GradientPoint> gradientPoints;
+    int arrowSize;
+
+    int selectedGradientPoint;
+    int menuPoint;
+
+    QMenu *pointContextMenu;
+    QMenu *mainContextMenu;
 };
 
 #endif // GRADIENTEDITOR_H

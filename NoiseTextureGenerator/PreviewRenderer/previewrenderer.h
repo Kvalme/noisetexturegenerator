@@ -5,7 +5,6 @@
 #include "tinyXml/tinyxml.h"
 #include "Generation/noisexmlbuilder.h"
 #include "QLinearGradient"
-#include "GradientEditor/gradienteditor.h"
 
 namespace Ui {
     class PreviewRenderer;
@@ -35,8 +34,6 @@ private:
     int textureWidth;
     int textureHeight;
     NoiseXMLBuilder *xmlBuilder;
-    GradientEditor *gradientEditor;
-
 };
 
 #endif // PREVIEWRENDERER_H

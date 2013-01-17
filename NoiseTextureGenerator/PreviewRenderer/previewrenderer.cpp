@@ -2,7 +2,6 @@
 #include "ui_previewrenderer.h"
 #include <QPainter>
 #include <QFileDialog>
-#include "GradientEditor/gradienteditor.h"
 
 
 PreviewRenderer::PreviewRenderer(QWidget *parent):
@@ -15,9 +14,6 @@ PreviewRenderer::PreviewRenderer(QWidget *parent):
     QPixmap pix(0, 0);
     pix.fill(Qt::black);
     ui->previewPixmap->setPixmap(pix);
-    ui->gradient->setLayout(new QVBoxLayout());
-    gradientEditor = new GradientEditor(this);
-    ui->gradient->layout()->addWidget(gradientEditor);
 }
 void PreviewRenderer::showTexture(TiXmlDocument *doc)
 {
@@ -28,12 +24,11 @@ void PreviewRenderer::showTexture(TiXmlDocument *doc)
 
     drawImage();
 }
-#include <iostream>
 void PreviewRenderer::drawImage()
 {
-    const QMap<float, QColor > &gradientPoints = gradientEditor->getGradientPoints();
+//    const QMap<float, QColor > &gradientPoints = gradientEditor->getGradientPoints();
 
-    std::vector<NoiseXMLBuilder::GradientPoint> gradient;
+/*    std::vector<NoiseXMLBuilder::GradientPoint> gradient;
 
     for(QMap<float, QColor>::const_iterator it = gradientPoints.constBegin(); it != gradientPoints.end(); ++it)
     {
@@ -47,9 +42,9 @@ void PreviewRenderer::drawImage()
 
         std::cerr<<"Adding point ["<<gPoint.pos<<"] = ["<<(int)gPoint.r<<":"<<(int)gPoint.g<<":"<<(int)gPoint.b<<":"<<(int)gPoint.a<<"]"<<std::endl;
     }
+*/
 
-
-    noise::utils::Image *img = xmlBuilder->getImage(gradient.empty()?0:&gradient);
+    noise::utils::Image *img = xmlBuilder->getImage(0);//gradient.empty()?0:&gradient);
 
     utils::Color *c = img->GetSlabPtr();
     int w = img->GetWidth();
