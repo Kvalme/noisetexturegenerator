@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QGraphicsItem>
+#include <QString>
 #include "PreviewRenderer/previewrenderer.h"
 
 class NoiseModuleScene;
@@ -68,12 +69,15 @@ private slots:
 
     void on_actionSelector_triggered();
 
+    void on_action_New_project_triggered();
+
 private:
     Ui::MainWindow *ui;
     NoiseModuleScene *nmScene;
     bool blockCurrentIndexChange;
     QWidget *opt;
     PreviewRenderer *previewRenderer;
+    QString lastFileName;
 
 };
 

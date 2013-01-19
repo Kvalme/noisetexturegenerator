@@ -119,6 +119,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="action_New_project"/>
     <addaction name="action_Save_project"/>
     <addaction name="action_Load_project"/>
     <addaction name="separator"/>
@@ -167,6 +168,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="action_New_project"/>
    <addaction name="action_Save_project"/>
    <addaction name="action_Load_project"/>
    <addaction name="action_Export_noise_description"/>
@@ -245,6 +247,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="action_New_project">
+   <property name="text">
+    <string>&amp;New project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
  </widget>

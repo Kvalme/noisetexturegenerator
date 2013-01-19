@@ -26,18 +26,18 @@ NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type)
 {
     switch(type)
     {
-	case NoiseModule::Generator:
-	    return new NoiseGeneratorModule(myItemMenu);
-	case NoiseModule::Output:
-	    return new NoiseOutputModule(myItemMenu);
-	case NoiseModule::Modifier:
-	    return new NoiseModifierModule(myItemMenu);
-	case NoiseModule::Combiner:
-	    return new NoiseCombinerModule(myItemMenu);
-	case NoiseModule::Selector:
-	    return new NoiseSelectorModule(myItemMenu);
-	default:
-	    return 0;
+        case NoiseModule::Generator:
+            return new NoiseGeneratorModule(myItemMenu);
+        case NoiseModule::Output:
+            return new NoiseOutputModule(myItemMenu);
+        case NoiseModule::Modifier:
+            return new NoiseModifierModule(myItemMenu);
+        case NoiseModule::Combiner:
+            return new NoiseCombinerModule(myItemMenu);
+        case NoiseModule::Selector:
+            return new NoiseSelectorModule(myItemMenu);
+        default:
+            return 0;
     }
     return 0;
 }
@@ -72,11 +72,12 @@ void NoiseModuleScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (myMode == InsertLine && line != 0)
     {
-	QLineF newLine(line->line().p1(), mouseEvent->scenePos());
-	line->setLine(newLine);
-    } else if (myMode == MoveItem)
+        QLineF newLine(line->line().p1(), mouseEvent->scenePos());
+        line->setLine(newLine);
+    }
+    else if (myMode == MoveItem)
     {
-	QGraphicsScene::mouseMoveEvent(mouseEvent);
+        QGraphicsScene::mouseMoveEvent(mouseEvent);
     }
 }
 void NoiseModuleScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)

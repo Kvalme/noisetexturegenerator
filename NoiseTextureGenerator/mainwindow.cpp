@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(nmScene, SIGNAL(itemInserted(NoiseModule*)), this, SLOT(itemInserted(NoiseModule*)));
     connect(nmScene, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
+
     blockCurrentIndexChange = false;
     opt = 0;
     previewRenderer = new PreviewRenderer(this);
@@ -61,9 +62,12 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         QString name = action->text();
         if(action->text() == "&Save project")action->setIcon(QIcon::fromTheme("document-save"));
-        if(action->text() == "&Open project")action->setIcon(QIcon::fromTheme("document-open"));
-        if(action->text() == "&Export noise description")action->setIcon(QIcon::fromTheme("text-x-script"));
+        else if(action->text() == "&Open project")action->setIcon(QIcon::fromTheme("document-open"));
+        else if(action->text() == "&Export noise description")action->setIcon(QIcon::fromTheme("text-x-script"));
+        else if(action->text() == "&New project")action->setIcon(QIcon::fromTheme("document-new"));
+
     }
+    lastFileName = "";
 }
 
 MainWindow::~MainWindow()
@@ -93,6 +97,7 @@ void MainWindow::itemSelected()
     std::cerr<<__FUNCTION__<<std::endl;
     if(nmScene->selectedItems().empty())return;
     QGraphicsItem *item = nmScene->selectedItems().first();
+
     if(item->type()!=NoiseModule::Type)return;
     NoiseModule *module = dynamic_cast<NoiseModule*>(item);
     fillModuleType(module);
@@ -121,7 +126,6 @@ void MainWindow::on_actionSelector_triggered()
 
 void MainWindow::on_moduleType_currentIndexChanged(int index)
 {
-    std::cerr<<"Block:"<<blockCurrentIndexChange<<" index:"<<index<<std::endl;
     if(blockCurrentIndexChange)return;
     if(index<0)return;
     NoiseModule *module = dynamic_cast<NoiseModule*>(nmScene->selectedItems().first());
@@ -161,30 +165,32 @@ void MainWindow::fillGeneratorModuleType(NoiseModule *module)
     std::cerr<<__FUNCTION__<<std::endl;
     NoiseGeneratorModule *m = dynamic_cast<NoiseGeneratorModule*>(module);
     blockCurrentIndexChange = true;
-    std::cerr<<__FUNCTION__<<" Start blocking"<<std::endl;
     ui->moduleType->clear();
     int curIndex = 0;
     for(int a=NoiseGeneratorModule::Billow; a<=NoiseGeneratorModule::Voronoi; ++a)
     {
-	ui->moduleType->addItem(m->getGeneratorName((NoiseGeneratorModule::GeneratorType)a).c_str());
-	if((NoiseGeneratorModule::GeneratorType)a == m->getGeneratorType())curIndex = a;
-
+        ui->moduleType->addItem(m->getGeneratorName((NoiseGeneratorModule::GeneratorType)a).c_str());
+        if((NoiseGeneratorModule::GeneratorType)a == m->getGeneratorType())curIndex = a;
     }
-    blockCurrentIndexChange = false;
-    std::cerr<<__FUNCTION__<<" End blocking"<<std::endl;
     ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
+    blockCurrentIndexChange = false;
     ui->moduleType->setCurrentIndex(curIndex);
 }
 void MainWindow::generatorSelected(NoiseModule *module, int index)
 {
     std::cerr<<__FUNCTION__<<std::endl;
     NoiseGeneratorModule *m = dynamic_cast<NoiseGeneratorModule*>(module);
-    m->setGeneratorType((NoiseGeneratorModule::GeneratorType)index);
+
+    if(m->getGeneratorType() != (NoiseGeneratorModule::GeneratorType)index)
+    {
+        m->setGeneratorType((NoiseGeneratorModule::GeneratorType)index);
+    }
+
     if(opt)
     {
-	delete opt;
-	QLayout *layout = ui->moduleOptionsFrame->layout();
-	delete layout;
+        delete opt;
+        QLayout *layout = ui->moduleOptionsFrame->layout();
+        delete layout;
     }
 
     switch((NoiseGeneratorModule::GeneratorType)index)
@@ -224,7 +230,6 @@ void MainWindow::fillOutputModuleType(NoiseModule *module)
     std::cerr<<__FUNCTION__<<std::endl;
     NoiseOutputModule *m = dynamic_cast<NoiseOutputModule*>(module);
     blockCurrentIndexChange = true;
-    std::cerr<<__FUNCTION__<<" Start blocking"<<std::endl;
     ui->moduleType->clear();
     int curIndex = 0;
     for(int a=NoiseOutputModule::Cylinder; a<=NoiseOutputModule::Sphere; ++a)
@@ -233,9 +238,8 @@ void MainWindow::fillOutputModuleType(NoiseModule *module)
 	if((NoiseOutputModule::OutputType)a == m->getOutputType())curIndex = a;
 
     }
-    blockCurrentIndexChange = false;
-    std::cerr<<__FUNCTION__<<"End blocking"<<std::endl;
     ui->moduleType->setCurrentIndex(curIndex>1?curIndex-1:curIndex+1);
+    blockCurrentIndexChange = false;
     ui->moduleType->setCurrentIndex(curIndex);
 
 }
@@ -243,7 +247,12 @@ void MainWindow::outputSelected(NoiseModule *module, int index)
 {
     std::cerr<<__FUNCTION__<<std::endl;
     NoiseOutputModule *m = dynamic_cast<NoiseOutputModule*>(module);
-    m->setOutputType((NoiseOutputModule::OutputType)index);
+
+    if(m->getOutputType() != (NoiseOutputModule::OutputType)index)
+    {
+        m->setOutputType((NoiseOutputModule::OutputType)index);
+    }
+
     if(opt)
     {
 	delete opt;
@@ -302,14 +311,17 @@ void MainWindow::on_action_Save_project_triggered()
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setViewMode(QFileDialog::Detail);
     QString saveFileName;
-    if(dialog.exec())
+    if(lastFileName == "")
     {
-	QStringList saveFileNames = dialog.selectedFiles();
-	saveFileName = saveFileNames.at(0);
-
-	exportSceneData(saveFileName.toUtf8().data());
+        if(dialog.exec())
+        {
+            QStringList saveFileNames = dialog.selectedFiles();
+            saveFileName = saveFileNames.at(0);
+        }
     }
+    else saveFileName = lastFileName;
 
+    if (lastFileName != "") exportSceneData(saveFileName.toUtf8().data());
 }
 
 void MainWindow::on_action_Load_project_triggered()
@@ -322,9 +334,13 @@ void MainWindow::on_action_Load_project_triggered()
     NTGPLoader loader;
     TiXmlDocument doc;
     doc.LoadFile(fileName.toUtf8().data());
+
+    nmScene->clear();
     QVector<GradientEditor::GradientPoint> gradient;
     loader.load(&doc, nmScene, &gradient);
+
     ui->gradientEditor->setGradient(gradient);
+    lastFileName = fileName;
 }
 
 void MainWindow::on_action_Export_noise_description_triggered()
@@ -389,20 +405,25 @@ void MainWindow::fillModifierModuleType(NoiseModule *module)
 
     }
     blockCurrentIndexChange = false;
-    std::cerr<<__FUNCTION__<<" End blocking"<<std::endl;
     ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
+    std::cerr<<__FUNCTION__<<" End blocking"<<std::endl;
     ui->moduleType->setCurrentIndex(curIndex);
 }
 void MainWindow::modifierSelected(NoiseModule *module, int index)
 {
     std::cerr<<__FUNCTION__<<std::endl;
     NoiseModifierModule *m = dynamic_cast<NoiseModifierModule*>(module);
-    m->setType((NoiseModifierModule::ModifierType)index);
+
+    if(m->getType() != (NoiseModifierModule::ModifierType)index)
+    {
+        m->setType((NoiseModifierModule::ModifierType)index);
+    }
+
     if(opt)
     {
-	delete opt;
-	QLayout *layout = ui->moduleOptionsFrame->layout();
-	delete layout;
+        delete opt;
+        QLayout *layout = ui->moduleOptionsFrame->layout();
+        delete layout;
     }
 
     switch((NoiseModifierModule::ModifierType)index)
@@ -447,15 +468,23 @@ void MainWindow::fillCombinerModuleType(NoiseModule *module)
 	if((NoiseCombinerModule::CombinerType)a == m->getType())curIndex = a;
 
     }
-    blockCurrentIndexChange = false;
     ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
+    blockCurrentIndexChange = false;
     ui->moduleType->setCurrentIndex(curIndex);
 }
 void MainWindow::combinerSelected(NoiseModule *module, int index)
 {
     std::cerr<<__FUNCTION__<<std::endl;
     NoiseCombinerModule *m = dynamic_cast<NoiseCombinerModule*>(module);
-    m->setType((NoiseCombinerModule::CombinerType)index);
+    if(m->getType() != (NoiseCombinerModule::CombinerType)index) m->setType((NoiseCombinerModule::CombinerType)index);
+
+    if(opt)
+    {
+        delete opt;
+        QLayout *layout = ui->moduleOptionsFrame->layout();
+        delete layout;
+        opt = 0;
+    }
 }
 
 void MainWindow::fillSelectorModuleType(NoiseModule *module)
@@ -471,8 +500,8 @@ void MainWindow::fillSelectorModuleType(NoiseModule *module)
 	if((NoiseSelectorModule::ModuleType)a == m->getType())curIndex = a;
 
     }
-    blockCurrentIndexChange = false;
     ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
+    blockCurrentIndexChange = false;
     ui->moduleType->setCurrentIndex(curIndex);
 }
 
@@ -480,12 +509,14 @@ void MainWindow::selectorSelected(NoiseModule *module, int index)
 {
     std::cerr<<__FUNCTION__<<std::endl;
     NoiseSelectorModule *m = dynamic_cast<NoiseSelectorModule*>(module);
-    m->setType((NoiseSelectorModule::SelectorType)index);
+
+    if(m->getType() != (NoiseSelectorModule::SelectorType)index)m->setType((NoiseSelectorModule::SelectorType)index);
+
     if(opt)
     {
-	delete opt;
-	QLayout *layout = ui->moduleOptionsFrame->layout();
-	delete layout;
+        delete opt;
+        QLayout *layout = ui->moduleOptionsFrame->layout();
+        delete layout;
     }
 
     switch((NoiseSelectorModule::SelectorType)index)
@@ -499,4 +530,9 @@ void MainWindow::selectorSelected(NoiseModule *module, int index)
     }
     ui->moduleOptionsFrame->setLayout(new QVBoxLayout());
     ui->moduleOptionsFrame->layout()->addWidget(opt);
+}
+
+void MainWindow::on_action_New_project_triggered()
+{
+    nmScene->clear();
 }
