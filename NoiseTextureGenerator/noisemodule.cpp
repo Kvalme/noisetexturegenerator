@@ -53,6 +53,7 @@ NoiseModule::NoiseModule(NoiseModule::ModuleType moduleType, QMenu *contextMenu,
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
+    setFlag(QGraphicsItem::ItemIsFocusable, true);
 }
 
 void NoiseModule::removeArrow(Arrow *arrow)
@@ -115,4 +116,14 @@ QVariant NoiseModule::itemChange(GraphicsItemChange change,
     }
 
     return value;
+}
+
+void NoiseModule::keyReleaseEvent ( QKeyEvent *event )
+{
+    if(event->matches(QKeySequence::Delete))
+    {
+        removeArrows();
+        scene()->removeItem(this);
+        delete this;
+    }
 }

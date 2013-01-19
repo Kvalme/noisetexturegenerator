@@ -25,6 +25,7 @@ public:
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    void keyReleaseEvent ( QKeyEvent *event );
 
     ModuleType myModuleType;
     QPolygonF myPolygon;

@@ -9,10 +9,8 @@ QT       += core gui
 TARGET = NoiseTextureGenerator
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
         mainwindow.cpp \
-    noiseutils.cpp \
     noisemodulescene.cpp \
     noisemodule.cpp \
     arrow.cpp \
@@ -55,7 +53,43 @@ SOURCES += main.cpp\
     NoiseTransformer/transformerscalepoint.cpp \
     NoiseTransformer/transformertranslatepoint.cpp \
     NoiseTransformer/transformerturbulence.cpp \
-    GradientEditor/gradienteditor.cpp
+    GradientEditor/gradienteditor.cpp \
+    libnoise/noise/src/latlon.cpp \
+    libnoise/noise/src/noisegen.cpp \
+    libnoise/noise/src/model/cylinder.cpp \
+    libnoise/noise/src/model/line.cpp \
+    libnoise/noise/src/model/plane.cpp \
+    libnoise/noise/src/model/sphere.cpp \
+    libnoise/noise/src/module/abs.cpp \
+    libnoise/noise/src/module/add.cpp \
+    libnoise/noise/src/module/billow.cpp \
+    libnoise/noise/src/module/blend.cpp \
+    libnoise/noise/src/module/cache.cpp \
+    libnoise/noise/src/module/checkerboard.cpp \
+    libnoise/noise/src/module/clamp.cpp \
+    libnoise/noise/src/module/const.cpp \
+    libnoise/noise/src/module/curve.cpp \
+    libnoise/noise/src/module/cylinders.cpp \
+    libnoise/noise/src/module/displace.cpp \
+    libnoise/noise/src/module/exponent.cpp \
+    libnoise/noise/src/module/invert.cpp \
+    libnoise/noise/src/module/max.cpp \
+    libnoise/noise/src/module/min.cpp \
+    libnoise/noise/src/module/modulebase.cpp \
+    libnoise/noise/src/module/multiply.cpp \
+    libnoise/noise/src/module/perlin.cpp \
+    libnoise/noise/src/module/power.cpp \
+    libnoise/noise/src/module/ridgedmulti.cpp \
+    libnoise/noise/src/module/rotatepoint.cpp \
+    libnoise/noise/src/module/scalebias.cpp \
+    libnoise/noise/src/module/scalepoint.cpp \
+    libnoise/noise/src/module/select.cpp \
+    libnoise/noise/src/module/spheres.cpp \
+    libnoise/noise/src/module/terrace.cpp \
+    libnoise/noise/src/module/translatepoint.cpp \
+    libnoise/noise/src/module/turbulence.cpp \
+    libnoise/noise/src/module/voronoi.cpp \
+    libnoise/utils/noiseutils.cpp
 
 HEADERS  += mainwindow.h \
     noisemodulescene.h \
@@ -98,7 +132,52 @@ HEADERS  += mainwindow.h \
     NoiseTransformer/transformerscalepoint.h \
     NoiseTransformer/transformertranslatepoint.h \
     NoiseTransformer/transformerturbulence.h \
-    GradientEditor/gradienteditor.h
+    GradientEditor/gradienteditor.h \
+    libnoise/noise/src/basictypes.h \
+    libnoise/noise/src/exception.h \
+    libnoise/noise/src/interp.h \
+    libnoise/noise/src/latlon.h \
+    libnoise/noise/src/mathconsts.h \
+    libnoise/noise/src/misc.h \
+    libnoise/noise/src/noise.h \
+    libnoise/noise/src/noisegen.h \
+    libnoise/noise/src/vectortable.h \
+    libnoise/noise/src/model/cylinder.h \
+    libnoise/noise/src/model/line.h \
+    libnoise/noise/src/model/model.h \
+    libnoise/noise/src/model/plane.h \
+    libnoise/noise/src/model/sphere.h \
+    libnoise/noise/src/module/abs.h \
+    libnoise/noise/src/module/add.h \
+    libnoise/noise/src/module/billow.h \
+    libnoise/noise/src/module/blend.h \
+    libnoise/noise/src/module/cache.h \
+    libnoise/noise/src/module/checkerboard.h \
+    libnoise/noise/src/module/clamp.h \
+    libnoise/noise/src/module/const.h \
+    libnoise/noise/src/module/curve.h \
+    libnoise/noise/src/module/cylinders.h \
+    libnoise/noise/src/module/displace.h \
+    libnoise/noise/src/module/exponent.h \
+    libnoise/noise/src/module/invert.h \
+    libnoise/noise/src/module/max.h \
+    libnoise/noise/src/module/min.h \
+    libnoise/noise/src/module/module.h \
+    libnoise/noise/src/module/modulebase.h \
+    libnoise/noise/src/module/multiply.h \
+    libnoise/noise/src/module/perlin.h \
+    libnoise/noise/src/module/power.h \
+    libnoise/noise/src/module/ridgedmulti.h \
+    libnoise/noise/src/module/rotatepoint.h \
+    libnoise/noise/src/module/scalebias.h \
+    libnoise/noise/src/module/scalepoint.h \
+    libnoise/noise/src/module/select.h \
+    libnoise/noise/src/module/spheres.h \
+    libnoise/noise/src/module/terrace.h \
+    libnoise/noise/src/module/translatepoint.h \
+    libnoise/noise/src/module/turbulence.h \
+    libnoise/noise/src/module/voronoi.h \
+    libnoise/utils/noiseutils.h
 
 FORMS    += mainwindow.ui \
     NoiseGenerators/billowoptions.ui \
@@ -128,9 +207,9 @@ FORMS    += mainwindow.ui \
     NoiseTransformer/transformertranslatepoint.ui \
     NoiseTransformer/transformerturbulence.ui
 
-unix|win32: LIBS += -lnoise
-
-INCLUDEPATH += /usr/include/libnoise
+INCLUDEPATH += libnoise/noise \
+    libnoise/noise/src \
+    libnoise/utils
 
 RESOURCES += \
     base.qrc
