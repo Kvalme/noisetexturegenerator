@@ -62,21 +62,25 @@ void NoiseModule::removeArrow(Arrow *arrow)
 
     if (index != -1)
 	arrows.removeAt(index);
+    checkSourceCount();
 }
 
 void NoiseModule::removeArrows()
 {
-    foreach (Arrow *arrow, arrows) {
-	arrow->startItem()->removeArrow(arrow);
-	arrow->endItem()->removeArrow(arrow);
-	scene()->removeItem(arrow);
-	delete arrow;
+    foreach (Arrow *arrow, arrows)
+    {
+        arrow->startItem()->removeArrow(arrow);
+        arrow->endItem()->removeArrow(arrow);
+        scene()->removeItem(arrow);
+        delete arrow;
     }
+    checkSourceCount();
 }
 
 void NoiseModule::addArrow(Arrow *arrow)
 {
     arrows.append(arrow);
+    checkSourceCount();
 }
 
 QPixmap NoiseModule::image() const
@@ -125,5 +129,22 @@ void NoiseModule::keyReleaseEvent ( QKeyEvent *event )
         removeArrows();
         scene()->removeItem(this);
         delete this;
+    }
+}
+
+void NoiseModule::checkSourceCount()
+{
+    int sourceCount = 0;
+    foreach (Arrow *arrow, arrows)
+    {
+        if(arrow->endItem() == this)sourceCount++;
+    }
+    if(sourceCount!=moduleSourceCount)
+    {
+        setPen(QPen(QBrush(Qt::red), 4));
+    }
+    else
+    {
+        setPen(QPen(QBrush(Qt::green), 2));
     }
 }

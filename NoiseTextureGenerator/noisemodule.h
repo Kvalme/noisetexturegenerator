@@ -26,11 +26,13 @@ protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void keyReleaseEvent ( QKeyEvent *event );
+    void checkSourceCount();
 
     ModuleType myModuleType;
     QPolygonF myPolygon;
     QMenu *myContextMenu;
     QList<Arrow *> arrows;
+    int moduleSourceCount;
 };
 
 #endif // NOISEMODULE_H

@@ -17,6 +17,9 @@ NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, QGraphicsItem *parent, 
 	  << QPointF(-hw, -hh);
     setPolygon(myPolygon);
     builder = new noise::utils::NoiseMapBuilderPlane;
+
+    moduleSourceCount = 1;
+    checkSourceCount();
 }
 NoiseOutputModule::~NoiseOutputModule()
 {

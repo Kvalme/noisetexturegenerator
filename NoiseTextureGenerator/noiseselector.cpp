@@ -16,6 +16,9 @@ NoiseSelectorModule::NoiseSelectorModule(QMenu *contextMenu, QGraphicsItem *pare
     myPolygon << QPointF(-hw, -hh) << QPointF(hw/2, -hh) << QPointF(hw, 0) << QPointF(hw/2, hh)
 	      << QPointF(-hw, hh) << QPointF(-hw/2, 0) <<QPointF(-hw, -hh);
     setPolygon(myPolygon);
+
+    moduleSourceCount = module->GetSourceModuleCount();
+    checkSourceCount();
 }
 NoiseSelectorModule::~NoiseSelectorModule()
 {

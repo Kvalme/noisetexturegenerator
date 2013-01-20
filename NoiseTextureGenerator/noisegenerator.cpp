@@ -17,6 +17,9 @@ NoiseGeneratorModule::NoiseGeneratorModule(QMenu *contextMenu, QGraphicsItem *pa
 	  << QPointF(-hw, -hh);
     setPolygon(myPolygon);
     module = new noise::module::Billow;
+
+    moduleSourceCount = module->GetSourceModuleCount();
+    checkSourceCount();
 }
 NoiseGeneratorModule::~NoiseGeneratorModule()
 {
