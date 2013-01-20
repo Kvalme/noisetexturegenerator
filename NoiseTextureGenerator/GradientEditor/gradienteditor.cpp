@@ -1,5 +1,4 @@
 #include "gradienteditor.h"
-#include "ui_gradienteditor.h"
 #include "QPainter"
 #include <iostream>
 #include "QColorDialog"

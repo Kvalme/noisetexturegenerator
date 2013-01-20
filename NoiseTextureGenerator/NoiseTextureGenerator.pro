@@ -213,3 +213,5 @@ INCLUDEPATH += libnoise/noise \
 
 RESOURCES += \
     base.qrc
+
+QMAKE_CXXFLAGS_RELEASE += -O3 -mfpmath=sse,387 -msse -msse2 -msse3
