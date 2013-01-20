@@ -321,7 +321,7 @@ void MainWindow::on_action_Save_project_triggered()
     }
     else saveFileName = lastFileName;
 
-    if (lastFileName != "") exportSceneData(saveFileName.toUtf8().data());
+    if (saveFileName != "") exportSceneData(saveFileName.toUtf8().data());
 }
 
 void MainWindow::on_action_Load_project_triggered()
