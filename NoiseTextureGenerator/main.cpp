@@ -1,11 +1,18 @@
 #include <QtGui/QApplication>
 #include "mainwindow.h"
-
+#include <iostream>
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+    try
+    {
+        QApplication a(argc, argv);
+        MainWindow w;
+        w.show();
 
-    return a.exec();
+        return a.exec();
+    }
+    catch(...)
+    {
+        std::cerr<<"Unexpected error!"<<std::endl;
+    }
 }

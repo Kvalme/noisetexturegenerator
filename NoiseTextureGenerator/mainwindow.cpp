@@ -2,6 +2,7 @@
 #include <set>
 #include <QLayout>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -39,6 +40,17 @@ MainWindow::MainWindow(QWidget *parent) :
         else if(action->text() == "&New project")action->setIcon(QIcon::fromTheme("document-new"));
 
     }
+    try
+    {
+        noise = new CLNoise::Noise;
+        noise->initCLContext();
+    }
+    catch(CLNoise::Error &error)
+    {
+        QMessageBox::critical(this, "Error in libclnoise", error.what());
+        return;
+    }
+
     lastFileName = "";
 }
 
@@ -77,12 +89,29 @@ void MainWindow::itemSelected()
 
 void MainWindow::on_actionNoise_module_triggered()
 {
-    nmScene->addModule(NoiseModule::BaseModule);
+    try
+    {
+        nmScene->addModule(NoiseModule::BaseModule, noise);
+    }
+    catch(CLNoise::Error &error)
+    {
+        QMessageBox::critical(this, "Error in libclnoise", error.what());
+        return;
+    }
+
 }
 
 void MainWindow::on_actionOutput_triggered(bool)
 {
-    nmScene->addModule(NoiseModule::OutputModule);
+    try
+    {
+        nmScene->addModule(NoiseModule::OutputModule, noise);
+    }
+    catch(CLNoise::Error &error)
+    {
+        QMessageBox::critical(this, "Error in libclnoise", error.what());
+        return;
+    }
 }
 
 void MainWindow::on_moduleType_currentIndexChanged(int index)

@@ -40,8 +40,8 @@ HEADERS  += mainwindow.h \
     Generation/noisexmlbuilder.h \
     Generation/ntgploader.h \
     GradientEditor/gradienteditor.h \
-    libclnoise/src/clnoisecl.h \
-    libclnoise/src/clnoiseclerror.h \
+    libclnoise/src/clnoise.h \
+    libclnoise/src/clnoiseerror.h \
     libclnoise/src/clnoisemodule.h \
     libclnoise/src/clnoisemoduleattribute.h \
     libclnoise/src/clnoiseoutput.h
@@ -57,4 +57,5 @@ RESOURCES += \
 LIBS += -lOpenCL
 
 QMAKE_CXXFLAGS += -Wno-cpp -std=c++11
-QMAKE_CXXFLAGS_RELEASE += -O3 -mfpmath=sse,387 -msse -msse2 -msse3
+QMAKE_CXXFLAGS_RELEASE += -g0 -O3 -mfpmath=sse,387 -msse -msse2 -msse3
+QMAKE_CXXFLAGS_DEBUG += -Wno-cpp -std=c++11 -g3 -O0

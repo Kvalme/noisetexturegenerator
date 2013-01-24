@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QAction>
 #include "noisemodule.h"
+#include "clnoise.h"
 
 class NoiseModuleScene : public QGraphicsScene
 {
@@ -11,7 +12,7 @@ class NoiseModuleScene : public QGraphicsScene
 public:
     enum Mode { InsertLine, MoveItem };
     explicit NoiseModuleScene(QObject *parent = 0);
-    NoiseModule* addModule(NoiseModule::ModuleType type);
+    void addModule(NoiseModule::ModuleType type, CLNoise::Noise *noise);
 
 public slots:
     void setMode(Mode mode);
@@ -28,7 +29,7 @@ protected:
 
 private:
     bool isItemChange(int type);
-    NoiseModule* createModule(NoiseModule::ModuleType type);
+    NoiseModule* createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise);
 
     NoiseModule::ModuleType myItemType;
     QMenu *myItemMenu;

@@ -5,6 +5,8 @@
 #include <QGraphicsItem>
 #include <QString>
 #include "PreviewRenderer/previewrenderer.h"
+#include "clnoise.h"
+
 
 class NoiseModuleScene;
 class NoiseModule;
@@ -35,17 +37,11 @@ public slots:
 private slots:
     void on_actionNoise_module_triggered();
     void on_moduleType_currentIndexChanged(int index);
-
     void on_actionOutput_triggered(bool);
-
     void on_generateImage_released();
-
     void on_action_Save_project_triggered();
-
     void on_action_Load_project_triggered();
-
     void on_action_Export_noise_description_triggered();
-
     void on_action_New_project_triggered();
 
 private:
@@ -57,6 +53,7 @@ private:
     QWidget *opt;
     PreviewRenderer *previewRenderer;
     QString lastFileName;
+    CLNoise::Noise *noise;
 
 };
 

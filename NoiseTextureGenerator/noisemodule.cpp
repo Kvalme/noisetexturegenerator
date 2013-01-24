@@ -43,17 +43,44 @@
 #include "noisemodule.h"
 #include "arrow.h"
 
-NoiseModule::NoiseModule( QMenu *contextMenu,
+NoiseModule::NoiseModule( QMenu *contextMenu, CLNoise::Noise *noise,
 	     QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsPolygonItem(parent, scene)
 {
     myModuleType = BaseModule;
     myContextMenu = contextMenu;
+    noiseLibrary = noise;
 
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
+
+    text.setAcceptTouchEvents(false);
+    text.setAcceptHoverEvents(false);
+    text.setPos(-50, -25);
+    text.setDefaultTextColor(Qt::black);
+    text.setParentItem(this);
+
+    int hw = 50, hh=25;
+
+    myPolygon << QPointF(-hw, -hh) << QPointF(hw, -hh)
+      << QPointF(hw, hh) << QPointF(-hw, hh)
+      << QPointF(-hw, -hh);
+    setPolygon(myPolygon);
+
+    std::vector<std::string> mods = noiseLibrary->getModulesOfType(CLNoise::Module::BASE);
+
+    if(mods.empty())
+    {
+        QMessageBox::critical(0, "Error in libclnoise", "Empty module set returned");
+        return;
+    }
+
+    std::string firstModuleName = *mods.begin();
+    module = noiseLibrary->createModule(firstModuleName);
+    text.setPlainText(firstModuleName.c_str());
+
 }
 
 void NoiseModule::removeArrow(Arrow *arrow)

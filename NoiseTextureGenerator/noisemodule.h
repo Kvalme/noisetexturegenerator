@@ -3,6 +3,8 @@
 
 #include <QGraphicsPolygonItem>
 #include "arrow.h"
+#include "clnoisemodule.h"
+#include "clnoise.h"
 
 class NoiseModule : public QGraphicsPolygonItem
 {
@@ -11,7 +13,7 @@ public:
     enum { Type = UserType + 15 };
     enum ModuleType { BaseModule, OutputModule};
 
-    NoiseModule(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
 
     void removeArrow(Arrow *arrow);
     void removeArrows();
@@ -33,6 +35,14 @@ protected:
     QMenu *myContextMenu;
     QList<Arrow *> arrows;
     int moduleSourceCount;
+
+    QGraphicsTextItem text;
+    QVector<QGraphicsPolygonItem*> inputs;
+    QVector<QGraphicsPolygonItem*> outputs;
+    QVector<QGraphicsPolygonItem*> controls;
+
+    CLNoise::Noise *noiseLibrary;
+    CLNoise::Module *module;
 };
 
 #endif // NOISEMODULE_H

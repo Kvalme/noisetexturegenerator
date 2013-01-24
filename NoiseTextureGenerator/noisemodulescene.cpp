@@ -18,28 +18,27 @@ NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     deleteAction = myItemMenu->addAction(QIcon(), "Delete");
 }
 
-NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type)
+NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise)
 {
     switch(type)
     {
         case NoiseModule::BaseModule:
-            return new NoiseModule(myItemMenu);
+            return new NoiseModule(myItemMenu, noise);
         case NoiseModule::OutputModule:
-            return new NoiseOutputModule(myItemMenu);
+            return new NoiseOutputModule(myItemMenu, noise);
         default:
             return 0;
     }
     return 0;
 }
-NoiseModule* NoiseModuleScene::addModule(NoiseModule::ModuleType type)
+void NoiseModuleScene::addModule(NoiseModule::ModuleType type, CLNoise::Noise *noise)
 {
-    NoiseModule *item= createModule(type);
-    if(!item)return 0;
+    NoiseModule *item = createModule(type, noise);
+    if (!item) return;
     item->setBrush(myItemColor);
     addItem(item);
     item->setPos(0, 0);
     emit itemInserted(item);
-    return item;
 }
 
 void NoiseModuleScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
