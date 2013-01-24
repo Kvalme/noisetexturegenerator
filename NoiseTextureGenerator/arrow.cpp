@@ -55,8 +55,8 @@ Arrow::Arrow(NoiseModuleConnector *startItem, NoiseModuleConnector *endItem,
     myEndItem = endItem;
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
-    myColor = Qt::black;
-    setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    myColor = Qt::green;
+    setPen(QPen(myColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 }
 
 QRectF Arrow::boundingRect() const
@@ -88,8 +88,7 @@ void Arrow::updatePosition()
 void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 	  QWidget *)
 {
-    if (myStartItem->collidesWithItem(myEndItem))
-	return;
+//    if (myStartItem->collidesWithItem(myEndItem))return;
 
     QPen myPen = pen();
     myPen.setColor(myColor);
@@ -97,15 +96,15 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->setPen(myPen);
     painter->setBrush(myColor);
 
-    QLineF centerLine(myStartItem->pos(), myEndItem->pos());
+    QLineF centerLine(myStartItem->scenePos(), myEndItem->scenePos());
     QPolygonF endPolygon = myEndItem->polygon();
-    QPointF p1 = endPolygon.first() + myEndItem->pos();
+    QPointF p1 = endPolygon.first() + myEndItem->scenePos();
     QPointF p2;
     QPointF intersectPoint;
     QLineF polyLine;
     for (int i = 1; i < endPolygon.count(); ++i)
     {
-        p2 = endPolygon.at(i) + myEndItem->pos();
+        p2 = endPolygon.at(i) + myEndItem->scenePos();
         polyLine = QLineF(p1, p2);
         QLineF::IntersectType intersectType =
         polyLine.intersect(centerLine, &intersectPoint);
@@ -114,7 +113,7 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         p1 = p2;
     }
 
-    setLine(QLineF(intersectPoint, myStartItem->pos()));
+    setLine(QLineF(intersectPoint, myStartItem->scenePos()));
 
     double angle = ::acos(line().dx() / line().length());
     if (line().dy() >= 0)

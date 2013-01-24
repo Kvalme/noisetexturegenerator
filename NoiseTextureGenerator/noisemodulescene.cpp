@@ -98,7 +98,7 @@ void NoiseModuleScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         Arrow *arrow = new Arrow(startConnector, endConnector);
         startConnector->addArrow(arrow);
         endConnector->addArrow(arrow);
-//        arrow->setZValue(-1000.0);
+        arrow->setZValue(-1000.0);
         addItem(arrow);
         arrow->updatePosition();
     }

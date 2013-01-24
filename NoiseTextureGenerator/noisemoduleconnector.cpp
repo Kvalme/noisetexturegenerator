@@ -45,4 +45,6 @@ void NoiseModuleConnector::addArrow(Arrow *arrow)
 {
     if(parentItem()->type() < UserType)return;
     dynamic_cast<NoiseModule*>(parentItem())->addArrow(arrow);
+    setPen(QPen(QBrush(Qt::green), 1));
+    setBrush(QBrush(Qt::green));
 }
