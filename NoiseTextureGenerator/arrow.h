@@ -41,7 +41,7 @@
  #ifndef ARROW_H
  #define ARROW_H
 
- #include <QGraphicsLineItem>
+#include <QGraphicsLineItem>
 
  class NoiseModule;
  class QGraphicsPolygonItem;
@@ -50,24 +50,23 @@
  class QRectF;
  class QGraphicsSceneMouseEvent;
  class QPainterPath;
+ class NoiseModuleConnector;
 
  class Arrow : public QGraphicsLineItem
  {
  public:
-     enum { Type = UserType + 4 };
+     int type() const;
 
-     Arrow(NoiseModule *startItem, NoiseModule *endItem,
+     Arrow(NoiseModuleConnector *startItem, NoiseModuleConnector *endItem,
        QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
 
-     int type() const
-	 { return Type; }
      QRectF boundingRect() const;
      QPainterPath shape() const;
      void setColor(const QColor &color)
 	 { myColor = color; }
-     NoiseModule *startItem() const
+     NoiseModuleConnector *startItem() const
 	 { return myStartItem; }
-     NoiseModule *endItem() const
+     NoiseModuleConnector *endItem() const
 	 { return myEndItem; }
 
      void updatePosition();
@@ -78,8 +77,8 @@
      void keyReleaseEvent ( QKeyEvent *event );
 
  private:
-     NoiseModule *myStartItem;
-     NoiseModule *myEndItem;
+     NoiseModuleConnector *myStartItem;
+     NoiseModuleConnector *myEndItem;
      QColor myColor;
      QPolygonF arrowHead;
  };

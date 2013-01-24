@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     GradientEditor/gradienteditor.cpp \
     libclnoise/src/clnoise.cpp \
     libclnoise/src/clnoisemodule.cpp \
-    libclnoise/src/clnoiseoutput.cpp
+    libclnoise/src/clnoiseoutput.cpp \
+    noisemoduleconnector.cpp
 
 HEADERS  += mainwindow.h \
     noisemodulescene.h \
@@ -44,7 +45,8 @@ HEADERS  += mainwindow.h \
     libclnoise/src/clnoiseerror.h \
     libclnoise/src/clnoisemodule.h \
     libclnoise/src/clnoisemoduleattribute.h \
-    libclnoise/src/clnoiseoutput.h
+    libclnoise/src/clnoiseoutput.h \
+    noisemoduleconnector.h
 
 FORMS    += mainwindow.ui \
     PreviewRenderer/previewrenderer.ui

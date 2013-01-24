@@ -37,6 +37,8 @@ void NTGPLoader::readModules(TiXmlElement *src, NoiseModuleScene *scene)
 {
     for(TiXmlElement *generator = src->FirstChildElement("Module"); generator; generator = generator->NextSiblingElement("Module"))
     {
+        src++;
+        scene++;
     }
 }
 
@@ -51,12 +53,12 @@ void NTGPLoader::readLinks(TiXmlElement *src, NoiseModuleScene *scene )
         NoiseModule *toMod = modules[toId];
         if(!fromMod || !toMod)continue;
 
-        Arrow *arrow = new Arrow(fromMod, toMod);
+/*        Arrow *arrow = new Arrow(fromMod, toMod);
         fromMod->addArrow(arrow);
         toMod->addArrow(arrow);
         arrow->setZValue(-1000.0);
         arrow->updatePosition();
-        scene->addItem(arrow);
+        scene->addItem(arrow);*/
     }
 }
 

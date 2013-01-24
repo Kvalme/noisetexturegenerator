@@ -54,12 +54,12 @@ TiXmlDocument* NoiseXMLGenerator::generate(
     writeLinks();
 
     writeGradientPoints(gradientPoints);
-
+    return 0;
 }
 
 void NoiseXMLGenerator::writeModules(bool savePosition)
 {
-    std::cerr<<__FUNCTION__<<std::endl;
+    std::cerr<<__FUNCTION__<<savePosition<<std::endl;
 /*    for(std::map<NoiseGeneratorModule*, int>::iterator it = generatorModules.begin(); it!=generatorModules.end(); ++it)
     {
         NoiseGeneratorModule *m = it->first;
@@ -79,7 +79,7 @@ void NoiseXMLGenerator::writeModules(bool savePosition)
 }
 void NoiseXMLGenerator::writeModule(NoiseModule *m, TiXmlElement *generator)
 {
-    std::cerr<<__FUNCTION__<<std::endl;
+    std::cerr<<__FUNCTION__<<m<<generator<<std::endl;
 }
 
 void NoiseXMLGenerator::generateLinks(NoiseModule *m)
@@ -88,13 +88,13 @@ void NoiseXMLGenerator::generateLinks(NoiseModule *m)
     if(arrows.empty())return;
     foreach(Arrow *arrow, arrows)
     {
-        if(arrow->endItem()!=m)continue;
+/*        if(arrow->endItem()!=m)continue;
         std::map<NoiseModule*, int>::iterator it = allModules.find(arrow->startItem());
         std::map<NoiseModule*, int>::iterator itEnd = allModules.find(arrow->endItem());
         if(it==allModules.end())continue;
         if(itEnd == allModules.end())continue;
 
-        links.insert(std::make_pair(it->second, itEnd->second));
+        links.insert(std::make_pair(it->second, itEnd->second));*/
     }
 }
 

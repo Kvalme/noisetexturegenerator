@@ -42,6 +42,8 @@
 
 #include "noisemodule.h"
 #include "arrow.h"
+#include "noisemodulescene.h"
+
 
 NoiseModule::NoiseModule( QMenu *contextMenu, CLNoise::Noise *noise,
 	     QGraphicsItem *parent, QGraphicsScene *scene)
@@ -55,6 +57,7 @@ NoiseModule::NoiseModule( QMenu *contextMenu, CLNoise::Noise *noise,
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
+    setFiltersChildEvents(false);
 
     text.setAcceptTouchEvents(false);
     text.setAcceptHoverEvents(false);
@@ -80,28 +83,50 @@ NoiseModule::NoiseModule( QMenu *contextMenu, CLNoise::Noise *noise,
     std::string firstModuleName = *mods.begin();
     module = noiseLibrary->createModule(firstModuleName);
     text.setPlainText(firstModuleName.c_str());
+}
 
+void NoiseModule::setConnectors()
+{
+    for(int id = 0; id < module->getOutputCount(); ++id)
+    {
+        NoiseModuleConnector *conn = new NoiseModuleConnector(NoiseModuleConnector::OutputConnector, this);
+
+        float h = (float)myPolygon.boundingRect().height();
+        float y = h / (float)module->getOutputCount() - h;
+
+        conn->setPos(myPolygon.boundingRect().width()/2. + conn->polygon().boundingRect().width()/2., y);
+    }
+
+    for(int id = 0; id < module->getInputCount(); ++id)
+    {
+        NoiseModuleConnector *conn = new NoiseModuleConnector(NoiseModuleConnector::InputConnector, this);
+
+        float h = (float)myPolygon.boundingRect().height();
+        float y = h / (float)module->getInputCount() - h;
+
+        conn->setPos(-myPolygon.boundingRect().width()/2. + conn->polygon().boundingRect().width()/2., y);
+    }
 }
 
 void NoiseModule::removeArrow(Arrow *arrow)
 {
-    int index = arrows.indexOf(arrow);
+/*    int index = arrows.indexOf(arrow);
 
     if (index != -1)
 	arrows.removeAt(index);
-    checkSourceCount();
+    checkSourceCount();*/
 }
 
 void NoiseModule::removeArrows()
 {
-    foreach (Arrow *arrow, arrows)
+/*    foreach (Arrow *arrow, arrows)
     {
         arrow->startItem()->removeArrow(arrow);
         arrow->endItem()->removeArrow(arrow);
         scene()->removeItem(arrow);
         delete arrow;
     }
-    checkSourceCount();
+    checkSourceCount();*/
 }
 
 void NoiseModule::addArrow(Arrow *arrow)
@@ -110,17 +135,6 @@ void NoiseModule::addArrow(Arrow *arrow)
     checkSourceCount();
 }
 
-QPixmap NoiseModule::image() const
-{
-    QPixmap pixmap(250, 250);
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    painter.setPen(QPen(Qt::black, 8));
-    painter.translate(125, 125);
-    painter.drawPolyline(myPolygon);
-
-    return pixmap;
-}
 void NoiseModule::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     scene()->clearSelection();
@@ -161,17 +175,22 @@ void NoiseModule::keyReleaseEvent ( QKeyEvent *event )
 
 void NoiseModule::checkSourceCount()
 {
-    int sourceCount = 0;
+/*    int sourceCount = 0;
     foreach (Arrow *arrow, arrows)
     {
         if(arrow->endItem() == this)sourceCount++;
     }
     if(sourceCount!=moduleSourceCount)
     {
-        setPen(QPen(QBrush(Qt::red), 4));
+        setPen(QPen(QBrush(Qt::red), 1));
     }
     else
     {
-        setPen(QPen(QBrush(Qt::green), 2));
-    }
+        setPen(QPen(QBrush(Qt::green), 1));
+    }*/
+}
+
+int NoiseModule::type() const
+{
+    return NoiseModuleScene::BaseModule;
 }

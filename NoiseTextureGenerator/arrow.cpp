@@ -43,10 +43,11 @@
 #include "arrow.h"
 #include <math.h>
 #include "noisemodule.h"
+#include "noisemodulescene.h"
 
 const qreal Pi = 3.14;
 
-Arrow::Arrow(NoiseModule *startItem, NoiseModule *endItem,
+Arrow::Arrow(NoiseModuleConnector *startItem, NoiseModuleConnector *endItem,
 	 QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsLineItem(parent, scene)
 {
@@ -77,7 +78,10 @@ QPainterPath Arrow::shape() const
 
 void Arrow::updatePosition()
 {
-    QLineF line(mapFromItem(myStartItem, 0, 0), mapFromItem(myEndItem, 0, 0));
+    QPointF start(myStartItem->scenePos());
+    QPointF end(myEndItem->scenePos());
+//    QLineF line(mapFromItem(myStartItem, 0, 0), mapFromItem(myEndItem, 0, 0));
+    QLineF line(start, end);
     setLine(line);
 }
 
@@ -139,9 +143,14 @@ void Arrow::keyReleaseEvent(QKeyEvent *event)
 {
     if(event->matches(QKeySequence::Delete))
     {
-        myStartItem->removeArrow(this);
-        myEndItem->removeArrow(this);
+        /*myStartItem->removeArrow(this);
+        myEndItem->removeArrow(this);*/
         scene()->removeItem(this);
         delete this;
     }
+}
+
+int Arrow::type() const
+{
+    return NoiseModuleScene::ArrowModule;
 }

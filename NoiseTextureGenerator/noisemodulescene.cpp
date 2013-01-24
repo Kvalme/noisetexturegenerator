@@ -3,6 +3,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include "noiseoutput.h"
 #include <QMenu>
+#include "noisemoduleconnector.h"
 
 NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     QGraphicsScene(parent)
@@ -12,10 +13,11 @@ NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     line = 0;
     myItemColor = Qt::white;
     myTextColor = Qt::black;
-    myLineColor = Qt::black;
+    myLineColor = Qt::red;
 
     myItemMenu = new QMenu;
     deleteAction = myItemMenu->addAction(QIcon(), "Delete");
+    startConnector = endConnector = 0;
 }
 
 NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise)
@@ -37,31 +39,48 @@ void NoiseModuleScene::addModule(NoiseModule::ModuleType type, CLNoise::Noise *n
     if (!item) return;
     item->setBrush(myItemColor);
     addItem(item);
+    item->setConnectors();
     item->setPos(0, 0);
     emit itemInserted(item);
 }
 
 void NoiseModuleScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    if (mouseEvent->button() != Qt::LeftButton) return;
-
-    switch (myMode)
-    {
-	case InsertLine:
-	    line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
-	    line->setPen(QPen(myLineColor, 2));
-	    addItem(line);
-	    break;
-	default:
-	    ;
-    }
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
+
+#include <iostream>
+
 void NoiseModuleScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (myMode == InsertLine && line != 0)
     {
-        QLineF newLine(line->line().p1(), mouseEvent->scenePos());
+        QRectF box(mouseEvent->scenePos(), QSizeF(10.0, 10.0));
+        box.setLeft(box.left() - 3);
+        box.setTop(box.top() - 3);
+
+        QList<QGraphicsItem *> objects = items(box);
+
+        QPointF finalPoint = mouseEvent->scenePos();
+        line->setPen(QPen(myLineColor, 1));
+
+        endConnector = 0;
+
+        for(QGraphicsItem *object : objects)
+        {
+            if (object->type() == ConnectorModule)
+            {
+                NoiseModuleConnector *con = dynamic_cast<NoiseModuleConnector*>(object);
+                if(con->getConnectorType() != NoiseModuleConnector::OutputConnector)
+                {
+                    finalPoint = con->scenePos();
+                    line->setPen(QPen(Qt::green, 1));
+                    endConnector = con;
+                    break;
+                }
+            }
+        }
+        QLineF newLine(line->line().p1(), finalPoint);
         line->setLine(newLine);
     }
     else if (myMode == MoveItem)
@@ -71,35 +90,24 @@ void NoiseModuleScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 }
 void NoiseModuleScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-     if (line != 0 && myMode == InsertLine)
-     {
-	 QList<QGraphicsItem *> startItems = items(line->line().p1());
-	 if (startItems.count() && startItems.first() == line) startItems.removeFirst();
+    if (line != 0 && myMode == InsertLine && endConnector != 0 && startConnector != 0)
+    {
+        removeItem(line);
+        delete line;
 
-	 QList<QGraphicsItem *> endItems = items(line->line().p2());
-	 if (endItems.count() && endItems.first() == line) endItems.removeFirst();
-
-	 removeItem(line);
-	 delete line;
-	 if (startItems.count() > 0 && endItems.count() > 0 &&
-		   startItems.first()->type() == NoiseModule::Type &&
-		   endItems.first()->type() == NoiseModule::Type &&
-		   startItems.first() != endItems.first())
-	 {
-		   NoiseModule *startItem = qgraphicsitem_cast<NoiseModule*>(startItems.first());
-		   NoiseModule *endItem = qgraphicsitem_cast<NoiseModule*>(endItems.first());
-		   Arrow *arrow = new Arrow(startItem, endItem);
-		   arrow->setColor(myLineColor);
-		   startItem->addArrow(arrow);
-		   endItem->addArrow(arrow);
-		   arrow->setZValue(-1000.0);
-		   addItem(arrow);
-		   arrow->updatePosition();
-	}
+        Arrow *arrow = new Arrow(startConnector, endConnector);
+        startConnector->addArrow(arrow);
+        endConnector->addArrow(arrow);
+//        arrow->setZValue(-1000.0);
+        addItem(arrow);
+        arrow->updatePosition();
     }
+
+    myMode = MoveItem;
     line = 0;
+    startConnector = endConnector = 0;
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
- }
+}
 bool NoiseModuleScene::isItemChange(int type)
 {
     foreach (QGraphicsItem *item, selectedItems()) {
@@ -108,9 +116,15 @@ bool NoiseModuleScene::isItemChange(int type)
     }
     return false;
 }
-void NoiseModuleScene::setMode(Mode mode)
+void NoiseModuleScene::setMode(Mode mode, NoiseModuleConnector *item)
 {
+    if (item->getConnectorType() != NoiseModuleConnector::OutputConnector)return;
+
     myMode = mode;
+    line = new QGraphicsLineItem(QLineF(item->scenePos(), item->scenePos()));
+    line->setPen(QPen(myLineColor, 1));
+    addItem(line);
+    startConnector = item;
 }
 
 void NoiseModuleScene::setItemType(NoiseModule::ModuleType type)

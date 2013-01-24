@@ -1,6 +1,6 @@
 #include <QMessageBox>
 #include "noiseoutput.h"
-
+#include "noisemodulescene.h"
 #include "clnoiseoutput.h"
 
 NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, QGraphicsItem *parent, QGraphicsScene *scene) : NoiseModule(contextMenu, noise, parent, scene)
@@ -33,18 +33,7 @@ NoiseOutputModule::~NoiseOutputModule()
 {
 }
 
-/*std::string NoiseOutputModule::getOutputName(OutputType type)
+int NoiseOutputModule::type() const
 {
-    switch(type)
-    {
-    case Cylinder: return "Cylinder";
-	break;
-    case Plane: return "Plane";
-	break;
-    case Sphere: return "Sphere";
-	break;
-
-    }
-    return "";
+    return NoiseModuleScene::OutputModule;
 }
-*/

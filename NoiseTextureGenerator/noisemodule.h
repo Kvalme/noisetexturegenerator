@@ -5,30 +5,32 @@
 #include "arrow.h"
 #include "clnoisemodule.h"
 #include "clnoise.h"
+#include "noisemoduleconnector.h"
 
 class NoiseModule : public QGraphicsPolygonItem
 {
 public:
     NoiseModule();
-    enum { Type = UserType + 15 };
     enum ModuleType { BaseModule, OutputModule};
 
     NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
 
     void removeArrow(Arrow *arrow);
     void removeArrows();
+
     ModuleType moduleType() const { return myModuleType; }
     QPolygonF polygon() const { return myPolygon; }
     void addArrow(Arrow *arrow);
-    QPixmap image() const;
-    int type() const { return Type;}
+    int type() const;
     QList<Arrow*> getArrows() const { return arrows;}
+    void setConnectors();
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void keyReleaseEvent ( QKeyEvent *event );
     void checkSourceCount();
+
 
     ModuleType myModuleType;
     QPolygonF myPolygon;
@@ -37,9 +39,9 @@ protected:
     int moduleSourceCount;
 
     QGraphicsTextItem text;
-    QVector<QGraphicsPolygonItem*> inputs;
-    QVector<QGraphicsPolygonItem*> outputs;
-    QVector<QGraphicsPolygonItem*> controls;
+    QVector<NoiseModuleConnector*> inputs;
+    QVector<NoiseModuleConnector*> outputs;
+    QVector<NoiseModuleConnector*> controls;
 
     CLNoise::Noise *noiseLibrary;
     CLNoise::Module *module;

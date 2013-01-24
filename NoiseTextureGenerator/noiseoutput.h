@@ -4,16 +4,12 @@
 #include "noisemodule.h"
 #include "clnoiseoutput.h"
 
-namespace CLNoise
-{
-    class Output;
-}
-
 class NoiseOutputModule : public NoiseModule
 {
 public:
-    NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
 
+    int type() const;
+    NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     virtual ~NoiseOutputModule();
 
 //    void setOutputType(OutputType type);
