@@ -15,7 +15,7 @@ class ImageRenderer : public QObject
 {
     Q_OBJECT
 public:
-    ImageRenderer(NoiseXMLBuilder *xmlBuilder) : builder(xmlBuilder), QObject(0){};
+    ImageRenderer(NoiseXMLBuilder *xmlBuilder) : QObject(0), builder(xmlBuilder){};
     static void onLineReady(int row);
     void lineReadySignalSender(int row);
 
@@ -23,7 +23,7 @@ public slots:
     void renderImage();
 
 signals:
-    void imageRendered(noise::utils::Image*);
+//    void imageRendered(noise::utils::Image*);
     void lineReady(int);
     void finished();
 
@@ -46,7 +46,7 @@ protected:
 
 private slots:
     void on_action_Save_triggered();
-    void imageRendered(noise::utils::Image *image);
+//    void imageRendered(noise::utils::Image *image);
     void lineReady(int);
 
 private:

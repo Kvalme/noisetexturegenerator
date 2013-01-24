@@ -1,0 +1,6 @@
+[submodule "NoiseTextureGenerator/libnoisecl"]
+	path = NoiseTextureGenerator/libnoisecl
+	url = gitolite.developer.nsws.ru:libnoisecl
+[submodule "NoiseTextureGenerator/libclnoise"]
+	path = NoiseTextureGenerator/libclnoise
+	url = gitolite.developer.nsws.ru:libclnoise

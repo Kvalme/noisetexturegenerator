@@ -9,9 +9,9 @@ class NoiseModule : public QGraphicsPolygonItem
 public:
     NoiseModule();
     enum { Type = UserType + 15 };
-    enum ModuleType { Generator, Modifier, Combiner, Selector, Transformer, Output};
+    enum ModuleType { Base, Output};
 
-    NoiseModule(ModuleType moduleType, QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    NoiseModule(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
 
     void removeArrow(Arrow *arrow);
     void removeArrows();

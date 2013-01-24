@@ -1,18 +1,14 @@
 #include "noisemodulescene.h"
 #include "arrow.h"
 #include <QGraphicsSceneMouseEvent>
-#include "noisegenerator.h"
 #include "noiseoutput.h"
-#include "noisemodifier.h"
-#include "noisecombiner.h"
-#include "noiseselector.h"
 #include <QMenu>
 
 NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     QGraphicsScene(parent)
 {
     myMode = MoveItem;
-    myItemType = NoiseModule::Generator;
+    myItemType = NoiseModule::Base;
     line = 0;
     myItemColor = Qt::white;
     myTextColor = Qt::black;
@@ -26,16 +22,10 @@ NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type)
 {
     switch(type)
     {
-        case NoiseModule::Generator:
-            return new NoiseGeneratorModule(myItemMenu);
+        case NoiseModule::Base:
+            return new NoiseModule(myItemMenu);
         case NoiseModule::Output:
             return new NoiseOutputModule(myItemMenu);
-        case NoiseModule::Modifier:
-            return new NoiseModifierModule(myItemMenu);
-        case NoiseModule::Combiner:
-            return new NoiseCombinerModule(myItemMenu);
-        case NoiseModule::Selector:
-            return new NoiseSelectorModule(myItemMenu);
         default:
             return 0;
     }

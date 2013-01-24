@@ -7,35 +7,7 @@
 #include "ui_mainwindow.h"
 #include "noisemodulescene.h"
 #include "noisemodule.h"
-#include "noisegenerator.h"
 #include "noiseoutput.h"
-#include "noisecombiner.h"
-#include "noisemodifier.h"
-#include "noiseselector.h"
-
-#include "NoiseGenerators/billowoptions.h"
-#include "NoiseGenerators/checkerboardoptions.h"
-#include "NoiseGenerators/constoptions.h"
-#include "NoiseGenerators/cylindersoptions.h"
-#include "NoiseGenerators/perlinoptions.h"
-#include "NoiseGenerators/ridgedmultioptions.h"
-#include "NoiseGenerators/spheresoptions.h"
-#include "NoiseGenerators/voronoioptions.h"
-
-#include "NoiseOutput/cylinderoutput.h"
-#include "NoiseOutput/planeoptions.h"
-#include "NoiseOutput/sphereoptions.h"
-
-#include "NoiseModifiers/modifierabs.h"
-#include "NoiseModifiers/modifierclamp.h"
-#include "NoiseModifiers/modifiercurve.h"
-#include "NoiseModifiers/modifierexponent.h"
-#include "NoiseModifiers/modifierinvert.h"
-#include "NoiseModifiers/modifierscalebias.h"
-#include "NoiseModifiers/modifierterrace.h"
-
-#include "NoiseSelector/selectorblend.h"
-#include "NoiseSelector/selectorselect.h"
 
 #include "Generation/generation.h"
 #include "Generation/ntgploader.h"
@@ -103,25 +75,14 @@ void MainWindow::itemSelected()
     fillModuleType(module);
 }
 
-void MainWindow::on_actionNoise_generator_triggered(bool)
+void MainWindow::on_actionNoise_module_triggered(bool)
 {
-    nmScene->addModule(NoiseModule::Generator);
+    nmScene->addModule(NoiseModule::Base);
 }
-void MainWindow::on_actionOutput_triggered(bool checked)
+
+void MainWindow::on_actionOutput_triggered(bool)
 {
     nmScene->addModule(NoiseModule::Output);
-}
-void MainWindow::on_actionModifier_triggered()
-{
-    nmScene->addModule(NoiseModule::Modifier);
-}
-void MainWindow::on_actionCombiner_triggered()
-{
-    nmScene->addModule(NoiseModule::Combiner);
-}
-void MainWindow::on_actionSelector_triggered()
-{
-    nmScene->addModule(NoiseModule::Selector);
 }
 
 void MainWindow::on_moduleType_currentIndexChanged(int index)
@@ -129,157 +90,18 @@ void MainWindow::on_moduleType_currentIndexChanged(int index)
     if(blockCurrentIndexChange)return;
     if(index<0)return;
     NoiseModule *module = dynamic_cast<NoiseModule*>(nmScene->selectedItems().first());
-    switch(module->moduleType())
-    {
-	case NoiseModule::Generator: generatorSelected(module, index);
-	    break;
-	case NoiseModule::Output: outputSelected(module, index);
-	    break;
-	case NoiseModule::Modifier: modifierSelected(module, index);
-	    break;
-	case NoiseModule::Combiner: combinerSelected(module, index);
-	    break;
-	case NoiseModule::Selector: selectorSelected(module, index);
-	    break;
-    }
+    moduleSelected(module, index);
 }
 
 void MainWindow::fillModuleType(NoiseModule *module)
 {
-    switch(module->moduleType())
+/*    switch(module->moduleType())
     {
-	case NoiseModule::Generator: fillGeneratorModuleType(module);
+    case NoiseModule::Base: fillGeneratorModuleType(module);
 	    break;
 	case NoiseModule::Output: fillOutputModuleType(module);
 	    break;
-	case NoiseModule::Modifier: fillModifierModuleType(module);
-	    break;
-	case NoiseModule::Combiner: fillCombinerModuleType(module);
-	    break;
-	case NoiseModule::Selector: fillSelectorModuleType(module);
-	    break;
-    }
-}
-void MainWindow::fillGeneratorModuleType(NoiseModule *module)
-{
-    std::cerr<<__FUNCTION__<<std::endl;
-    NoiseGeneratorModule *m = dynamic_cast<NoiseGeneratorModule*>(module);
-    blockCurrentIndexChange = true;
-    ui->moduleType->clear();
-    int curIndex = 0;
-    for(int a=NoiseGeneratorModule::Billow; a<=NoiseGeneratorModule::Voronoi; ++a)
-    {
-        ui->moduleType->addItem(m->getGeneratorName((NoiseGeneratorModule::GeneratorType)a).c_str());
-        if((NoiseGeneratorModule::GeneratorType)a == m->getGeneratorType())curIndex = a;
-    }
-    ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
-    blockCurrentIndexChange = false;
-    ui->moduleType->setCurrentIndex(curIndex);
-}
-void MainWindow::generatorSelected(NoiseModule *module, int index)
-{
-    std::cerr<<__FUNCTION__<<std::endl;
-    NoiseGeneratorModule *m = dynamic_cast<NoiseGeneratorModule*>(module);
-
-    if(m->getGeneratorType() != (NoiseGeneratorModule::GeneratorType)index)
-    {
-        m->setGeneratorType((NoiseGeneratorModule::GeneratorType)index);
-    }
-
-    if(opt)
-    {
-        delete opt;
-        QLayout *layout = ui->moduleOptionsFrame->layout();
-        delete layout;
-    }
-
-    switch((NoiseGeneratorModule::GeneratorType)index)
-    {
-	case NoiseGeneratorModule::Billow:
-	    opt = new BillowOptions(m);
-	    break;
-	case NoiseGeneratorModule::Checkerboard:
-	    opt = new CheckerboardOptions(m);
-	    break;
-	case NoiseGeneratorModule::Const:
-	    opt = new ConstOptions(m);
-	    break;
-	case NoiseGeneratorModule::Cylinders:
-	    opt = new CylindersOptions(m);
-	    break;
-	case NoiseGeneratorModule::Perlin:
-	    opt = new PerlinOptions(m);
-	    break;
-	case NoiseGeneratorModule::RidgedMulti:
-	    opt = new RidgedMultiOptions(m);
-	    break;
-	case NoiseGeneratorModule::Spheres:
-	    opt = new SpheresOptions(m);
-	    break;
-	case NoiseGeneratorModule::Voronoi:
-	    opt = new VoronoiOptions(m);
-	    break;
-    }
-    ui->moduleOptionsFrame->setLayout(new QVBoxLayout());
-    ui->moduleOptionsFrame->layout()->addWidget(opt);
-
-}
-
-void MainWindow::fillOutputModuleType(NoiseModule *module)
-{
-    std::cerr<<__FUNCTION__<<std::endl;
-    NoiseOutputModule *m = dynamic_cast<NoiseOutputModule*>(module);
-    blockCurrentIndexChange = true;
-    ui->moduleType->clear();
-    int curIndex = 0;
-    for(int a=NoiseOutputModule::Cylinder; a<=NoiseOutputModule::Sphere; ++a)
-    {
-	ui->moduleType->addItem(m->getOutputName((NoiseOutputModule::OutputType)a).c_str());
-	if((NoiseOutputModule::OutputType)a == m->getOutputType())curIndex = a;
-
-    }
-    ui->moduleType->setCurrentIndex(curIndex>1?curIndex-1:curIndex+1);
-    blockCurrentIndexChange = false;
-    ui->moduleType->setCurrentIndex(curIndex);
-
-}
-void MainWindow::outputSelected(NoiseModule *module, int index)
-{
-    std::cerr<<__FUNCTION__<<std::endl;
-    NoiseOutputModule *m = dynamic_cast<NoiseOutputModule*>(module);
-
-    if(m->getOutputType() != (NoiseOutputModule::OutputType)index)
-    {
-        m->setOutputType((NoiseOutputModule::OutputType)index);
-    }
-
-    if(opt)
-    {
-	delete opt;
-	QLayout *layout = ui->moduleOptionsFrame->layout();
-	delete layout;
-    }
-
-    switch((NoiseOutputModule::OutputType)index)
-    {
-	case NoiseOutputModule::Cylinder:
-	    opt = new CylinderOutput(m);
-	    break;
-	case NoiseOutputModule::Plane:
-	    opt = new PlaneOptions(m);
-	    break;
-	case NoiseGeneratorModule::Const:
-	    opt = new SphereOptions(m);
-	    break;
-    }
-    ui->moduleOptionsFrame->setLayout(new QVBoxLayout());
-    ui->moduleOptionsFrame->layout()->addWidget(opt);
-}
-
-void MainWindow::on_actionConnect_triggered(bool checked)
-{
-    if(checked)nmScene->setMode(NoiseModuleScene::InsertLine);
-    else nmScene->setMode(NoiseModuleScene::MoveItem);
+    }*/
 }
 
 void MainWindow::on_generateImage_released()
@@ -390,149 +212,9 @@ void MainWindow::exportSceneData(const char *fname)
 }
 
 
-void MainWindow::fillModifierModuleType(NoiseModule *module)
-{
-    std::cerr<<__FUNCTION__<<std::endl;
-    NoiseModifierModule *m = dynamic_cast<NoiseModifierModule*>(module);
-    blockCurrentIndexChange = true;
-    std::cerr<<__FUNCTION__<<" Start blocking"<<std::endl;
-    ui->moduleType->clear();
-    int curIndex = 0;
-    for(int a=NoiseModifierModule::Abs; a<=NoiseModifierModule::Terrace; ++a)
-    {
-	ui->moduleType->addItem(m->getName((NoiseModifierModule::ModifierType)a).c_str());
-	if((NoiseModifierModule::ModifierType)a == m->getType())curIndex = a;
-
-    }
-    blockCurrentIndexChange = false;
-    ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
-    std::cerr<<__FUNCTION__<<" End blocking"<<std::endl;
-    ui->moduleType->setCurrentIndex(curIndex);
-}
-void MainWindow::modifierSelected(NoiseModule *module, int index)
-{
-    std::cerr<<__FUNCTION__<<std::endl;
-    NoiseModifierModule *m = dynamic_cast<NoiseModifierModule*>(module);
-
-    if(m->getType() != (NoiseModifierModule::ModifierType)index)
-    {
-        m->setType((NoiseModifierModule::ModifierType)index);
-    }
-
-    if(opt)
-    {
-        delete opt;
-        QLayout *layout = ui->moduleOptionsFrame->layout();
-        delete layout;
-    }
-
-    switch((NoiseModifierModule::ModifierType)index)
-    {
-	case NoiseModifierModule::Abs:
-	    opt = new ModifierAbs(m);
-	    break;
-	case NoiseModifierModule::Clamp:
-	    opt = new ModifierClamp(m);
-	    break;
-	case NoiseModifierModule::Curve:
-	    opt = new ModifierCurve(m);
-	    break;
-	case NoiseModifierModule::Exponent:
-	    opt = new ModifierExponent(m);
-	    break;
-	case NoiseModifierModule::Invert:
-	    opt = new ModifierInvert(m);
-	    break;
-	case NoiseModifierModule::ScaleBias:
-	    opt = new ModifierScaleBias(m);
-	    break;
-	case NoiseModifierModule::Terrace:
-	    opt = new ModifierTerrace(m);
-	    break;
-    }
-    ui->moduleOptionsFrame->setLayout(new QVBoxLayout());
-    ui->moduleOptionsFrame->layout()->addWidget(opt);
-
-}
-
-void MainWindow::fillCombinerModuleType(NoiseModule *module)
-{
-    std::cerr<<__FUNCTION__<<std::endl;
-    NoiseCombinerModule *m = dynamic_cast<NoiseCombinerModule*>(module);
-    blockCurrentIndexChange = true;
-    ui->moduleType->clear();
-    int curIndex = 0;
-    for(int a=NoiseCombinerModule::Add; a<=NoiseCombinerModule::Power; ++a)
-    {
-	ui->moduleType->addItem(m->getName((NoiseCombinerModule::CombinerType)a).c_str());
-	if((NoiseCombinerModule::CombinerType)a == m->getType())curIndex = a;
-
-    }
-    ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
-    blockCurrentIndexChange = false;
-    ui->moduleType->setCurrentIndex(curIndex);
-}
-void MainWindow::combinerSelected(NoiseModule *module, int index)
-{
-    std::cerr<<__FUNCTION__<<std::endl;
-    NoiseCombinerModule *m = dynamic_cast<NoiseCombinerModule*>(module);
-    if(m->getType() != (NoiseCombinerModule::CombinerType)index) m->setType((NoiseCombinerModule::CombinerType)index);
-
-    if(opt)
-    {
-        delete opt;
-        QLayout *layout = ui->moduleOptionsFrame->layout();
-        delete layout;
-        opt = 0;
-    }
-}
-
-void MainWindow::fillSelectorModuleType(NoiseModule *module)
-{
-    std::cerr<<__FUNCTION__<<std::endl;
-    NoiseSelectorModule *m = dynamic_cast<NoiseSelectorModule*>(module);
-    blockCurrentIndexChange = true;
-    ui->moduleType->clear();
-    int curIndex = 0;
-    for(int a=NoiseSelectorModule::Blend; a<=NoiseSelectorModule::Select; ++a)
-    {
-	ui->moduleType->addItem(m->getName((NoiseSelectorModule::SelectorType)a).c_str());
-	if((NoiseSelectorModule::ModuleType)a == m->getType())curIndex = a;
-
-    }
-    ui->moduleType->setCurrentIndex(curIndex>2?curIndex-1:curIndex+1);
-    blockCurrentIndexChange = false;
-    ui->moduleType->setCurrentIndex(curIndex);
-}
-
-void MainWindow::selectorSelected(NoiseModule *module, int index)
-{
-    std::cerr<<__FUNCTION__<<std::endl;
-    NoiseSelectorModule *m = dynamic_cast<NoiseSelectorModule*>(module);
-
-    if(m->getType() != (NoiseSelectorModule::SelectorType)index)m->setType((NoiseSelectorModule::SelectorType)index);
-
-    if(opt)
-    {
-        delete opt;
-        QLayout *layout = ui->moduleOptionsFrame->layout();
-        delete layout;
-    }
-
-    switch((NoiseSelectorModule::SelectorType)index)
-    {
-	case NoiseSelectorModule::Blend:
-	    opt = new SelectorBlend(m);
-	    break;
-	case NoiseSelectorModule::Select:
-	    opt = new SelectorSelect(m);
-	    break;
-    }
-    ui->moduleOptionsFrame->setLayout(new QVBoxLayout());
-    ui->moduleOptionsFrame->layout()->addWidget(opt);
-}
 
 void MainWindow::on_action_New_project_triggered()
 {
     nmScene->clear();
 }
+

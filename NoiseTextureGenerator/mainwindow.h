@@ -24,21 +24,6 @@ protected:
     void changeEvent(QEvent *e);
     void fillModuleType(NoiseModule *module);
 
-    void fillGeneratorModuleType(NoiseModule *module);
-    void generatorSelected(NoiseModule *module, int index);
-
-    void fillOutputModuleType(NoiseModule *module);
-    void outputSelected(NoiseModule *module, int index);
-
-    void fillModifierModuleType(NoiseModule *module);
-    void modifierSelected(NoiseModule *module, int index);
-
-    void fillCombinerModuleType(NoiseModule *module);
-    void combinerSelected(NoiseModule *module, int index);
-
-    void fillSelectorModuleType(NoiseModule *module);
-    void selectorSelected(NoiseModule *module, int index);
-
     void exportSceneData(const char *fname);
 
 
@@ -48,12 +33,10 @@ public slots:
     void itemSelected();
 
 private slots:
-    void on_actionNoise_generator_triggered(bool checked);
+    void on_actionNoise_module_triggered(bool checked);
     void on_moduleType_currentIndexChanged(int index);
 
-    void on_actionOutput_triggered(bool checked);
-
-    void on_actionConnect_triggered(bool checked);
+    void on_actionOutput_triggered(bool);
 
     void on_generateImage_released();
 
@@ -63,15 +46,13 @@ private slots:
 
     void on_action_Export_noise_description_triggered();
 
-    void on_actionModifier_triggered();
-
-    void on_actionCombiner_triggered();
-
-    void on_actionSelector_triggered();
-
     void on_action_New_project_triggered();
 
+    void on_actionNoise_module_triggered();
+
 private:
+    void moduleSelected(NoiseModule *module, int index);
+
     Ui::MainWindow *ui;
     NoiseModuleScene *nmScene;
     bool blockCurrentIndexChange;

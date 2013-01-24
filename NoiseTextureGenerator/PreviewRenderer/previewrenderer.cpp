@@ -27,8 +27,8 @@ void PreviewRenderer::showTexture(TiXmlDocument *doc)
     xmlBuilder = new NoiseXMLBuilder;
     xmlBuilder->load(source);
 
-    progressBar.setMaximum((xmlBuilder->getLineCount()-1) * 2);
-    progressBar.setValue(0);
+/*    progressBar.setMaximum((xmlBuilder->getLineCount()-1) * 2);
+    progressBar.setValue(0);*/
 
     if(isWorkerStarted)return;
 
@@ -47,7 +47,7 @@ void PreviewRenderer::showTexture(TiXmlDocument *doc)
     workerThread->start();
 }
 
-void PreviewRenderer::imageRendered(noise::utils::Image *img)
+/*void PreviewRenderer::imageRendered(noise::utils::Image *img)
 {
     utils::Color *c = img->GetSlabPtr();
     int w = img->GetWidth();
@@ -69,7 +69,7 @@ void PreviewRenderer::imageRendered(noise::utils::Image *img)
     }
     ui->previewPixmap->setPixmap(pix);
     isWorkerStarted = false;
-}
+}*/
 
 PreviewRenderer::~PreviewRenderer()
 {
@@ -123,7 +123,7 @@ void ImageRenderer::lineReadySignalSender(int row)
 
 void ImageRenderer::renderImage()
 {
-    current = this;
+/*    current = this;
 
     builder->setLineReadyCallback(onLineReady);
 
@@ -131,7 +131,7 @@ void ImageRenderer::renderImage()
 
     builder->setLineReadyCallback(0);
 
-    emit imageRendered(img);
+    emit imageRendered(img);*/
     emit finished();
 }
 

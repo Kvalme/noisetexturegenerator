@@ -129,12 +129,8 @@
     <property name="title">
      <string>&amp;Create module</string>
     </property>
-    <addaction name="actionNoise_generator"/>
+    <addaction name="actionNoise_module"/>
     <addaction name="separator"/>
-    <addaction name="actionModifier"/>
-    <addaction name="actionCombiner"/>
-    <addaction name="actionSelector"/>
-    <addaction name="actionTransformer"/>
     <addaction name="separator"/>
     <addaction name="actionOutput"/>
     <addaction name="separator"/>
@@ -173,53 +169,23 @@
    <addaction name="action_Load_project"/>
    <addaction name="action_Export_noise_description"/>
    <addaction name="separator"/>
-   <addaction name="actionNoise_generator"/>
-   <addaction name="separator"/>
-   <addaction name="actionModifier"/>
-   <addaction name="actionCombiner"/>
-   <addaction name="actionSelector"/>
-   <addaction name="actionTransformer"/>
-   <addaction name="separator"/>
+   <addaction name="actionNoise_module"/>
    <addaction name="actionOutput"/>
-   <addaction name="separator"/>
-   <addaction name="actionConnect"/>
   </widget>
-  <action name="actionNoise_generator">
+  <action name="actionNoise_module">
    <property name="text">
-    <string>Generator</string>
+    <string>NoiseModule</string>
    </property>
-  </action>
-  <action name="actionModifier">
-   <property name="text">
-    <string>Modifier</string>
-   </property>
-  </action>
-  <action name="actionCombiner">
-   <property name="text">
-    <string>Combiner</string>
-   </property>
-  </action>
-  <action name="actionSelector">
-   <property name="text">
-    <string>Selector</string>
-   </property>
-  </action>
-  <action name="actionTransformer">
-   <property name="text">
-    <string>Transformer</string>
+   <property name="toolTip">
+    <string>Noise modules of different kind</string>
    </property>
   </action>
   <action name="actionOutput">
    <property name="text">
-    <string>Output</string>
+    <string>NoiseOutput</string>
    </property>
-  </action>
-  <action name="actionConnect">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Connect</string>
+   <property name="toolTip">
+    <string>Noise outputs</string>
    </property>
   </action>
   <action name="action_Save_project">
