@@ -43,11 +43,11 @@
 #include "noisemodule.h"
 #include "arrow.h"
 
-NoiseModule::NoiseModule(NoiseModule::ModuleType moduleType, QMenu *contextMenu,
+NoiseModule::NoiseModule( QMenu *contextMenu,
 	     QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsPolygonItem(parent, scene)
 {
-    myModuleType = moduleType;
+    myModuleType = BaseModule;
     myContextMenu = contextMenu;
 
     setFlag(QGraphicsItem::ItemIsMovable, true);

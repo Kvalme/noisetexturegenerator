@@ -1,13 +1,15 @@
-#include "noiseoutput.h".h"
+#include "noiseoutput.h"
 
-NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene) : NoiseModule(Output, contextMenu, parent, scene)
+#include "clnoiseoutput.h"
+
+NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene) : NoiseModule(contextMenu, parent, scene)
 {
-    oType = Plane;
+    myModuleType = OutputModule;
     text.setAcceptTouchEvents(false);
     text.setAcceptHoverEvents(false);
     text.setPos(-50, -25);
     text.setDefaultTextColor(Qt::black);
-    text.setPlainText(getOutputName(oType).c_str());
+    text.setPlainText("Output");
     text.setParentItem(this);
 
     int hw = 50, hh=25;
@@ -16,7 +18,7 @@ NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, QGraphicsItem *parent, 
 	  << QPointF(hw, hh) << QPointF(-hw, hh)
 	  << QPointF(-hw, -hh);
     setPolygon(myPolygon);
-    builder = new noise::utils::NoiseMapBuilderPlane;
+//    builder = new noise::utils::NoiseMapBuilderPlane;
 
     moduleSourceCount = 1;
     checkSourceCount();
@@ -25,25 +27,7 @@ NoiseOutputModule::~NoiseOutputModule()
 {
 }
 
-void NoiseOutputModule::setOutputType(OutputType type)
-{
-    if(type == oType)return;
-    oType = type;
-    text.setPlainText(getOutputName(oType).c_str());
-    delete builder;
-    switch(type)
-    {
-    case Cylinder: builder = new noise::utils::NoiseMapBuilderCylinder;
-	break;
-    case Plane: builder = new noise::utils::NoiseMapBuilderPlane;
-	break;
-    case Sphere: builder = new noise::utils::NoiseMapBuilderSphere;
-	break;
-
-    }
-}
-
-std::string NoiseOutputModule::getOutputName(OutputType type)
+/*std::string NoiseOutputModule::getOutputName(OutputType type)
 {
     switch(type)
     {
@@ -57,3 +41,4 @@ std::string NoiseOutputModule::getOutputName(OutputType type)
     }
     return "";
 }
+*/

@@ -8,7 +8,7 @@ NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     QGraphicsScene(parent)
 {
     myMode = MoveItem;
-    myItemType = NoiseModule::Base;
+    myItemType = NoiseModule::BaseModule;
     line = 0;
     myItemColor = Qt::white;
     myTextColor = Qt::black;
@@ -22,9 +22,9 @@ NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type)
 {
     switch(type)
     {
-        case NoiseModule::Base:
+        case NoiseModule::BaseModule:
             return new NoiseModule(myItemMenu);
-        case NoiseModule::Output:
+        case NoiseModule::OutputModule:
             return new NoiseOutputModule(myItemMenu);
         default:
             return 0;

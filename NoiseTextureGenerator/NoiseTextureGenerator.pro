@@ -24,9 +24,9 @@ SOURCES += main.cpp\
     Generation/noisexmlbuilder.cpp \
     Generation/ntgploader.cpp \
     GradientEditor/gradienteditor.cpp \
-    libclnoisecl/src/clnoise.cpp \
-    libclnoisecl/src/clnoisemodule.cpp \
-    libclnoisecl/src/clnoiseoutput.cpp
+    libclnoise/src/clnoise.cpp \
+    libclnoise/src/clnoisemodule.cpp \
+    libclnoise/src/clnoiseoutput.cpp
 
 HEADERS  += mainwindow.h \
     noisemodulescene.h \
@@ -40,19 +40,21 @@ HEADERS  += mainwindow.h \
     Generation/noisexmlbuilder.h \
     Generation/ntgploader.h \
     GradientEditor/gradienteditor.h \
-    libclnoisecl/src/clnoisecl.h \
-    libclnoisecl/src/clnoiseclerror.h \
-    libclnoisecl/src/clnoisemodule.h \
-    libclnoisecl/src/clnoisemoduleattribute.h \
-    libclnoisecl/src/clnoiseoutput.h
+    libclnoise/src/clnoisecl.h \
+    libclnoise/src/clnoiseclerror.h \
+    libclnoise/src/clnoisemodule.h \
+    libclnoise/src/clnoisemoduleattribute.h \
+    libclnoise/src/clnoiseoutput.h
 
 FORMS    += mainwindow.ui \
     PreviewRenderer/previewrenderer.ui
 
-INCLUDEPATH += .
+INCLUDEPATH += libclnoise/src
 
 RESOURCES += \
     base.qrc
+
+LIBS += -lOpenCL
 
 QMAKE_CXXFLAGS += -Wno-cpp -std=c++11
 QMAKE_CXXFLAGS_RELEASE += -O3 -mfpmath=sse,387 -msse -msse2 -msse3

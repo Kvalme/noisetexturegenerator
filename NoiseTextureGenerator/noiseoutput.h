@@ -2,7 +2,11 @@
 
 #include <QGraphicsPolygonItem>
 #include "noisemodule.h"
-#include "libnoisecl/src/noiseoutput.h"
+
+namespace CLNoise
+{
+    class Output;
+}
 
 class NoiseOutputModule : public NoiseModule
 {
@@ -14,9 +18,9 @@ public:
 //    void setOutputType(OutputType type);
 //    OutputType getOutputType() const { return oType;}
 //    std::string getOutputName(OutputType type);
-    NOISECL::NoiseOutput* getModule() { return module;}
-    void setModule(NOISECL::NoiseOutput *mod) { module = mod;}
+    CLNoise::Output* getModule() { return module;}
+    void setModule(CLNoise::Output *mod) { module = mod;}
 protected:
     QGraphicsTextItem text;
-    NOISECL::NoiseOutput *module;
+    CLNoise::Output *module;
 };

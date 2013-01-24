@@ -33,7 +33,7 @@ public slots:
     void itemSelected();
 
 private slots:
-    void on_actionNoise_module_triggered(bool checked);
+    void on_actionNoise_module_triggered();
     void on_moduleType_currentIndexChanged(int index);
 
     void on_actionOutput_triggered(bool);
@@ -47,8 +47,6 @@ private slots:
     void on_action_Export_noise_description_triggered();
 
     void on_action_New_project_triggered();
-
-    void on_actionNoise_module_triggered();
 
 private:
     void moduleSelected(NoiseModule *module, int index);

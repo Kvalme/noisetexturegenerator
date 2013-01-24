@@ -9,7 +9,7 @@ class NoiseModule : public QGraphicsPolygonItem
 public:
     NoiseModule();
     enum { Type = UserType + 15 };
-    enum ModuleType { Base, Output};
+    enum ModuleType { BaseModule, OutputModule};
 
     NoiseModule(QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
 

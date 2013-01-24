@@ -75,14 +75,14 @@ void MainWindow::itemSelected()
     fillModuleType(module);
 }
 
-void MainWindow::on_actionNoise_module_triggered(bool)
+void MainWindow::on_actionNoise_module_triggered()
 {
-    nmScene->addModule(NoiseModule::Base);
+    nmScene->addModule(NoiseModule::BaseModule);
 }
 
 void MainWindow::on_actionOutput_triggered(bool)
 {
-    nmScene->addModule(NoiseModule::Output);
+    nmScene->addModule(NoiseModule::OutputModule);
 }
 
 void MainWindow::on_moduleType_currentIndexChanged(int index)
@@ -218,3 +218,7 @@ void MainWindow::on_action_New_project_triggered()
     nmScene->clear();
 }
 
+void MainWindow::moduleSelected(NoiseModule *module, int index)
+{
+
+}
