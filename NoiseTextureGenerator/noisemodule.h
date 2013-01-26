@@ -24,6 +24,7 @@ public:
     int type() const;
     QList<Arrow*> getArrows() const { return arrows;}
     void setConnectors();
+    CLNoise::Module* getNoiseModule() { return module;}
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);

@@ -49,8 +49,6 @@ void NoiseModuleScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
 
-#include <iostream>
-
 void NoiseModuleScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (myMode == InsertLine && line != 0)
@@ -101,6 +99,11 @@ void NoiseModuleScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
         arrow->setZValue(-1000.0);
         addItem(arrow);
         arrow->updatePosition();
+    }
+    else
+    {
+        removeItem(line);
+        delete line;
     }
 
     myMode = MoveItem;

@@ -24,8 +24,6 @@ public:
 
 protected:
     void changeEvent(QEvent *e);
-    void fillModuleType(NoiseModule *module);
-
     void exportSceneData(const char *fname);
 
 
@@ -43,10 +41,10 @@ private slots:
     void on_action_Load_project_triggered();
     void on_action_Export_noise_description_triggered();
     void on_action_New_project_triggered();
+    void onAttributeValueChanged(int value);
 
 private:
-    void moduleSelected(NoiseModule *module, int index);
-
+    void buildModuleOptions(NoiseModule*);
     Ui::MainWindow *ui;
     NoiseModuleScene *nmScene;
     bool blockCurrentIndexChange;

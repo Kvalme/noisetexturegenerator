@@ -15,6 +15,16 @@
 
 #include "PreviewRenderer/previewrenderer.h"
 
+class AttributeData : public QObjectUserData
+{
+public:
+    AttributeData(const std::string &name, CLNoise::ModuleAttribute::ATTRIBUTE_TYPE t) : attName(name), type(t){}
+    std::string getAddName() const { return attName;}
+    CLNoise::ModuleAttribute::ATTRIBUTE_TYPE getType() const { return type;}
+private:
+    std::string attName;
+    CLNoise::ModuleAttribute::ATTRIBUTE_TYPE type;
+};
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -78,13 +88,18 @@ void MainWindow::itemInserted(NoiseModule *)
 
 void MainWindow::itemSelected()
 {
-    std::cerr<<__FUNCTION__<<std::endl;
     if(nmScene->selectedItems().empty())return;
-    QGraphicsItem *item = nmScene->selectedItems().first();
 
-    if(item->type()!=NoiseModule::Type)return;
-    NoiseModule *module = dynamic_cast<NoiseModule*>(item);
-    fillModuleType(module);
+    QGraphicsItem *item;
+    foreach(item, nmScene->selectedItems())
+    {
+        int type = item->type();
+        if(type != NoiseModuleScene::BaseModule && type!= NoiseModuleScene::OutputModule)return;
+        else break;
+    }
+
+    buildModuleOptions(dynamic_cast<NoiseModule*>(item));
+
 }
 
 void MainWindow::on_actionNoise_module_triggered()
@@ -118,19 +133,75 @@ void MainWindow::on_moduleType_currentIndexChanged(int index)
 {
     if(blockCurrentIndexChange)return;
     if(index<0)return;
-    NoiseModule *module = dynamic_cast<NoiseModule*>(nmScene->selectedItems().first());
-    moduleSelected(module, index);
+//    NoiseModule *module = dynamic_cast<NoiseModule*>(nmScene->selectedItems().first());
 }
 
-void MainWindow::fillModuleType(NoiseModule *module)
+void MainWindow::buildModuleOptions(NoiseModule *module)
 {
-/*    switch(module->moduleType())
+    CLNoise::Module *noiseModule = module->getNoiseModule();
+    if(!noiseModule)return;
+    auto attributes = noiseModule->getAttributes();
+
+    if(ui->moduleOptionsFrame->layout())
     {
-    case NoiseModule::Base: fillGeneratorModuleType(module);
-	    break;
-	case NoiseModule::Output: fillOutputModuleType(module);
-	    break;
-    }*/
+        QLayout *l = ui->moduleOptionsFrame->layout();
+        QLayoutItem* item;
+        while ( ( item = l->takeAt( 0 ) ) != NULL )
+        {
+            delete item->widget();
+            delete item;
+        }
+        delete l;
+    }
+
+    QGridLayout *layout = new QGridLayout();
+    ui->moduleOptionsFrame->setLayout(layout);
+
+    int row = 1;
+    for(const CLNoise::ModuleAttribute &att : attributes)
+    {
+        QString val;
+        QSlider *control = new QSlider(Qt::Horizontal);
+        AttributeData *data = new AttributeData(att.getName(), att.getType());
+        if(att.getType() == CLNoise::ModuleAttribute::FLOAT)
+        {
+            val = QString("%1").arg(att.getFloat());
+            control->setMinimum(0);
+            control->setMaximum(100);
+            control->setMaximumWidth(100);
+            control->setEnabled(true);
+            control->setValue(att.getFloat() * 100.);
+            control->activateWindow();
+            control->setUserData(Qt::UserRole + 1, data);
+        }
+        else if(att.getType() == CLNoise::ModuleAttribute::INT)
+        {
+            val = QString("%1").arg(att.getInt());
+            control->setMinimum(0);
+            control->setMaximum(100);
+            control->setMaximumWidth(100);
+            control->setEnabled(true);
+            control->setValue(att.getInt());
+            control->activateWindow();
+            control->setUserData(Qt::UserRole + 1, data);
+        }
+        connect(control, SIGNAL(valueChanged(int)), this, SLOT(onAttributeValueChanged(int)));
+        QLabel *value = new QLabel(val);
+        value->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        value->setObjectName(QString(att.getName().c_str()) + "Value");
+        value->setAlignment(Qt::AlignLeft);
+
+        QLabel *valueName = new QLabel(QString(att.getName().c_str())+":");
+        valueName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        valueName->setAlignment(Qt::AlignRight);
+
+        control->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+        layout->addWidget(valueName, row, 0);
+        layout->addWidget(value, row, 1);
+        layout->addWidget(control, row, 2);
+        row++;
+    }
 }
 
 void MainWindow::on_generateImage_released()
@@ -247,7 +318,27 @@ void MainWindow::on_action_New_project_triggered()
     nmScene->clear();
 }
 
-void MainWindow::moduleSelected(NoiseModule *module, int index)
+void MainWindow::onAttributeValueChanged(int value)
 {
+    QObject *s = sender();
+    if(!s)return;
+    QWidget *w = dynamic_cast<QWidget*>(s);
+    AttributeData *a= dynamic_cast<AttributeData*>(w->userData(Qt::UserRole + 1));
+    if(!a)return;
+
+    std::string name = a->getAddName();
+    QLabel *valLabel = ui->moduleOptionsFrame->findChild<QLabel*>(QString(name.c_str())+"Value");
+    if(!valLabel)return;
+
+    if(a->getType() == CLNoise::ModuleAttribute::FLOAT)
+    {
+        char buf[10];
+        snprintf(buf, 10, "%.2f", (float)value/100.);
+        valLabel->setText(buf);
+    }
+    else if(a->getType() == CLNoise::ModuleAttribute::INT)
+    {
+        valLabel->setText(QString("%1").arg(value));
+    }
 
 }
