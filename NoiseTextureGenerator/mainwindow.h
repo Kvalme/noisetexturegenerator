@@ -52,6 +52,7 @@ private:
     PreviewRenderer *previewRenderer;
     QString lastFileName;
     CLNoise::Noise *noise;
+    NoiseModule *currentModule;
 
 };
 

@@ -111,6 +111,7 @@ void NoiseModuleScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     startConnector = endConnector = 0;
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
+
 bool NoiseModuleScene::isItemChange(int type)
 {
     foreach (QGraphicsItem *item, selectedItems()) {

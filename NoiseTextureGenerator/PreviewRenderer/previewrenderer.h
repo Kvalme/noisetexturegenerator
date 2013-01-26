@@ -2,16 +2,16 @@
 #define PREVIEWRENDERER_H
 
 #include <QMainWindow>
-#include "tinyXml/tinyxml.h"
-#include "Generation/noisexmlbuilder.h"
 #include "QLinearGradient"
 #include "QProgressBar"
+#include "clnoise.h"
+#include "clnoiseoutput.h"
 
 namespace Ui {
     class PreviewRenderer;
 }
 
-class ImageRenderer : public QObject
+/*class ImageRenderer : public QObject
 {
     Q_OBJECT
 public:
@@ -31,14 +31,14 @@ private:
     static ImageRenderer *current;
     NoiseXMLBuilder *builder;
 };
-
+*/
 class PreviewRenderer : public QMainWindow
 {
     Q_OBJECT
 
 public:
     explicit PreviewRenderer(QWidget *parent = 0);
-    void showTexture(TiXmlDocument *doc);
+    void generateTexture(CLNoise::Output *output);
     ~PreviewRenderer();
 
 protected:
@@ -46,19 +46,13 @@ protected:
 
 private slots:
     void on_action_Save_triggered();
-//    void imageRendered(noise::utils::Image *image);
-    void lineReady(int);
 
 private:
-    void drawImage();
+    void drawImage(const unsigned char *image);
+
     Ui::PreviewRenderer *ui;
-    TiXmlDocument *source;
     int textureWidth;
     int textureHeight;
-    NoiseXMLBuilder *xmlBuilder;
-
-    bool isWorkerStarted;
-    QProgressBar progressBar;
 };
 
 #endif // PREVIEWRENDERER_H

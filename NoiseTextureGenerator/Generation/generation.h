@@ -21,7 +21,7 @@ class NoiseXMLGenerator
     void writeModules(bool savePosition = false);
     void writeModule(NoiseModule *m, TiXmlElement *output);
 
-    void generateLinks(NoiseModule *m);
+    void generateLinks(NoiseModule *);
     void writeLinks();
 
     void writeGradientPoints(const QVector<GradientEditor::GradientPoint> &gradientPoints);

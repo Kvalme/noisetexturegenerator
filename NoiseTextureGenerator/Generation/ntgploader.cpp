@@ -42,7 +42,7 @@ void NTGPLoader::readModules(TiXmlElement *src, NoiseModuleScene *scene)
     }
 }
 
-void NTGPLoader::readLinks(TiXmlElement *src, NoiseModuleScene *scene )
+void NTGPLoader::readLinks(TiXmlElement *src, NoiseModuleScene * )
 {
     for(TiXmlElement *xmlLink = src->FirstChildElement("Link"); xmlLink; xmlLink = xmlLink->NextSiblingElement("Link"))
     {

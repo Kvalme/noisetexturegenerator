@@ -90,6 +90,7 @@ void NoiseModule::setConnectors()
     for(int id = 0; id < module->getOutputCount(); ++id)
     {
         NoiseModuleConnector *conn = new NoiseModuleConnector(NoiseModuleConnector::OutputConnector, this);
+        conn->setConnectorId(id);
 
         float h = (float)myPolygon.boundingRect().height();
         float y = h / (float)module->getOutputCount() - h;
@@ -100,39 +101,13 @@ void NoiseModule::setConnectors()
     for(int id = 0; id < module->getInputCount(); ++id)
     {
         NoiseModuleConnector *conn = new NoiseModuleConnector(NoiseModuleConnector::InputConnector, this);
+        conn->setConnectorId(id);
 
         float h = (float)myPolygon.boundingRect().height();
         float y = h / (float)module->getInputCount() - h;
 
         conn->setPos(-myPolygon.boundingRect().width()/2. + conn->polygon().boundingRect().width()/2., y);
     }
-}
-
-void NoiseModule::removeArrow(Arrow *arrow)
-{
-/*    int index = arrows.indexOf(arrow);
-
-    if (index != -1)
-	arrows.removeAt(index);
-    checkSourceCount();*/
-}
-
-void NoiseModule::removeArrows()
-{
-/*    foreach (Arrow *arrow, arrows)
-    {
-        arrow->startItem()->removeArrow(arrow);
-        arrow->endItem()->removeArrow(arrow);
-        scene()->removeItem(arrow);
-        delete arrow;
-    }
-    checkSourceCount();*/
-}
-
-void NoiseModule::addArrow(Arrow *arrow)
-{
-    arrows.append(arrow);
-    checkSourceCount();
 }
 
 void NoiseModule::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -144,30 +119,16 @@ void NoiseModule::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         QAction *act = myContextMenu->exec(event->screenPos());
         if(act->text() == "Delete")
         {
-            removeArrows();
             scene()->removeItem(this);
             delete this;
         }
     }
 }
 
-QVariant NoiseModule::itemChange(GraphicsItemChange change,
-		     const QVariant &value)
-{
-    if (change == QGraphicsItem::ItemPositionChange) {
-	foreach (Arrow *arrow, arrows) {
-	    arrow->updatePosition();
-	}
-    }
-
-    return value;
-}
-
 void NoiseModule::keyReleaseEvent ( QKeyEvent *event )
 {
     if(event->matches(QKeySequence::Delete))
     {
-        removeArrows();
         scene()->removeItem(this);
         delete this;
     }
@@ -193,4 +154,16 @@ void NoiseModule::checkSourceCount()
 int NoiseModule::type() const
 {
     return NoiseModuleScene::BaseModule;
+}
+
+void NoiseModule::setInput(int id, NoiseModule *input)
+{
+    if(!module || !input || !input->getNoiseModule())return;
+    module->setSource(id, input->getNoiseModule());
+}
+
+void NoiseModule::setControl(int id, NoiseModule *control)
+{
+    if(!module || !control || !control->getNoiseModule())return;
+    module->setControls(id, control->getNoiseModule());
 }

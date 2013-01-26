@@ -3,6 +3,7 @@
 #include <QLayout>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPushButton>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -83,7 +84,6 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::itemInserted(NoiseModule *)
 {
-//    nmScene->setMode(NoiseModuleScene::MoveItem);
 }
 
 void MainWindow::itemSelected()
@@ -94,12 +94,10 @@ void MainWindow::itemSelected()
     foreach(item, nmScene->selectedItems())
     {
         int type = item->type();
-        if(type != NoiseModuleScene::BaseModule && type!= NoiseModuleScene::OutputModule)return;
+        if(type != NoiseModuleScene::BaseModule && type!= NoiseModuleScene::OutputModule)continue;
         else break;
     }
-
     buildModuleOptions(dynamic_cast<NoiseModule*>(item));
-
 }
 
 void MainWindow::on_actionNoise_module_triggered()
@@ -138,8 +136,12 @@ void MainWindow::on_moduleType_currentIndexChanged(int index)
 
 void MainWindow::buildModuleOptions(NoiseModule *module)
 {
+    if(!module)return;
+    currentModule = module;
+
     CLNoise::Module *noiseModule = module->getNoiseModule();
     if(!noiseModule)return;
+
     auto attributes = noiseModule->getAttributes();
 
     if(ui->moduleOptionsFrame->layout())
@@ -202,26 +204,24 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
         layout->addWidget(control, row, 2);
         row++;
     }
+
+    //Add Output special configuration
+    if(noiseModule->getModuleType() == CLNoise::Module::OUTPUT)
+    {
+        QPushButton *button = new QPushButton("Generate");
+        button->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        connect(button, SIGNAL(released()), this, SLOT(on_generateImage_released()));
+        layout->addWidget(button, row, 0);
+    }
 }
 
 void MainWindow::on_generateImage_released()
 {
-    NoiseXMLGenerator generator;
-
-    QList<QGraphicsItem*> items = nmScene->items();
-    QGraphicsItem* item;
-    std::set<NoiseModule*> modules;
-    foreach(item, items)
-    {
-        if(item->type()!=NoiseModule::Type)continue;
-        NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
-        modules.insert(mod);
-    }
-
-    TiXmlDocument *doc = generator.generateExport(modules, ui->gradientEditor->getGradientPoints());
+    if(currentModule->type() != NoiseModuleScene::OutputModule)return;
+    if(!currentModule->getNoiseModule())return;
 
     previewRenderer->show();
-    previewRenderer->showTexture(doc);
+    previewRenderer->generateTexture(dynamic_cast<CLNoise::Output*>(currentModule->getNoiseModule()));
 }
 
 void MainWindow::on_action_Save_project_triggered()
@@ -320,6 +320,10 @@ void MainWindow::on_action_New_project_triggered()
 
 void MainWindow::onAttributeValueChanged(int value)
 {
+    if(!currentModule)return;
+    CLNoise::Module *noiseModule = currentModule->getNoiseModule();
+    if(!noiseModule)return;
+
     QObject *s = sender();
     if(!s)return;
     QWidget *w = dynamic_cast<QWidget*>(s);
@@ -335,10 +339,12 @@ void MainWindow::onAttributeValueChanged(int value)
         char buf[10];
         snprintf(buf, 10, "%.2f", (float)value/100.);
         valLabel->setText(buf);
+        noiseModule->setAttribute(name, (float)value/100.f);
     }
     else if(a->getType() == CLNoise::ModuleAttribute::INT)
     {
         valLabel->setText(QString("%1").arg(value));
+        noiseModule->setAttribute(name, value);
     }
 
 }

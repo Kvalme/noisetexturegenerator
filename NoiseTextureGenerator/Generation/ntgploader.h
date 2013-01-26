@@ -18,7 +18,7 @@ private:
 
     void readModules(TiXmlElement *src, NoiseModuleScene *scene);
     void readGradient(TiXmlElement *src, QVector<GradientEditor::GradientPoint> *gradientPoints);
-    void readLinks(TiXmlElement *src, NoiseModuleScene *scene);
+    void readLinks(TiXmlElement *src, NoiseModuleScene *);
 
     std::map<int, NoiseModule*> modules;
 

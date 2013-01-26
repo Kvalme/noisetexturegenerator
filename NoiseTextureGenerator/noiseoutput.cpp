@@ -3,7 +3,8 @@
 #include "noisemodulescene.h"
 #include "clnoiseoutput.h"
 
-NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, QGraphicsItem *parent, QGraphicsScene *scene) : NoiseModule(contextMenu, noise, parent, scene)
+NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, QGraphicsItem *parent, QGraphicsScene *scene) :
+    NoiseModule(contextMenu, noise, parent, scene)
 {
     int hw = 50, hh=25;
 
@@ -25,6 +26,8 @@ NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, 
     std::string firstModuleName = *mods.begin();
     module = noiseLibrary->createOutput(firstModuleName);
     text.setPlainText(firstModuleName.c_str());
+
+    myModuleType = OutputModule;
 
     moduleSourceCount = 1;
     checkSourceCount();
