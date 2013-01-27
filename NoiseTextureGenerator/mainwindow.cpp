@@ -284,22 +284,18 @@ void MainWindow::on_action_Export_noise_description_triggered()
         QStringList saveFileNames = dialog.selectedFiles();
         saveFileName = saveFileNames.at(0);
 
-        NoiseXMLGenerator generator;
-
-        QList<QGraphicsItem*> items = nmScene->items();
-        QGraphicsItem* item;
-        std::set<NoiseModule*> modules;
-        foreach(item, items)
+        try
         {
-            if(item->type()!=NoiseModule::Type)continue;
-            NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
-            modules.insert(mod);
+            if (saveFileName != "") exportSceneData(saveFileName.toUtf8().data(), true);
         }
-        TiXmlDocument *doc = generator.generateExport(modules);
-        doc->SaveFile(saveFileName.toUtf8().data());
+        catch(CLNoise::Error &error)
+        {
+            QMessageBox::critical(this, "Error in libclnoise", error.what());
+            return;
+        }
     }
 }
-void MainWindow::exportSceneData(const char *fname)
+void MainWindow::exportSceneData(const char *fname, bool isExport)
 {
     NoiseXMLGenerator generator;
 
@@ -311,7 +307,9 @@ void MainWindow::exportSceneData(const char *fname)
         NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
         if(mod) modules.insert(mod);
     }
-    TiXmlDocument *doc = generator.generateSave(modules/*, ui->gradientEditor->getGradientPoints()*/);
+    TiXmlDocument *doc;
+    if(isExport) doc = generator.generateExport(modules);
+    else doc = generator.generateSave(modules);
     doc->SaveFile(fname);
 }
 

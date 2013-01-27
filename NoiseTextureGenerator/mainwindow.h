@@ -24,7 +24,7 @@ public:
 
 protected:
     void changeEvent(QEvent *e);
-    void exportSceneData(const char *fname);
+    void exportSceneData(const char *fname, bool isExport = false);
 
 
 
