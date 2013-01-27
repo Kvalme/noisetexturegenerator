@@ -21,7 +21,6 @@ SOURCES += main.cpp\
     tinyXml/tinyxmlerror.cpp \
     Generation/generation.cpp \
     PreviewRenderer/previewrenderer.cpp \
-    Generation/noisexmlbuilder.cpp \
     Generation/ntgploader.cpp \
     GradientEditor/gradienteditor.cpp \
     libclnoise/src/clnoise.cpp \
@@ -38,7 +37,6 @@ HEADERS  += mainwindow.h \
     tinyXml/tinyxml.h \
     Generation/generation.h \
     PreviewRenderer/previewrenderer.h \
-    Generation/noisexmlbuilder.h \
     Generation/ntgploader.h \
     GradientEditor/gradienteditor.h \
     libclnoise/src/clnoise.h \

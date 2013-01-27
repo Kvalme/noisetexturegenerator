@@ -95,12 +95,12 @@ void GradientEditor::contextMenuEvent(QContextMenuEvent *event)
     }
     else
     {
-        QAction *action = mainContextMenu->exec(event->globalPos());
+        mainContextMenu->exec(event->globalPos());
     }
 
 }
 
-void GradientEditor::mouseReleaseEvent(QMouseEvent *event)
+void GradientEditor::mouseReleaseEvent(QMouseEvent *)
 {
     selectedGradientPoint = -1;
 }

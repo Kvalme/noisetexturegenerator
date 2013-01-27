@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     blockCurrentIndexChange = false;
     opt = 0;
     previewRenderer = new PreviewRenderer(this);
+    ui->gradientEditor->setVisible(false);
 
     foreach (QAction *action, ui->menu_File->actions())
     {
