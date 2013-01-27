@@ -167,6 +167,7 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
             control->setMinimum(att.getFloatMin() * 100.);
             control->setMaximum(att.getFloatMax() * 100.);
             control->setSingleStep(1);
+            control->setTickInterval(100);
             control->setEnabled(true);
             control->setValue(att.getFloat() * 100.);
             control->activateWindow();
@@ -177,12 +178,15 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
             val = QString("%1").arg(att.getInt());
             control->setMinimum(att.getIntMin());
             control->setMaximum(att.getIntMax());
+            int range = att.getIntMax() - att.getIntMin();
+            control->setTickInterval( range > 100?range/100:1 );
             control->setSingleStep(1);
             control->setEnabled(true);
             control->setValue(att.getInt());
             control->activateWindow();
             control->setUserData(Qt::UserRole + 1, data);
         }
+        control->setTickPosition(QSlider::TicksBothSides);
         connect(control, SIGNAL(valueChanged(int)), this, SLOT(onAttributeValueChanged(int)));
         QLabel *value = new QLabel(val);
         value->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
