@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QTime>
 #include "previewrenderer.h"
 #include "ui_previewrenderer.h"
 
@@ -14,24 +15,54 @@ PreviewRenderer::PreviewRenderer(QWidget *parent):
     QPixmap pix(0, 0);
     pix.fill(Qt::black);
     ui->previewPixmap->setPixmap(pix);
+    isAutoupdateOn = false;
+    timer.connect(&timer, SIGNAL(timeout()), this, SLOT(generateTexture()));
+    timer.setSingleShot(true);
 }
 
 void PreviewRenderer::generateTexture(CLNoise::Output *output)
 {
     if(!output) return;
+    currentOutput = output;
+    generateTexture();
+}
 
+void PreviewRenderer::generateTexture()
+{
     try
     {
-        textureWidth = 256;
-        textureHeight = 256;
-        unsigned char *buf = new unsigned char[textureWidth * textureHeight * 4];
-        output->setImageDimension(textureWidth, textureHeight);
-        output->build();
-        output->run();
-        output->getImage(buf);
+        textureWidth = ui->width->currentText().toInt();
+        textureHeight = ui->height->currentText().toInt();
 
+        if (textureWidth == 0) textureWidth = 256;
+        if (textureHeight == 0) textureWidth = 256;
+
+        unsigned char *buf = new unsigned char[textureWidth * textureHeight * 4];
+        currentOutput->setImageDimension(textureWidth, textureHeight);
+        QTime tm;
+
+        tm.start();
+        currentOutput->build();
+        ui->buildTime->setNum(tm.elapsed());
+
+        tm.restart();
+        currentOutput->run();
+        ui->runTime->setNum(tm.elapsed());
+
+        tm.restart();
+        currentOutput->getImage(buf);
+        ui->getTime->setNum(tm.elapsed());
+
+        tm.restart();
         drawImage(buf);
+        ui->drawTime->setNum(tm.elapsed());
         delete[] buf;
+
+        if(isAutoupdateOn)
+        {
+            timer.start(ui->autoupdateTime->value() * 1000.);
+        }
+
     }
     catch(CLNoise::Error &error)
     {
@@ -42,31 +73,8 @@ void PreviewRenderer::generateTexture(CLNoise::Output *output)
 
 void PreviewRenderer::drawImage(const unsigned char *image)
 {
-    QPixmap pix(textureWidth, textureHeight);
-    pix.fill(Qt::black);
-    QPainter painter(&pix);
-
-#pragma pack(push, 1)
-    struct Color
-    {
-        unsigned char r;
-        unsigned char g;
-        unsigned char b;
-        unsigned char a;
-    };
-#pragma pack(pop)
-
-    Color *c = (Color*)(image);
-
-    for(int y = 0; y < textureWidth; ++y)
-    {
-        for(int x = 0; x < textureHeight; ++x)
-        {
-            painter.setPen(QPen(QBrush(QColor(c->r, c->g, c->b, c->a)), 1, Qt::SolidLine));
-            painter.drawPoint(x, y);
-            c++;
-        }
-    }
+    QImage img(image, textureWidth, textureHeight, QImage::Format_ARGB32);
+    QPixmap pix = QPixmap::fromImage(img);
     ui->previewPixmap->setPixmap(pix);
 }
 
@@ -102,5 +110,30 @@ void PreviewRenderer::on_action_Save_triggered()
         saveFileName = saveFileNames.at(0);
         QImage img = ui->previewPixmap->pixmap()->toImage();
         img.save(saveFileName, "png", 100);
+    }
+}
+
+void PreviewRenderer::on_pushButton_released()
+{
+    generateTexture();
+}
+
+void PreviewRenderer::on_enableAutoupdate_toggled(bool checked)
+{
+    if(checked)
+    {
+        if(isAutoupdateOn) return;
+        isAutoupdateOn = true;
+        ui->pushButton->setEnabled(false);
+        timer.start(ui->autoupdateTime->value() * 1000.);
+    }
+    else
+    {
+        ui->pushButton->setEnabled(true);
+        if(isAutoupdateOn)
+        {
+            isAutoupdateOn = false;
+            timer.stop();
+        }
     }
 }

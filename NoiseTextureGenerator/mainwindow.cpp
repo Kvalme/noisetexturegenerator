@@ -35,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent) :
     nmScene = new NoiseModuleScene;
     ui->graphicsView->setScene(nmScene);
 
-    connect(nmScene, SIGNAL(itemInserted(NoiseModule*)), this, SLOT(itemInserted(NoiseModule*)));
     connect(nmScene, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
 
     blockCurrentIndexChange = false;
@@ -80,10 +79,6 @@ void MainWindow::changeEvent(QEvent *e)
     default:
         break;
     }
-}
-
-void MainWindow::itemInserted(NoiseModule *)
-{
 }
 
 void MainWindow::itemSelected()
@@ -168,9 +163,9 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
         if(att.getType() == CLNoise::ModuleAttribute::FLOAT)
         {
             val = QString("%1").arg(att.getFloat());
-            control->setMinimum(0);
-            control->setMaximum(100);
-            control->setMaximumWidth(100);
+            control->setMinimum(att.getFloatMin() * 100.);
+            control->setMaximum(att.getFloatMax() * 100.);
+            control->setSingleStep(1);
             control->setEnabled(true);
             control->setValue(att.getFloat() * 100.);
             control->activateWindow();
@@ -179,9 +174,9 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
         else if(att.getType() == CLNoise::ModuleAttribute::INT)
         {
             val = QString("%1").arg(att.getInt());
-            control->setMinimum(0);
-            control->setMaximum(100);
-            control->setMaximumWidth(100);
+            control->setMinimum(att.getIntMin());
+            control->setMaximum(att.getIntMax());
+            control->setSingleStep(1);
             control->setEnabled(true);
             control->setValue(att.getInt());
             control->activateWindow();
@@ -197,7 +192,7 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
         valueName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         valueName->setAlignment(Qt::AlignRight);
 
-        control->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        control->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         layout->addWidget(valueName, row, 0);
         layout->addWidget(value, row, 1);
@@ -239,11 +234,21 @@ void MainWindow::on_action_Save_project_triggered()
         {
             QStringList saveFileNames = dialog.selectedFiles();
             saveFileName = saveFileNames.at(0);
+            lastFileName = saveFileName;
         }
     }
     else saveFileName = lastFileName;
 
-    if (saveFileName != "") exportSceneData(saveFileName.toUtf8().data());
+    try
+    {
+        if (saveFileName != "") exportSceneData(saveFileName.toUtf8().data());
+    }
+    catch(CLNoise::Error &error)
+    {
+        QMessageBox::critical(this, "Error in libclnoise", error.what());
+        return;
+    }
+
 }
 
 void MainWindow::on_action_Load_project_triggered()
@@ -259,7 +264,7 @@ void MainWindow::on_action_Load_project_triggered()
 
     nmScene->clear();
     QVector<GradientEditor::GradientPoint> gradient;
-    loader.load(&doc, nmScene, &gradient);
+    loader.load(&doc, nmScene, noise);
 
     ui->gradientEditor->setGradient(gradient);
     lastFileName = fileName;
@@ -290,7 +295,7 @@ void MainWindow::on_action_Export_noise_description_triggered()
             NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
             modules.insert(mod);
         }
-        TiXmlDocument *doc = generator.generateExport(modules, ui->gradientEditor->getGradientPoints());
+        TiXmlDocument *doc = generator.generateExport(modules);
         doc->SaveFile(saveFileName.toUtf8().data());
     }
 }
@@ -303,11 +308,10 @@ void MainWindow::exportSceneData(const char *fname)
     std::set<NoiseModule*> modules;
     foreach(item, items)
     {
-	if(item->type()!=NoiseModule::Type)continue;
-	NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
-	modules.insert(mod);
+        NoiseModule *mod = dynamic_cast<NoiseModule*>(item);
+        if(mod) modules.insert(mod);
     }
-    TiXmlDocument *doc = generator.generateSave(modules, ui->gradientEditor->getGradientPoints());
+    TiXmlDocument *doc = generator.generateSave(modules/*, ui->gradientEditor->getGradientPoints()*/);
     doc->SaveFile(fname);
 }
 

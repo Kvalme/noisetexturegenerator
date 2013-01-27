@@ -45,8 +45,8 @@
 #include "noisemodulescene.h"
 
 
-NoiseModule::NoiseModule( QMenu *contextMenu, CLNoise::Noise *noise,
-	     QGraphicsItem *parent, QGraphicsScene *scene)
+NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, CLNoise::Module *mod,
+         QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsPolygonItem(parent, scene)
 {
     myModuleType = BaseModule;
@@ -72,17 +72,24 @@ NoiseModule::NoiseModule( QMenu *contextMenu, CLNoise::Noise *noise,
       << QPointF(-hw, -hh);
     setPolygon(myPolygon);
 
-    std::vector<std::string> mods = noiseLibrary->getModulesOfType(CLNoise::Module::BASE);
-
-    if(mods.empty())
+    if(!mod)
     {
-        QMessageBox::critical(0, "Error in libclnoise", "Empty module set returned");
-        return;
-    }
+        std::vector<std::string> mods = noiseLibrary->getModulesOfType(CLNoise::Module::BASE);
 
-    std::string firstModuleName = *mods.begin();
-    module = noiseLibrary->createModule(firstModuleName);
-    text.setPlainText(firstModuleName.c_str());
+        if(mods.empty())
+        {
+            QMessageBox::critical(0, "Error in libclnoise", "Empty module set returned");
+            return;
+        }
+
+        std::string firstModuleName = *mods.begin();
+        module = noiseLibrary->createModule(firstModuleName);
+    }
+    else
+    {
+        module = mod;
+    }
+    text.setPlainText(module->getName().c_str());
 }
 
 void NoiseModule::setConnectors()
@@ -132,6 +139,19 @@ void NoiseModule::keyReleaseEvent ( QKeyEvent *event )
         scene()->removeItem(this);
         delete this;
     }
+}
+
+NoiseModuleConnector* NoiseModule::getConnector(int slotId, NoiseModuleConnector::ConnectorType type)
+{
+    foreach(QGraphicsItem *item,  childItems())
+    {
+        if(item->type() != NoiseModuleScene::ConnectorModule)continue;
+        NoiseModuleConnector *conn = dynamic_cast<NoiseModuleConnector*>(item);
+        if(!conn)continue;
+        if(conn->getConnectorType() != type)continue;
+        if(conn->getConnectorId() == slotId)return conn;
+    }
+    return 0;
 }
 
 void NoiseModule::checkSourceCount()

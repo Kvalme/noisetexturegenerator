@@ -3,8 +3,8 @@
 #include "noisemodulescene.h"
 #include "clnoiseoutput.h"
 
-NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, QGraphicsItem *parent, QGraphicsScene *scene) :
-    NoiseModule(contextMenu, noise, parent, scene)
+NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, CLNoise::Module *mod, QGraphicsItem *parent, QGraphicsScene *scene) :
+    NoiseModule(contextMenu, noise, mod, parent, scene)
 {
     int hw = 50, hh=25;
 
@@ -14,22 +14,26 @@ NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, 
              << QPointF(-hw, -hh);
     setPolygon(myPolygon);
 
-
-    std::vector<std::string> mods = noiseLibrary->getModulesOfType(CLNoise::Module::OUTPUT);
-
-    if(mods.empty())
+    if(!mod)
     {
-        QMessageBox::critical(0, "Error in libclnoise", "Empty module set returned");
-        return;
+        std::vector<std::string> mods = noiseLibrary->getModulesOfType(CLNoise::Module::OUTPUT);
+
+        if(mods.empty())
+        {
+            QMessageBox::critical(0, "Error in libclnoise", "Empty module set returned");
+            return;
+        }
+
+        std::string firstModuleName = *mods.begin();
+        module = noiseLibrary->createOutput(firstModuleName);
     }
-
-    std::string firstModuleName = *mods.begin();
-    module = noiseLibrary->createOutput(firstModuleName);
-    text.setPlainText(firstModuleName.c_str());
-
+    else
+    {
+        module = mod;
+    }
+    text.setPlainText(module->getName().c_str());
     myModuleType = OutputModule;
 
-    moduleSourceCount = 1;
     checkSourceCount();
 }
 NoiseOutputModule::~NoiseOutputModule()

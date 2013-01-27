@@ -20,14 +20,39 @@ NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     startConnector = endConnector = 0;
 }
 
-NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise)
+NoiseModule* NoiseModuleScene::addModule(CLNoise::Noise *noise, CLNoise::Module *mod)
+{
+    NoiseModule::ModuleType type;
+    switch(mod->getModuleType())
+    {
+        case CLNoise::Module::BASE:
+            type = NoiseModule::BaseModule;
+            break;
+        case CLNoise::Module::OUTPUT:
+            type = NoiseModule::OutputModule;
+            break;
+        default:
+            return 0;
+    }
+
+    NoiseModule *item = createModule(type, noise, mod);
+    if (!item) return 0;
+    item->setBrush(myItemColor);
+    addItem(item);
+    item->setConnectors();
+    item->setPos(0, 0);
+    return item;
+}
+
+
+NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, CLNoise::Module *mod)
 {
     switch(type)
     {
         case NoiseModule::BaseModule:
-            return new NoiseModule(myItemMenu, noise);
+            return new NoiseModule(myItemMenu, noise, mod);
         case NoiseModule::OutputModule:
-            return new NoiseOutputModule(myItemMenu, noise);
+            return new NoiseOutputModule(myItemMenu, noise, mod);
         default:
             return 0;
     }

@@ -12,13 +12,13 @@ class NTGPLoader
 public:
 
     NTGPLoader();
-    void load(TiXmlDocument *doc, NoiseModuleScene *scene, QVector<GradientEditor::GradientPoint> *gradientPoints);
+    void load(TiXmlDocument *doc, NoiseModuleScene *scene, CLNoise::Noise *noise);
 
 private:
 
-    void readModules(TiXmlElement *src, NoiseModuleScene *scene);
-    void readGradient(TiXmlElement *src, QVector<GradientEditor::GradientPoint> *gradientPoints);
-    void readLinks(TiXmlElement *src, NoiseModuleScene *);
+    void readModules(TiXmlElement *src, NoiseModuleScene *scene, CLNoise::Noise *noise);
+    NoiseModule* readModule(TiXmlElement *src, NoiseModuleScene *scene, CLNoise::Noise *noise);
+    void readLinks(TiXmlElement *src, NoiseModuleScene *scene);
 
     std::map<int, NoiseModule*> modules;
 

@@ -5,60 +5,87 @@
 NTGPLoader::NTGPLoader()
 {
 }
-void NTGPLoader::load(TiXmlDocument *doc, NoiseModuleScene *scene, QVector<GradientEditor::GradientPoint> *gradientPoints)
+void NTGPLoader::load(TiXmlDocument *doc, NoiseModuleScene *scene, CLNoise::Noise *noise)
 {
     TiXmlElement *root = doc->RootElement();
-    TiXmlElement *modules = root->FirstChildElement("Modules");
+    TiXmlElement *xmlModules = root->FirstChildElement("Modules");
     TiXmlElement *xmlLinks = root->FirstChildElement("Links");
-    TiXmlElement *gradient = root->FirstChildElement("Gradient");
 
-    if(modules)readModules(modules, scene);
+    if(xmlModules)readModules(xmlModules, scene, noise);
     if(xmlLinks)readLinks(xmlLinks, scene);
-
-    if(gradient)readGradient(gradient, gradientPoints);
 }
 
-void NTGPLoader::readGradient(TiXmlElement *src, QVector<GradientEditor::GradientPoint> *gradientPoints)
+void NTGPLoader::readModules(TiXmlElement *src, NoiseModuleScene *scene, CLNoise::Noise *noise)
 {
-    gradientPoints->clear();
-    for(TiXmlElement *point = src->FirstChildElement("Point"); point; point = point->NextSiblingElement("Point"))
+    for(TiXmlElement *xmlModule = src->FirstChildElement("Module"); xmlModule; xmlModule = xmlModule->NextSiblingElement("Module"))
     {
-        float pos = (float)atof(point->Attribute("pos"));
-        int r = atoi(point->Attribute("r"));
-        int g = atoi(point->Attribute("g"));
-        int b = atoi(point->Attribute("b"));
-        int a = atoi(point->Attribute("a"));
+        NoiseModule *module = readModule(xmlModule, scene, noise);
+        if(!module) continue;
 
-        gradientPoints->push_back(GradientEditor::GradientPoint(pos, QColor(r, g, b, a)));
+        int id = atol(xmlModule->Attribute("id"));
+        float xpos = atof(xmlModule->Attribute("xpos"));
+        float ypos = atof(xmlModule->Attribute("ypos"));
+
+        modules.insert(std::make_pair(id, module));
+        module->setPos(xpos, ypos);
     }
 }
 
-void NTGPLoader::readModules(TiXmlElement *src, NoiseModuleScene *scene)
+NoiseModule* NTGPLoader::readModule(TiXmlElement *src, NoiseModuleScene *scene, CLNoise::Noise *noise)
 {
-    for(TiXmlElement *generator = src->FirstChildElement("Module"); generator; generator = generator->NextSiblingElement("Module"))
+    int type = atol(src->Attribute("type"));
+    const char *moduleName = src->Attribute("name");
+
+    CLNoise::Module *module;
+    if(type == CLNoise::Module::OUTPUT)
+        module = noise->createOutput(moduleName);
+    else if(type == CLNoise::Module::BASE)
+        module = noise->createModule(moduleName);
+
+    if(!module)return 0;
+
+    for(TiXmlElement *xmlAtt = src->FirstChildElement("Attribute"); xmlAtt; xmlAtt = xmlAtt->NextSiblingElement("Attribute"))
     {
-        src++;
-        scene++;
+        const char *attName = xmlAtt->Attribute("name");
+        int type = atoi(xmlAtt->Attribute("type"));
+        switch(type)
+        {
+            case CLNoise::ModuleAttribute::FLOAT:
+                module->setAttribute(attName, (float)atof(xmlAtt->Attribute("value")));
+                break;
+            case CLNoise::ModuleAttribute::INT:
+                module->setAttribute(attName, atoi(xmlAtt->Attribute("value")));
+                break;
+            default:
+                break;
+        }
     }
+    return scene->addModule(noise, module);
 }
 
-void NTGPLoader::readLinks(TiXmlElement *src, NoiseModuleScene * )
+void NTGPLoader::readLinks(TiXmlElement *src, NoiseModuleScene * scene)
 {
     for(TiXmlElement *xmlLink = src->FirstChildElement("Link"); xmlLink; xmlLink = xmlLink->NextSiblingElement("Link"))
     {
         int fromId = atoi(xmlLink->Attribute("source"));
         int toId = atoi(xmlLink->Attribute("destination"));
+        int isControl = atoi(xmlLink->Attribute("isControl"));
+        int srcSlot = atoi(xmlLink->Attribute("sourceSlot"));
+        int dstSlot = atoi(xmlLink->Attribute("destinationSlot"));
 
         NoiseModule *fromMod = modules[fromId];
         NoiseModule *toMod = modules[toId];
         if(!fromMod || !toMod)continue;
+        NoiseModuleConnector *from = fromMod->getConnector(srcSlot, NoiseModuleConnector::OutputConnector);
+        NoiseModuleConnector *to = toMod->getConnector(dstSlot, isControl ? NoiseModuleConnector::ControlConnector : NoiseModuleConnector::InputConnector);
+        if(!from || !to)continue;
 
-/*        Arrow *arrow = new Arrow(fromMod, toMod);
-        fromMod->addArrow(arrow);
-        toMod->addArrow(arrow);
+        Arrow *arrow = new Arrow(from, to);
+        from->addArrow(arrow);
+        to->addArrow(arrow);
         arrow->setZValue(-1000.0);
+        scene->addItem(arrow);
         arrow->updatePosition();
-        scene->addItem(arrow);*/
     }
 }
 

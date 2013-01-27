@@ -1,5 +1,4 @@
-#ifndef NOISEMODULECONNECTOR_H
-#define NOISEMODULECONNECTOR_H
+#pragma once
 
 #include <QGraphicsPolygonItem>
 
@@ -14,9 +13,11 @@ public:
     enum ConnectorType { InputConnector, OutputConnector, ControlConnector};
     explicit NoiseModuleConnector(ConnectorType cType, QGraphicsItem *parent = 0);
     QPolygonF polygon() const { return connectorPoly; }
+
     void addArrow(Arrow *arrow);
     void setConnectorId(int id) { connectorId = id;}
     int getConnectorId() const { return connectorId;}
+    QList<Arrow*> getArrows() { return arrows;}
 
     NoiseModule* getModule();
 
@@ -36,5 +37,3 @@ protected:
     QList<Arrow *> arrows;
     
 };
-
-#endif // NOISEMODULECONNECTOR_H

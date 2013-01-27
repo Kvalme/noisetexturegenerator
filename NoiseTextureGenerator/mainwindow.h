@@ -29,7 +29,6 @@ protected:
 
 
 public slots:
-    void itemInserted(NoiseModule *);
     void itemSelected();
 
 private slots:

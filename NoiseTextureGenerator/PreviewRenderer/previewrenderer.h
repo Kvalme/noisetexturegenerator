@@ -2,6 +2,7 @@
 #define PREVIEWRENDERER_H
 
 #include <QMainWindow>
+#include <QTimer>
 #include "QLinearGradient"
 #include "QProgressBar"
 #include "clnoise.h"
@@ -45,7 +46,11 @@ protected:
     void changeEvent(QEvent *e);
 
 private slots:
+    void generateTexture();
     void on_action_Save_triggered();
+    void on_pushButton_released();
+
+    void on_enableAutoupdate_toggled(bool checked);
 
 private:
     void drawImage(const unsigned char *image);
@@ -53,6 +58,9 @@ private:
     Ui::PreviewRenderer *ui;
     int textureWidth;
     int textureHeight;
+    CLNoise::Output *currentOutput;
+    bool isAutoupdateOn;
+    QTimer timer;
 };
 
 #endif // PREVIEWRENDERER_H

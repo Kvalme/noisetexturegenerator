@@ -10,30 +10,25 @@
 class NoiseXMLGenerator
 {
     public:
-    TiXmlDocument* generateExport(const std::set<NoiseModule*>&, const QVector<GradientEditor::GradientPoint> &gradientPoints);
-    TiXmlDocument* generateSave(const std::set<NoiseModule*>&, const QVector<GradientEditor::GradientPoint> &gradientPoints);
+    TiXmlDocument* generateExport(const std::set<NoiseModule*>&);
+    TiXmlDocument* generateSave(const std::set<NoiseModule*>&);
 
     private:
-    TiXmlDocument* generate(const std::set<NoiseModule*>&, const QVector<GradientEditor::GradientPoint> &gradientPoints, TiXmlElement *root, bool isSave);
+    TiXmlDocument* generate(const std::set<NoiseModule*>&, TiXmlElement *root, bool isSave);
 
     void prepareModules(const std::set<NoiseModule*>&);
 
     void writeModules(bool savePosition = false);
-    void writeModule(NoiseModule *m, TiXmlElement *output);
+    void writeModule(NoiseModule *m, TiXmlElement *xmlModule);
 
     void generateLinks(NoiseModule *);
-    void writeLinks();
-
-    void writeGradientPoints(const QVector<GradientEditor::GradientPoint> &gradientPoints);
+    void writeLink(int src, int dst, int srcSlot, int dstSlot, NoiseModuleConnector::ConnectorType type);
 
 	TiXmlDocument *doc;
     TiXmlElement *xmlModules;
     TiXmlElement *xmlLinks;
-    TiXmlElement *gradient;
 
 	std::map<NoiseModule*, int> allModules;
-    std::multimap<int, int> links;
-
 };
 
 

@@ -13,7 +13,7 @@ public:
     NoiseModule();
     enum ModuleType { BaseModule, OutputModule};
 
-    NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, CLNoise::Module *mod = 0, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
 
     ModuleType moduleType() const { return myModuleType; }
     QPolygonF polygon() const { return myPolygon; }
@@ -23,6 +23,8 @@ public:
 
     void setInput(int id, NoiseModule *input);
     void setControl(int id, NoiseModule *control);
+
+    NoiseModuleConnector* getConnector(int slotId, NoiseModuleConnector::ConnectorType type);
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
@@ -34,7 +36,6 @@ protected:
     ModuleType myModuleType;
     QPolygonF myPolygon;
     QMenu *myContextMenu;
-    int moduleSourceCount;
 
     QGraphicsTextItem text;
 

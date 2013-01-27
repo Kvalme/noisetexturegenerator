@@ -16,6 +16,7 @@ public:
 
     explicit NoiseModuleScene(QObject *parent = 0);
     void addModule(NoiseModule::ModuleType type, CLNoise::Noise *noise);
+    NoiseModule *addModule(CLNoise::Noise *noise, CLNoise::Module *mod);
 
 public slots:
     void setMode(Mode mode, NoiseModuleConnector *item);
@@ -32,7 +33,7 @@ protected:
 
 private:
     bool isItemChange(int type);
-    NoiseModule* createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise);
+    NoiseModule* createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, CLNoise::Module *mod = 0);
 
     NoiseModule::ModuleType myItemType;
     QMenu *myItemMenu;

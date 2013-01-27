@@ -1,8 +1,8 @@
 #include "generation.h"
-#include <iostream>
+#include "noisemodulescene.h"
+
 void NoiseXMLGenerator::prepareModules(const std::set<NoiseModule*> &modules)
 {
-    std::cerr<<"Modules count:"<<modules.size()<<std::endl;
     allModules.clear();
 
     int id=0;
@@ -12,105 +12,129 @@ void NoiseXMLGenerator::prepareModules(const std::set<NoiseModule*> &modules)
     }
 }
 
-TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &modules, const QVector<GradientEditor::GradientPoint> &gradientPoints)
+TiXmlDocument* NoiseXMLGenerator::generateExport(const std::set<NoiseModule*> &modules)
 {
     doc = new TiXmlDocument();
     TiXmlElement *root = new TiXmlElement("NoiseMap");
     doc->LinkEndChild(root);
 
-    generate(modules, gradientPoints, root, false);
+    generate(modules, root, false);
 
     return doc;
 }
-TiXmlDocument* NoiseXMLGenerator::generateSave(const std::set<NoiseModule*> &modules, const QVector<GradientEditor::GradientPoint> &gradientPoints)
+TiXmlDocument* NoiseXMLGenerator::generateSave(const std::set<NoiseModule*> &modules)
 {
     doc = new TiXmlDocument();
     TiXmlElement *root = new TiXmlElement("NoiseTextureGeneratorProject");
     doc->LinkEndChild(root);
 
-    generate(modules, gradientPoints, root, true);
+    generate(modules, root, true);
 
     return doc;
 }
 
 TiXmlDocument* NoiseXMLGenerator::generate(
         const std::set<NoiseModule*> &modules,
-        const QVector<GradientEditor::GradientPoint> &gradientPoints,
         TiXmlElement *root,
         bool isSave)
 {
     xmlModules = new TiXmlElement("Modules");
     xmlLinks = new TiXmlElement("Links");
-    gradient = new TiXmlElement("Gradient");
 
     root->LinkEndChild(xmlModules);
     root->LinkEndChild(xmlLinks);
-    root->LinkEndChild(gradient);
 
     prepareModules(modules);
 
     writeModules(isSave);
 
-    writeLinks();
-
-    writeGradientPoints(gradientPoints);
     return 0;
 }
 
 void NoiseXMLGenerator::writeModules(bool savePosition)
 {
-    std::cerr<<__FUNCTION__<<savePosition<<std::endl;
-/*    for(std::map<NoiseGeneratorModule*, int>::iterator it = generatorModules.begin(); it!=generatorModules.end(); ++it)
+    for (std::pair<NoiseModule*, int> mod : allModules)
     {
-        NoiseGeneratorModule *m = it->first;
-        int id = it->second;
-        TiXmlElement *generator = new TiXmlElement("Generator");
-        generators->LinkEndChild(generator);
-        generator->SetAttribute("id", id);
-        generator->SetAttribute("type", m->getGeneratorType());
+        int id = mod.second;
+        TiXmlElement *xmlModule = new TiXmlElement("Module");
+        xmlModules->LinkEndChild(xmlModule);
+
+        xmlModule->SetAttribute("id", id);
+
         if(savePosition)
         {
-            generator->SetAttribute("PosX", m->pos().x());
-            generator->SetAttribute("PosY", m->pos().y());
+            QPointF pos = mod.first->scenePos();
+            xmlModule->SetAttribute("xpos", pos.x());
+            xmlModule->SetAttribute("ypos", pos.y());
         }
 
-        writeGenerator(m, generator);
-    }*/
+        writeModule(mod.first, xmlModule);
+        generateLinks(mod.first);
+    }
 }
-void NoiseXMLGenerator::writeModule(NoiseModule *m, TiXmlElement *generator)
+void NoiseXMLGenerator::writeModule(NoiseModule *m, TiXmlElement *xmlModule)
 {
-    std::cerr<<__FUNCTION__<<m<<generator<<std::endl;
-}
+    if(!m || !xmlModule)return;
 
-void NoiseXMLGenerator::generateLinks(NoiseModule*)
-{
-}
+    CLNoise::Module *module = m->getNoiseModule();
+    xmlModule->SetAttribute("name", module->getName().c_str());
+    xmlModule->SetAttribute("type", module->getModuleType());
 
-
-void NoiseXMLGenerator::writeLinks()
-{
-    for(std::map<int, int>::iterator it = links.begin(); it != links.end(); ++it)
+    for(CLNoise::ModuleAttribute att : module->getAttributes())
     {
-        TiXmlElement *xmlLink = new TiXmlElement("Link");
-        xmlLink->SetAttribute("source", it->first);
-        xmlLink->SetAttribute("destination", it->second);
-        xmlLinks->LinkEndChild(xmlLink);
+        TiXmlElement *xmlAtt = new TiXmlElement("Attribute");
+        xmlAtt->SetAttribute("name", att.getName().c_str());
+        xmlAtt->SetAttribute("type", att.getType());
+        switch(att.getType())
+        {
+            case CLNoise::ModuleAttribute::FLOAT:
+                xmlAtt->SetDoubleAttribute("value", att.getFloat());
+                break;
+            case CLNoise::ModuleAttribute::INT:
+                xmlAtt->SetAttribute("value", att.getInt());
+                break;
+            default:
+                break;
+        }
+        xmlModule->LinkEndChild(xmlAtt);
     }
 }
 
-void NoiseXMLGenerator::writeGradientPoints(const QVector<GradientEditor::GradientPoint> &gradientPoints)
+void NoiseXMLGenerator::generateLinks(NoiseModule *module)
 {
-    foreach (GradientEditor::GradientPoint point, gradientPoints)
+    auto childs = module->childItems();
+    foreach( QGraphicsItem *child, childs)
     {
-        TiXmlElement *xmlPoint = new TiXmlElement("Point");
-        char buf[20];
-        sprintf(buf, "%f", point.pos);
-        xmlPoint->SetAttribute("pos", buf);
-        xmlPoint->SetAttribute("r", point.color.red());
-        xmlPoint->SetAttribute("g", point.color.green());
-        xmlPoint->SetAttribute("b", point.color.blue());
-        xmlPoint->SetAttribute("a", 255);
+        if(child->type() != NoiseModuleScene::ConnectorModule)continue;
+        NoiseModuleConnector *connector = dynamic_cast<NoiseModuleConnector*>(child);
+        if(!connector)continue;
+        if(connector->getConnectorType() != NoiseModuleConnector::InputConnector &&
+           connector->getConnectorType() != NoiseModuleConnector::ControlConnector) continue;
 
-        gradient->LinkEndChild(xmlPoint);
+        QList<Arrow*> arrows = connector->getArrows();
+        int destId = allModules[module];
+        int dstSlot = connector->getConnectorId();
+
+        foreach(Arrow *arrow, arrows)
+        {
+            if(arrow->endItem() != connector) continue;
+            int srcId = allModules[arrow->startItem()->getModule()];
+            int srcSlot = arrow->startItem()->getConnectorId();
+
+            writeLink(srcId, destId, srcSlot, dstSlot, connector->getConnectorType());
+        }
     }
 }
+
+
+void NoiseXMLGenerator::writeLink(int src, int dst, int srcSlot, int dstSlot, NoiseModuleConnector::ConnectorType type)
+{
+    TiXmlElement *xmlLink = new TiXmlElement("Link");
+    xmlLink->SetAttribute("source", src);
+    xmlLink->SetAttribute("destination", dst);
+    xmlLink->SetAttribute("isControl", type == NoiseModuleConnector::ControlConnector);
+    xmlLink->SetAttribute("sourceSlot", srcSlot);
+    xmlLink->SetAttribute("destinationSlot", dstSlot);
+    xmlLinks->LinkEndChild(xmlLink);
+}
+
