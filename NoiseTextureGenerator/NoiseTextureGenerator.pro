@@ -26,7 +26,11 @@ SOURCES += main.cpp\
     libclnoise/src/clnoise.cpp \
     libclnoise/src/clnoisemodule.cpp \
     libclnoise/src/clnoiseoutput.cpp \
-    noisemoduleconnector.cpp
+    noisemoduleconnector.cpp \
+    libclnoise/src/clnoisemap.cpp \
+    libclnoise/src/clnoiselibrary.cpp \
+    libclnoise/src/clnoisefunction.cpp \
+    libclnoise/src/clnoisebasemodule.cpp
 
 HEADERS  += mainwindow.h \
     noisemodulescene.h \
@@ -44,7 +48,11 @@ HEADERS  += mainwindow.h \
     libclnoise/src/clnoisemodule.h \
     libclnoise/src/clnoisemoduleattribute.h \
     libclnoise/src/clnoiseoutput.h \
-    noisemoduleconnector.h
+    noisemoduleconnector.h \
+    libclnoise/src/clnoisemap.h \
+    libclnoise/src/clnoiselibrary.h \
+    libclnoise/src/clnoisefunction.h \
+    libclnoise/src/clnoisebasemodule.h
 
 FORMS    += mainwindow.ui \
     PreviewRenderer/previewrenderer.ui

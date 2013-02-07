@@ -5,6 +5,7 @@
 #include <QTime>
 #include "previewrenderer.h"
 #include "ui_previewrenderer.h"
+#include "clnoisemap.h"
 
 
 PreviewRenderer::PreviewRenderer(QWidget *parent):
@@ -24,6 +25,7 @@ void PreviewRenderer::generateTexture(CLNoise::Output *output)
 {
     if(!output) return;
     currentOutput = output;
+
     generateTexture();
 }
 
@@ -41,20 +43,24 @@ void PreviewRenderer::generateTexture()
         currentOutput->setImageDimension(textureWidth, textureHeight);
         QTime tm;
 
+        CLNoise::NoiseMap noiseMap(*noise);
+
         tm.start();
-        currentOutput->build();
+        noiseMap.build(currentOutput);
+        noiseMap.allocateResources();
+        noiseMap.buildKernel();
         ui->buildTime->setNum(tm.elapsed());
 
         tm.restart();
-        currentOutput->run();
+        noiseMap.runKernel();
         ui->runTime->setNum(tm.elapsed());
 
         tm.restart();
-        currentOutput->getImage(buf);
+        noiseMap.transferData();
         ui->getTime->setNum(tm.elapsed());
 
         tm.restart();
-        drawImage(buf);
+        drawImage(currentOutput->getData());
         ui->drawTime->setNum(tm.elapsed());
         delete[] buf;
 

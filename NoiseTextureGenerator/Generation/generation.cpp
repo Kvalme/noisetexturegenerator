@@ -78,7 +78,7 @@ void NoiseXMLGenerator::writeModule(NoiseModule *m, TiXmlElement *xmlModule)
 
     CLNoise::Module *module = m->getNoiseModule();
     xmlModule->SetAttribute("name", module->getName().c_str());
-    xmlModule->SetAttribute("type", module->getModuleType());
+    xmlModule->SetAttribute("type", module->getType());
 
     for(CLNoise::ModuleAttribute att : module->getAttributes())
     {

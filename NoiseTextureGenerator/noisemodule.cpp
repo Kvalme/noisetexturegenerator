@@ -83,7 +83,7 @@ NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, CLNoise::Mod
         }
 
         std::string firstModuleName = *mods.begin();
-        module = noiseLibrary->createModule(firstModuleName);
+        module = dynamic_cast<CLNoise::Module*>(noiseLibrary->createModule(firstModuleName, CLNoise::BaseModule::BASE));
     }
     else
     {
@@ -94,7 +94,7 @@ NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, CLNoise::Mod
 
 void NoiseModule::setConnectors()
 {
-    for(int id = 0; id < module->getOutputCount(); ++id)
+    for(unsigned int id = 0; id < module->getOutputCount(); ++id)
     {
         NoiseModuleConnector *conn = new NoiseModuleConnector(NoiseModuleConnector::OutputConnector, this);
         conn->setConnectorId(id);
@@ -105,7 +105,7 @@ void NoiseModule::setConnectors()
         conn->setPos(myPolygon.boundingRect().width()/2. + conn->polygon().boundingRect().width()/2., y);
     }
 
-    for(int id = 0; id < module->getInputCount(); ++id)
+    for(unsigned int id = 0; id < module->getInputCount(); ++id)
     {
         NoiseModuleConnector *conn = new NoiseModuleConnector(NoiseModuleConnector::InputConnector, this);
         conn->setConnectorId(id);
@@ -179,11 +179,11 @@ int NoiseModule::type() const
 void NoiseModule::setInput(int id, NoiseModule *input)
 {
     if(!module || !input || !input->getNoiseModule())return;
-    module->setSource(id, input->getNoiseModule());
+    module->setInput(id, input->getNoiseModule());
 }
 
 void NoiseModule::setControl(int id, NoiseModule *control)
 {
     if(!module || !control || !control->getNoiseModule())return;
-    module->setControls(id, control->getNoiseModule());
+    module->setControl(id, control->getNoiseModule());
 }

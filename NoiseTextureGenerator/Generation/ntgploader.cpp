@@ -38,9 +38,9 @@ NoiseModule* NTGPLoader::readModule(TiXmlElement *src, NoiseModuleScene *scene, 
 
     CLNoise::Module *module;
     if(type == CLNoise::Module::OUTPUT)
-        module = noise->createOutput(moduleName);
+        module = dynamic_cast<CLNoise::Output*>(noise->createModule(moduleName, CLNoise::Module::OUTPUT));
     else if(type == CLNoise::Module::BASE)
-        module = noise->createModule(moduleName);
+        module = dynamic_cast<CLNoise::Module*>(noise->createModule(moduleName, CLNoise::Module::BASE));
 
     if(!module)return 0;
 

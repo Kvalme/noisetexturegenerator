@@ -25,7 +25,7 @@ NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, 
         }
 
         std::string firstModuleName = *mods.begin();
-        module = noiseLibrary->createOutput(firstModuleName);
+        module = dynamic_cast<CLNoise::Output*>(noiseLibrary->createModule(firstModuleName, CLNoise::BaseModule::OUTPUT));
     }
     else
     {

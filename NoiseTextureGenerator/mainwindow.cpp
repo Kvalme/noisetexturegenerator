@@ -206,7 +206,7 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
     }
 
     //Add Output special configuration
-    if(noiseModule->getModuleType() == CLNoise::Module::OUTPUT)
+    if(noiseModule->getType() == CLNoise::Module::OUTPUT)
     {
         QPushButton *button = new QPushButton("Generate");
         button->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -220,6 +220,7 @@ void MainWindow::on_generateImage_released()
     if(currentModule->type() != NoiseModuleScene::OutputModule)return;
     if(!currentModule->getNoiseModule())return;
 
+    previewRenderer->setNoise(noise);
     previewRenderer->show();
     previewRenderer->generateTexture(dynamic_cast<CLNoise::Output*>(currentModule->getNoiseModule()));
 }

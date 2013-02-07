@@ -41,6 +41,7 @@ public:
     explicit PreviewRenderer(QWidget *parent = 0);
     void generateTexture(CLNoise::Output *output);
     ~PreviewRenderer();
+    void setNoise(CLNoise::Noise *n) { noise = n;}
 
 protected:
     void changeEvent(QEvent *e);
@@ -61,6 +62,7 @@ private:
     CLNoise::Output *currentOutput;
     bool isAutoupdateOn;
     QTimer timer;
+    CLNoise::Noise *noise;
 };
 
 #endif // PREVIEWRENDERER_H

@@ -23,7 +23,7 @@ NoiseModuleScene::NoiseModuleScene(QObject *parent) :
 NoiseModule* NoiseModuleScene::addModule(CLNoise::Noise *noise, CLNoise::Module *mod)
 {
     NoiseModule::ModuleType type;
-    switch(mod->getModuleType())
+    switch(mod->getType())
     {
         case CLNoise::Module::BASE:
             type = NoiseModule::BaseModule;
