@@ -6,7 +6,7 @@
 #include "previewrenderer.h"
 #include "ui_previewrenderer.h"
 #include "clnoisemap.h"
-
+#include <fstream>
 
 PreviewRenderer::PreviewRenderer(QWidget *parent):
     QMainWindow(parent),
@@ -47,6 +47,10 @@ void PreviewRenderer::generateTexture()
 
         tm.start();
         noiseMap.build(currentOutput);
+
+        std::ofstream err("erro");
+        err<<noiseMap.getKernelCode();
+
         noiseMap.allocateResources();
         noiseMap.buildKernel();
         ui->buildTime->setNum(tm.elapsed());

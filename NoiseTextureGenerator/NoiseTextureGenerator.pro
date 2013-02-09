@@ -30,7 +30,9 @@ SOURCES += main.cpp\
     libclnoise/src/clnoisemap.cpp \
     libclnoise/src/clnoiselibrary.cpp \
     libclnoise/src/clnoisefunction.cpp \
-    libclnoise/src/clnoisebasemodule.cpp
+    libclnoise/src/clnoisebasemodule.cpp \
+    libclnoise/src/clnoisemodifier.cpp \
+    noisemodifier.cpp
 
 HEADERS  += mainwindow.h \
     noisemodulescene.h \
@@ -52,7 +54,9 @@ HEADERS  += mainwindow.h \
     libclnoise/src/clnoisemap.h \
     libclnoise/src/clnoiselibrary.h \
     libclnoise/src/clnoisefunction.h \
-    libclnoise/src/clnoisebasemodule.h
+    libclnoise/src/clnoisebasemodule.h \
+    libclnoise/src/clnoisemodifier.h \
+    noisemodifier.h
 
 FORMS    += mainwindow.ui \
     PreviewRenderer/previewrenderer.ui

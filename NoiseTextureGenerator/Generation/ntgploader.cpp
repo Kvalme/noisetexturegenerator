@@ -1,5 +1,6 @@
 #include "ntgploader.h"
 #include "noiseoutput.h"
+#include "noisemodifier.h"
 #include "arrow.h"
 
 NTGPLoader::NTGPLoader()
@@ -41,6 +42,8 @@ NoiseModule* NTGPLoader::readModule(TiXmlElement *src, NoiseModuleScene *scene, 
         module = dynamic_cast<CLNoise::Output*>(noise->createModule(moduleName, CLNoise::Module::OUTPUT));
     else if(type == CLNoise::Module::BASE)
         module = dynamic_cast<CLNoise::Module*>(noise->createModule(moduleName, CLNoise::Module::BASE));
+    else if(type == CLNoise::Module::MODIFIER)
+        module = dynamic_cast<CLNoise::Modifier*>(noise->createModule(moduleName, CLNoise::Module::MODIFIER));
 
     if(!module)return 0;
 

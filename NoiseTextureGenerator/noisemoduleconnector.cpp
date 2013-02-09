@@ -71,7 +71,7 @@ void NoiseModuleConnector::addArrow(Arrow *arrow)
     {
         parent->setInput(connectorId, source);
     }
-    else if(connectorType == InputConnector)
+    else if(connectorType == ControlConnector)
     {
         parent->setControl(connectorId, source);
     }

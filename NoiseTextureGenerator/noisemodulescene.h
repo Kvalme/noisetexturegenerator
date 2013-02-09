@@ -12,7 +12,7 @@ class NoiseModuleScene : public QGraphicsScene
     Q_OBJECT
 public:
     enum Mode { InsertLine, MoveItem };
-    enum ModuleTypes { BaseModule = QGraphicsItem::UserType + 1, OutputModule, ConnectorModule, ArrowModule };
+    enum ModuleTypes { BaseModule = QGraphicsItem::UserType + 1, OutputModule, ConnectorModule, ArrowModule, ModifierModule };
 
     explicit NoiseModuleScene(QObject *parent = 0);
     void addModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, QString text);

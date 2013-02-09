@@ -44,6 +44,8 @@ private slots:
 
     void on_outputToolbox_itemDoubleClicked(QListWidgetItem *item);
 
+    void on_modifiersToolbox_itemDoubleClicked(QListWidgetItem *item);
+
 private:
     void buildModuleOptions(NoiseModule*);
     Ui::MainWindow *ui;

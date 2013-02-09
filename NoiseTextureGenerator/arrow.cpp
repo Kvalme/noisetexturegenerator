@@ -96,6 +96,8 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->setPen(myPen);
     painter->setBrush(myColor);
 
+    if(!myStartItem || !myEndItem) return;
+
     QLineF centerLine(myStartItem->scenePos(), myEndItem->scenePos());
     QPolygonF endPolygon = myEndItem->polygon();
     QPointF p1 = endPolygon.first() + myEndItem->scenePos();

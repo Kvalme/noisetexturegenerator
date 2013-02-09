@@ -65,6 +65,12 @@ MainWindow::MainWindow(QWidget *parent) :
         {
             ui->outputToolbox->addItem(new QListWidgetItem(str.c_str()));
         }
+
+        for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::MODIFIER))
+        {
+            ui->modifiersToolbox->addItem(new QListWidgetItem(str.c_str()));
+        }
+
     }
     catch(CLNoise::Error &error)
     {
@@ -351,6 +357,19 @@ void MainWindow::on_outputToolbox_itemDoubleClicked(QListWidgetItem *item)
     try
     {
         nmScene->addModule(NoiseModule::OutputModule, noise, item->text());
+    }
+    catch(CLNoise::Error &error)
+    {
+        QMessageBox::critical(this, "Error in libclnoise", error.what());
+        return;
+    }
+}
+
+void MainWindow::on_modifiersToolbox_itemDoubleClicked(QListWidgetItem *item)
+{
+    try
+    {
+        nmScene->addModule(NoiseModule::ModifierModule, noise, item->text());
     }
     catch(CLNoise::Error &error)
     {

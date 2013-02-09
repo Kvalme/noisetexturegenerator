@@ -94,9 +94,11 @@ void NoiseModule::setConnectors()
         conn->setConnectorId(id);
 
         float h = (float)myPolygon.boundingRect().height();
-        float y = h / (float)module->getOutputCount() - h;
+        float ys = (float)myPolygon.boundingRect().top();
+        float y = ys + (h - (id + 1) * h / ((float)module->getOutputCount() + 1));
+        float x = myPolygon.boundingRect().right() + conn->polygon().boundingRect().width()/2.;
 
-        conn->setPos(myPolygon.boundingRect().width()/2. + conn->polygon().boundingRect().width()/2., y);
+        conn->setPos(x, y);
     }
 
     for(unsigned int id = 0; id < module->getInputCount(); ++id)
@@ -105,9 +107,24 @@ void NoiseModule::setConnectors()
         conn->setConnectorId(id);
 
         float h = (float)myPolygon.boundingRect().height();
-        float y = h / (float)module->getInputCount() - h;
+        float ys = (float)myPolygon.boundingRect().top();
+        float y = ys + (h - (id + 1) * h / ((float)module->getInputCount() + 1));
+        float x = myPolygon.boundingRect().left() - conn->polygon().boundingRect().width()/2.;
 
-        conn->setPos(-myPolygon.boundingRect().width()/2. + conn->polygon().boundingRect().width()/2., y);
+        conn->setPos(x, y);
+    }
+
+    for(unsigned int id = 0; id < module->getControlCount(); ++id)
+    {
+        NoiseModuleConnector *conn = new NoiseModuleConnector(NoiseModuleConnector::ControlConnector, this);
+        conn->setConnectorId(id);
+
+        float w = (float)myPolygon.boundingRect().width();
+        float xs = (float)myPolygon.boundingRect().left();
+        float x = xs + (w - (id + 1) * w / ((float)module->getControlCount() + 1));
+        float y = myPolygon.boundingRect().bottom() + conn->polygon().boundingRect().height()/2.;
+
+        conn->setPos(x, y);
     }
 }
 
