@@ -34,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     nmScene = new NoiseModuleScene;
     ui->graphicsView->setScene(nmScene);
-
     connect(nmScene, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
 
     blockCurrentIndexChange = false;
@@ -55,6 +54,17 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         noise = new CLNoise::Noise;
         noise->initCLContext();
+        ui->modulesToolbox->clear();
+
+        for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::BASE))
+        {
+            ui->modulesToolbox->addItem(new QListWidgetItem(str.c_str()));
+        }
+
+        for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::OUTPUT))
+        {
+            ui->outputToolbox->addItem(new QListWidgetItem(str.c_str()));
+        }
     }
     catch(CLNoise::Error &error)
     {
@@ -86,7 +96,7 @@ void MainWindow::itemSelected()
 {
     if(nmScene->selectedItems().empty())return;
 
-    QGraphicsItem *item;
+    QGraphicsItem *item = 0;
     foreach(item, nmScene->selectedItems())
     {
         int type = item->type();
@@ -94,40 +104,6 @@ void MainWindow::itemSelected()
         else break;
     }
     buildModuleOptions(dynamic_cast<NoiseModule*>(item));
-}
-
-void MainWindow::on_actionNoise_module_triggered()
-{
-    try
-    {
-        nmScene->addModule(NoiseModule::BaseModule, noise);
-    }
-    catch(CLNoise::Error &error)
-    {
-        QMessageBox::critical(this, "Error in libclnoise", error.what());
-        return;
-    }
-
-}
-
-void MainWindow::on_actionOutput_triggered(bool)
-{
-    try
-    {
-        nmScene->addModule(NoiseModule::OutputModule, noise);
-    }
-    catch(CLNoise::Error &error)
-    {
-        QMessageBox::critical(this, "Error in libclnoise", error.what());
-        return;
-    }
-}
-
-void MainWindow::on_moduleType_currentIndexChanged(int index)
-{
-    if(blockCurrentIndexChange)return;
-    if(index<0)return;
-//    NoiseModule *module = dynamic_cast<NoiseModule*>(nmScene->selectedItems().first());
 }
 
 void MainWindow::buildModuleOptions(NoiseModule *module)
@@ -355,4 +331,30 @@ void MainWindow::onAttributeValueChanged(int value)
         noiseModule->setAttribute(name, value);
     }
 
+}
+
+void MainWindow::on_modulesToolbox_itemDoubleClicked(QListWidgetItem *item)
+{
+    try
+    {
+        nmScene->addModule(NoiseModule::BaseModule, noise, item->text());
+    }
+    catch(CLNoise::Error &error)
+    {
+        QMessageBox::critical(this, "Error in libclnoise", error.what());
+        return;
+    }
+}
+
+void MainWindow::on_outputToolbox_itemDoubleClicked(QListWidgetItem *item)
+{
+    try
+    {
+        nmScene->addModule(NoiseModule::OutputModule, noise, item->text());
+    }
+    catch(CLNoise::Error &error)
+    {
+        QMessageBox::critical(this, "Error in libclnoise", error.what());
+        return;
+    }
 }

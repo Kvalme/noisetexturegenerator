@@ -10,6 +10,7 @@
 
 class NoiseModuleScene;
 class NoiseModule;
+class QListWidgetItem;
 namespace Ui {
     class MainWindow;
 }
@@ -32,15 +33,16 @@ public slots:
     void itemSelected();
 
 private slots:
-    void on_actionNoise_module_triggered();
-    void on_moduleType_currentIndexChanged(int index);
-    void on_actionOutput_triggered(bool);
     void on_generateImage_released();
     void on_action_Save_project_triggered();
     void on_action_Load_project_triggered();
     void on_action_Export_noise_description_triggered();
     void on_action_New_project_triggered();
     void onAttributeValueChanged(int value);
+
+    void on_modulesToolbox_itemDoubleClicked(QListWidgetItem *item);
+
+    void on_outputToolbox_itemDoubleClicked(QListWidgetItem *item);
 
 private:
     void buildModuleOptions(NoiseModule*);

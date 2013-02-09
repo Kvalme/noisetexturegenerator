@@ -27,6 +27,39 @@
         </property>
        </widget>
       </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QListWidget" name="modulesToolbox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="flow">
+           <enum>QListView::TopToBottom</enum>
+          </property>
+          <property name="isWrapping" stdset="0">
+           <bool>false</bool>
+          </property>
+          <property name="batchSize">
+           <number>44</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="outputToolbox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
     </item>
     <item>
@@ -81,7 +114,7 @@
      <x>0</x>
      <y>0</y>
      <width>1087</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -101,10 +134,8 @@
     <property name="title">
      <string>&amp;Create module</string>
     </property>
-    <addaction name="actionNoise_module"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
-    <addaction name="actionOutput"/>
     <addaction name="separator"/>
    </widget>
    <addaction name="menu_File"/>
@@ -141,25 +172,7 @@
    <addaction name="action_Load_project"/>
    <addaction name="action_Export_noise_description"/>
    <addaction name="separator"/>
-   <addaction name="actionNoise_module"/>
-   <addaction name="actionOutput"/>
   </widget>
-  <action name="actionNoise_module">
-   <property name="text">
-    <string>NoiseModule</string>
-   </property>
-   <property name="toolTip">
-    <string>Noise modules of different kind</string>
-   </property>
-  </action>
-  <action name="actionOutput">
-   <property name="text">
-    <string>NoiseOutput</string>
-   </property>
-   <property name="toolTip">
-    <string>Noise outputs</string>
-   </property>
-  </action>
   <action name="action_Save_project">
    <property name="text">
     <string>&amp;Save project</string>

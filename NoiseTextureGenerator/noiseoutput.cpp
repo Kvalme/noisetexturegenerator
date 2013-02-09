@@ -3,8 +3,8 @@
 #include "noisemodulescene.h"
 #include "clnoiseoutput.h"
 
-NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, CLNoise::Module *mod, QGraphicsItem *parent, QGraphicsScene *scene) :
-    NoiseModule(contextMenu, noise, mod, parent, scene)
+NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::Module *mod, QGraphicsItem *parent, QGraphicsScene *scene) :
+    NoiseModule(contextMenu, noise, typeStr, mod, parent, scene)
 {
     int hw = 50, hh=25;
 
@@ -16,16 +16,7 @@ NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, 
 
     if(!mod)
     {
-        std::vector<std::string> mods = noiseLibrary->getModulesOfType(CLNoise::Module::OUTPUT);
-
-        if(mods.empty())
-        {
-            QMessageBox::critical(0, "Error in libclnoise", "Empty module set returned");
-            return;
-        }
-
-        std::string firstModuleName = *mods.begin();
-        module = dynamic_cast<CLNoise::Output*>(noiseLibrary->createModule(firstModuleName, CLNoise::BaseModule::OUTPUT));
+        module = dynamic_cast<CLNoise::Output*>(noiseLibrary->createModule(typeStr.toUtf8().data(), CLNoise::BaseModule::OUTPUT));
     }
     else
     {

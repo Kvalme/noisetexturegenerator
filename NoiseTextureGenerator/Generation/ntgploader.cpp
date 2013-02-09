@@ -60,7 +60,7 @@ NoiseModule* NTGPLoader::readModule(TiXmlElement *src, NoiseModuleScene *scene, 
                 break;
         }
     }
-    return scene->addModule(noise, module);
+    return scene->addModule(noise, module, moduleName);
 }
 
 void NTGPLoader::readLinks(TiXmlElement *src, NoiseModuleScene * scene)

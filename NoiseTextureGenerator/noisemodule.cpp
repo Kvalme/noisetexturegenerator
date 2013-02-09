@@ -45,7 +45,7 @@
 #include "noisemodulescene.h"
 
 
-NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, CLNoise::Module *mod,
+NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::Module *mod,
          QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsPolygonItem(parent, scene)
 {
@@ -74,22 +74,16 @@ NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, CLNoise::Mod
 
     if(!mod)
     {
-        std::vector<std::string> mods = noiseLibrary->getModulesOfType(CLNoise::Module::BASE);
-
-        if(mods.empty())
-        {
-            QMessageBox::critical(0, "Error in libclnoise", "Empty module set returned");
-            return;
-        }
-
-        std::string firstModuleName = *mods.begin();
-        module = dynamic_cast<CLNoise::Module*>(noiseLibrary->createModule(firstModuleName, CLNoise::BaseModule::BASE));
+        module = dynamic_cast<CLNoise::Module*>(noiseLibrary->createModule(typeStr.toUtf8().data(), CLNoise::BaseModule::BASE));
     }
     else
     {
         module = mod;
     }
-    text.setPlainText(module->getName().c_str());
+    if(module)
+    {
+        text.setPlainText(module->getName().c_str());
+    }
 }
 
 void NoiseModule::setConnectors()

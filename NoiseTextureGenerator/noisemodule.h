@@ -13,7 +13,7 @@ public:
     NoiseModule();
     enum ModuleType { BaseModule, OutputModule};
 
-    NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, CLNoise::Module *mod = 0, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::Module *mod = 0, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
 
     ModuleType moduleType() const { return myModuleType; }
     QPolygonF polygon() const { return myPolygon; }

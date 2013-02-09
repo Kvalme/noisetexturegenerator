@@ -20,7 +20,7 @@ NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     startConnector = endConnector = 0;
 }
 
-NoiseModule* NoiseModuleScene::addModule(CLNoise::Noise *noise, CLNoise::Module *mod)
+NoiseModule* NoiseModuleScene::addModule(CLNoise::Noise *noise, CLNoise::Module *mod, QString text)
 {
     NoiseModule::ModuleType type;
     switch(mod->getType())
@@ -35,7 +35,7 @@ NoiseModule* NoiseModuleScene::addModule(CLNoise::Noise *noise, CLNoise::Module 
             return 0;
     }
 
-    NoiseModule *item = createModule(type, noise, mod);
+    NoiseModule *item = createModule(type, noise, mod, text);
     if (!item) return 0;
     item->setBrush(myItemColor);
     addItem(item);
@@ -45,22 +45,22 @@ NoiseModule* NoiseModuleScene::addModule(CLNoise::Noise *noise, CLNoise::Module 
 }
 
 
-NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, CLNoise::Module *mod)
+NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, CLNoise::Module *mod, QString text)
 {
     switch(type)
     {
         case NoiseModule::BaseModule:
-            return new NoiseModule(myItemMenu, noise, mod);
+            return new NoiseModule(myItemMenu, noise, text, mod);
         case NoiseModule::OutputModule:
-            return new NoiseOutputModule(myItemMenu, noise, mod);
+            return new NoiseOutputModule(myItemMenu, noise, text, mod);
         default:
             return 0;
     }
     return 0;
 }
-void NoiseModuleScene::addModule(NoiseModule::ModuleType type, CLNoise::Noise *noise)
+void NoiseModuleScene::addModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, QString text)
 {
-    NoiseModule *item = createModule(type, noise);
+    NoiseModule *item = createModule(type, noise, 0, text);
     if (!item) return;
     item->setBrush(myItemColor);
     addItem(item);
@@ -145,6 +145,7 @@ bool NoiseModuleScene::isItemChange(int type)
     }
     return false;
 }
+
 void NoiseModuleScene::setMode(Mode mode, NoiseModuleConnector *item)
 {
     if (item->getConnectorType() != NoiseModuleConnector::OutputConnector)return;
