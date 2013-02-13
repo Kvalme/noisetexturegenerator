@@ -46,7 +46,14 @@ private slots:
 
     void on_modifiersToolbox_itemDoubleClicked(QListWidgetItem *item);
 
+    void on_clPlatform_currentIndexChanged(int index);
+
+    void on_clDevice_currentIndexChanged(int index);
+
 private:
+    void populateOpenCLPlatforms();
+    void populateOpenCLDevices(cl_platform_id platform);
+
     void buildModuleOptions(NoiseModule*);
     Ui::MainWindow *ui;
     NoiseModuleScene *nmScene;
@@ -56,6 +63,8 @@ private:
     QString lastFileName;
     CLNoise::Noise *noise;
     NoiseModule *currentModule;
+
+    cl_context clContext;
 
 };
 

@@ -16,6 +16,8 @@
 
 #include "PreviewRenderer/previewrenderer.h"
 
+#include "oclutils.h"
+
 class AttributeData : public QObjectUserData
 {
 public:
@@ -53,7 +55,6 @@ MainWindow::MainWindow(QWidget *parent) :
     try
     {
         noise = new CLNoise::Noise;
-        noise->initCLContext();
         ui->modulesToolbox->clear();
 
         for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::BASE))
@@ -77,6 +78,9 @@ MainWindow::MainWindow(QWidget *parent) :
         QMessageBox::critical(this, "Error in libclnoise", error.what());
         return;
     }
+
+    clContext = 0;
+    populateOpenCLPlatforms();
 
     lastFileName = "";
 }
@@ -372,6 +376,65 @@ void MainWindow::on_modifiersToolbox_itemDoubleClicked(QListWidgetItem *item)
         nmScene->addModule(NoiseModule::ModifierModule, noise, item->text());
     }
     catch(CLNoise::Error &error)
+    {
+        QMessageBox::critical(this, "Error in libclnoise", error.what());
+        return;
+    }
+}
+
+void MainWindow::populateOpenCLPlatforms()
+{
+    ui->clPlatform->clear();
+
+    auto platforms = oclGetPlatforms();
+    for( auto it = platforms.begin(); it != platforms.end(); ++it)
+    {
+        cl_platform_id p = it.key();
+        qlonglong lp = (qlonglong)p;
+        ui->clPlatform->addItem(it.value(), QVariant(lp));
+    }
+}
+
+void MainWindow::populateOpenCLDevices(cl_platform_id platform)
+{
+    ui->clDevice->clear();
+
+    auto devices = oclGetDevicesForPlatform(platform);
+    for( auto it = devices.begin(); it != devices.end(); ++it)
+    {
+        cl_device_id p = it.key();
+        qlonglong lp = (qlonglong)p;
+        ui->clDevice->addItem(it.value(), QVariant(lp));
+    }
+}
+
+
+void MainWindow::on_clPlatform_currentIndexChanged(int index)
+{
+    cl_platform_id platform = (cl_platform_id)(ui->clPlatform->itemData(index).toLongLong());
+    populateOpenCLDevices(platform);
+}
+
+void MainWindow::on_clDevice_currentIndexChanged(int index)
+{
+    cl_platform_id platform = (cl_platform_id)(ui->clPlatform->itemData(ui->clPlatform->currentIndex()).toLongLong());
+    cl_device_id device = (cl_device_id)(ui->clDevice->itemData(index).toLongLong());
+
+    if (clContext)
+    {
+        clReleaseContext(clContext);
+    }
+
+    // Create a compute context
+    cl_int err;
+    clContext = clCreateContext(0, 1, &device, NULL, NULL, &err);
+    if (!clContext) QMessageBox::critical(this, "OpenCL error", (std::string("Failed to create compute context: ") + CLNoise::getCLError(err)).c_str());
+
+    try
+    {
+        noise->setCLDevice(device, clContext);
+    }
+    catch (CLNoise::Error &error)
     {
         QMessageBox::critical(this, "Error in libclnoise", error.what());
         return;
