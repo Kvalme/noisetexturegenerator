@@ -17,7 +17,7 @@ public:
 
     ModuleType moduleType() const { return myModuleType; }
     QPolygonF polygon() const { return myPolygon; }
-    virtual int type() const override;
+    virtual int type() const;
     void setConnectors();
     CLNoise::Module* getNoiseModule() { return module;}
 

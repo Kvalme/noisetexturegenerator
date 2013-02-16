@@ -417,7 +417,6 @@ void MainWindow::on_clPlatform_currentIndexChanged(int index)
 
 void MainWindow::on_clDevice_currentIndexChanged(int index)
 {
-    cl_platform_id platform = (cl_platform_id)(ui->clPlatform->itemData(ui->clPlatform->currentIndex()).toLongLong());
     cl_device_id device = (cl_device_id)(ui->clDevice->itemData(index).toLongLong());
 
     if (clContext)

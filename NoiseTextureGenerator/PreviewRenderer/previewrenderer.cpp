@@ -109,17 +109,23 @@ void PreviewRenderer::on_action_Save_triggered()
 {
     QFileDialog dialog;
     dialog.setDefaultSuffix("png");
-    dialog.setNameFilter(tr("PNG image (*.png)"));
+
+    QStringList filters;
+    filters<<tr("PNG image (*.png)")<<tr("JPG image (*.jpg)");
+    dialog.setNameFilters(filters);
+
     dialog.setLabelText(QFileDialog::Accept, tr("Save"));
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setViewMode(QFileDialog::Detail);
+    dialog.setFileMode(QFileDialog::AnyFile);
+
     QString saveFileName;
     if(dialog.exec())
     {
         QStringList saveFileNames = dialog.selectedFiles();
         saveFileName = saveFileNames.at(0);
         QImage img = ui->previewPixmap->pixmap()->toImage();
-        img.save(saveFileName, "png", 100);
+        img.save(saveFileName, 0, 100);
     }
 }
 
