@@ -417,12 +417,9 @@ void MainWindow::on_clPlatform_currentIndexChanged(int index)
 
 void MainWindow::on_clDevice_currentIndexChanged(int index)
 {
+    if (index < 0)return;
     cl_device_id device = (cl_device_id)(ui->clDevice->itemData(index).toLongLong());
-
-    if (clContext)
-    {
-        clReleaseContext(clContext);
-    }
+    if (!device) return;
 
     // Create a compute context
     cl_int err;
