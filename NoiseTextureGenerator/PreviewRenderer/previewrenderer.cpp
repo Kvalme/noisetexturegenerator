@@ -48,9 +48,10 @@ void PreviewRenderer::generateTexture()
         tm.start();
         noiseMap.build(currentOutput);
 
-        std::ofstream err("erro");
+#ifdef DEBUG
+        std::ofstream err("kernel.cl");
         err<<noiseMap.getKernelCode();
-
+#endif
         noiseMap.allocateResources();
         noiseMap.buildKernel();
         ui->buildTime->setNum(tm.elapsed());

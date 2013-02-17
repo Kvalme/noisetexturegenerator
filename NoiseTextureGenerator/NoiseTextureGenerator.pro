@@ -72,4 +72,4 @@ LIBS += -lOpenCL
 
 QMAKE_CXXFLAGS += -Wno-cpp -std=c++0x
 QMAKE_CXXFLAGS_RELEASE += -g0 -O3 -mfpmath=sse,387 -msse -msse2 -msse3
-QMAKE_CXXFLAGS_DEBUG += -g3 -O0
+QMAKE_CXXFLAGS_DEBUG += -g3 -O0 -DDEBUG
