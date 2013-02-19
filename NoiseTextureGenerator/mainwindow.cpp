@@ -83,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
     populateOpenCLPlatforms();
 
     lastFileName = "";
+    centralWidget()->hide();
 }
 
 MainWindow::~MainWindow()
