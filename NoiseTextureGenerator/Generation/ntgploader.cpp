@@ -37,13 +37,13 @@ NoiseModule* NTGPLoader::readModule(TiXmlElement *src, NoiseModuleScene *scene, 
     int type = atol(src->Attribute("type"));
     const char *moduleName = src->Attribute("name");
 
-    CLNoise::Module *module;
-    if(type == CLNoise::Module::OUTPUT)
-        module = dynamic_cast<CLNoise::Output*>(noise->createModule(moduleName, CLNoise::Module::OUTPUT));
-    else if(type == CLNoise::Module::BASE)
-        module = dynamic_cast<CLNoise::Module*>(noise->createModule(moduleName, CLNoise::Module::BASE));
-    else if(type == CLNoise::Module::MODIFIER)
-        module = dynamic_cast<CLNoise::Modifier*>(noise->createModule(moduleName, CLNoise::Module::MODIFIER));
+    CLNoise::BaseModule *module;
+    if(type == CLNoise::BaseModule::OUTPUT)
+        module = dynamic_cast<CLNoise::Output*>(noise->createModule(moduleName, CLNoise::BaseModule::OUTPUT));
+    else if(type == CLNoise::BaseModule::GENERATOR)
+        module = dynamic_cast<CLNoise::BaseModule*>(noise->createModule(moduleName, CLNoise::BaseModule::GENERATOR));
+    else if(type == CLNoise::BaseModule::FILTER)
+        module = dynamic_cast<CLNoise::Filter*>(noise->createModule(moduleName, CLNoise::BaseModule::FILTER));
 
     if(!module)return 0;
 
@@ -53,11 +53,11 @@ NoiseModule* NTGPLoader::readModule(TiXmlElement *src, NoiseModuleScene *scene, 
         int type = atoi(xmlAtt->Attribute("type"));
         switch(type)
         {
-            case CLNoise::ModuleAttribute::FLOAT:
-                module->setAttribute(attName, (float)atof(xmlAtt->Attribute("value")));
+            case CLNoise::Attribute::FLOAT:
+                module->setAttribute(CLNoise::Attribute(attName, (float)atof(xmlAtt->Attribute("value")), 0.f, 0.f));
                 break;
-            case CLNoise::ModuleAttribute::INT:
-                module->setAttribute(attName, atoi(xmlAtt->Attribute("value")));
+            case CLNoise::Attribute::INT:
+                module->setAttribute(CLNoise::Attribute(attName, atoi(xmlAtt->Attribute("value")), 0, 0));
                 break;
             default:
                 break;
@@ -72,7 +72,6 @@ void NTGPLoader::readLinks(TiXmlElement *src, NoiseModuleScene * scene)
     {
         int fromId = atoi(xmlLink->Attribute("source"));
         int toId = atoi(xmlLink->Attribute("destination"));
-        int isControl = atoi(xmlLink->Attribute("isControl"));
         int srcSlot = atoi(xmlLink->Attribute("sourceSlot"));
         int dstSlot = atoi(xmlLink->Attribute("destinationSlot"));
 
@@ -80,7 +79,7 @@ void NTGPLoader::readLinks(TiXmlElement *src, NoiseModuleScene * scene)
         NoiseModule *toMod = modules[toId];
         if(!fromMod || !toMod)continue;
         NoiseModuleConnector *from = fromMod->getConnector(srcSlot, NoiseModuleConnector::OutputConnector);
-        NoiseModuleConnector *to = toMod->getConnector(dstSlot, isControl ? NoiseModuleConnector::ControlConnector : NoiseModuleConnector::InputConnector);
+        NoiseModuleConnector *to = toMod->getConnector(dstSlot, NoiseModuleConnector::InputConnector);
         if(!from || !to)continue;
 
         Arrow *arrow = new Arrow(from, to);

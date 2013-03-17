@@ -21,12 +21,12 @@
 class AttributeData : public QObjectUserData
 {
 public:
-    AttributeData(const std::string &name, CLNoise::ModuleAttribute::ATTRIBUTE_TYPE t) : attName(name), type(t){}
+    AttributeData(const std::string &name, CLNoise::Attribute::ATTRIBUTE_TYPE t) : attName(name), type(t){}
     std::string getAddName() const { return attName;}
-    CLNoise::ModuleAttribute::ATTRIBUTE_TYPE getType() const { return type;}
+    CLNoise::Attribute::ATTRIBUTE_TYPE getType() const { return type;}
 private:
     std::string attName;
-    CLNoise::ModuleAttribute::ATTRIBUTE_TYPE type;
+    CLNoise::Attribute::ATTRIBUTE_TYPE type;
 };
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
         noise = new CLNoise::Noise;
         ui->modulesToolbox->clear();
 
-        for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::BASE))
+        for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::GENERATOR))
         {
             ui->modulesToolbox->addItem(new QListWidgetItem(str.c_str()));
         }
@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->outputToolbox->addItem(new QListWidgetItem(str.c_str()));
         }
 
-        for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::MODIFIER))
+        for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::FILTER))
         {
             ui->modifiersToolbox->addItem(new QListWidgetItem(str.c_str()));
         }
@@ -83,7 +83,6 @@ MainWindow::MainWindow(QWidget *parent) :
     populateOpenCLPlatforms();
 
     lastFileName = "";
-    centralWidget()->hide();
 }
 
 MainWindow::~MainWindow()
@@ -122,7 +121,7 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
     if(!module)return;
     currentModule = module;
 
-    CLNoise::Module *noiseModule = module->getNoiseModule();
+    CLNoise::BaseModule *noiseModule = module->getNoiseModule();
     if(!noiseModule)return;
 
     auto attributes = noiseModule->getAttributes();
@@ -143,12 +142,12 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
     ui->moduleOptionsFrame->setLayout(layout);
 
     int row = 1;
-    for(const CLNoise::ModuleAttribute &att : attributes)
+    for(const CLNoise::Attribute &att : attributes)
     {
         QString val;
         QSlider *control = new QSlider(Qt::Horizontal);
         AttributeData *data = new AttributeData(att.getName(), att.getType());
-        if(att.getType() == CLNoise::ModuleAttribute::FLOAT)
+        if(att.getType() == CLNoise::Attribute::FLOAT)
         {
             val = QString("%1").arg(att.getFloat());
             control->setMinimum(att.getFloatMin() * 100.);
@@ -160,7 +159,7 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
             control->activateWindow();
             control->setUserData(Qt::UserRole + 1, data);
         }
-        else if(att.getType() == CLNoise::ModuleAttribute::INT)
+        else if(att.getType() == CLNoise::Attribute::INT)
         {
             val = QString("%1").arg(att.getInt());
             control->setMinimum(att.getIntMin());
@@ -193,7 +192,7 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
     }
 
     //Add Output special configuration
-    if(noiseModule->getType() == CLNoise::Module::OUTPUT)
+    if(noiseModule->getType() == CLNoise::BaseModule::OUTPUT)
     {
         QPushButton *button = new QPushButton("Generate");
         button->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -316,7 +315,7 @@ void MainWindow::on_action_New_project_triggered()
 void MainWindow::onAttributeValueChanged(int value)
 {
     if(!currentModule)return;
-    CLNoise::Module *noiseModule = currentModule->getNoiseModule();
+    CLNoise::BaseModule *noiseModule = currentModule->getNoiseModule();
     if(!noiseModule)return;
 
     QObject *s = sender();
@@ -329,26 +328,27 @@ void MainWindow::onAttributeValueChanged(int value)
     QLabel *valLabel = ui->moduleOptionsFrame->findChild<QLabel*>(QString(name.c_str())+"Value");
     if(!valLabel)return;
 
-    if(a->getType() == CLNoise::ModuleAttribute::FLOAT)
+    if(a->getType() == CLNoise::Attribute::FLOAT)
     {
         char buf[10];
         snprintf(buf, 10, "%.2f", (float)value/100.);
         valLabel->setText(buf);
-        noiseModule->setAttribute(name, (float)value/100.f);
+        CLNoise::Attribute att(name, (float)value/100.f, 0.f, 0.f);
+        noiseModule->setAttribute(att);
     }
-    else if(a->getType() == CLNoise::ModuleAttribute::INT)
+    else if(a->getType() == CLNoise::Attribute::INT)
     {
         valLabel->setText(QString("%1").arg(value));
-        noiseModule->setAttribute(name, value);
+        CLNoise::Attribute att(name, value, 0, 0);
+        noiseModule->setAttribute(att);
     }
-
 }
 
 void MainWindow::on_modulesToolbox_itemDoubleClicked(QListWidgetItem *item)
 {
     try
     {
-        nmScene->addModule(NoiseModule::BaseModule, noise, item->text());
+        nmScene->addModule(NoiseModule::GeneratorModule, noise, item->text());
     }
     catch(CLNoise::Error &error)
     {

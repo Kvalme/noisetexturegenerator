@@ -2,12 +2,12 @@
 #include "noisemodulescene.h"
 
 
-NoiseModifier::NoiseModifier(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::Module *mod, QGraphicsItem *parent, QGraphicsScene *scene) :
+NoiseModifier::NoiseModifier(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::BaseModule *mod, QGraphicsItem *parent, QGraphicsScene *scene) :
     NoiseModule(contextMenu, noise, typeStr, mod, parent, scene)
 {
     if(!mod)
     {
-        module = dynamic_cast<CLNoise::Modifier*>(noiseLibrary->createModule(typeStr.toUtf8().data(), CLNoise::BaseModule::MODIFIER));
+        module = dynamic_cast<CLNoise::Filter*>(noiseLibrary->createModule(typeStr.toUtf8().data(), CLNoise::BaseModule::FILTER));
     }
     else
     {

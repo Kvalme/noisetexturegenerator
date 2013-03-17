@@ -5,7 +5,7 @@
 #include <QGraphicsItem>
 #include <QString>
 #include "PreviewRenderer/previewrenderer.h"
-#include "clnoise.h"
+#include "clnoise/noise.h"
 
 
 class NoiseModuleScene;

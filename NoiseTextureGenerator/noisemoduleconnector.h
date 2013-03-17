@@ -10,7 +10,7 @@ public:
 
     int type() const;
 
-    enum ConnectorType { InputConnector, OutputConnector, ControlConnector};
+    enum ConnectorType { InputConnector, OutputConnector};
     explicit NoiseModuleConnector(ConnectorType cType, QGraphicsItem *parent = 0);
     QPolygonF polygon() const { return connectorPoly; }
 

@@ -45,11 +45,11 @@
 #include "noisemodulescene.h"
 
 
-NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::Module *mod,
+NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::BaseModule *mod,
          QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsPolygonItem(parent, scene)
 {
-    myModuleType = BaseModule;
+    myModuleType = GeneratorModule;
     myContextMenu = contextMenu;
     noiseLibrary = noise;
 
@@ -74,7 +74,7 @@ NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QString type
 
     if(!mod)
     {
-        module = dynamic_cast<CLNoise::Module*>(noiseLibrary->createModule(typeStr.toUtf8().data(), CLNoise::BaseModule::BASE));
+        module = dynamic_cast<CLNoise::BaseModule*>(noiseLibrary->createModule(typeStr.toUtf8().data(), CLNoise::BaseModule::GENERATOR));
     }
     else
     {
@@ -88,17 +88,13 @@ NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QString type
 
 void NoiseModule::setConnectors()
 {
-    for(unsigned int id = 0; id < module->getOutputCount(); ++id)
+    if (myModuleType != OutputModule)
     {
         NoiseModuleConnector *conn = new NoiseModuleConnector(NoiseModuleConnector::OutputConnector, this);
-        conn->setConnectorId(id);
+        conn->setConnectorId(0);
 
-        float h = (float)myPolygon.boundingRect().height();
-        float ys = (float)myPolygon.boundingRect().top();
-        float y = ys + (h - (id + 1) * h / ((float)module->getOutputCount() + 1));
         float x = myPolygon.boundingRect().right() + conn->polygon().boundingRect().width()/2.;
-
-        conn->setPos(x, y);
+        conn->setPos(x, 0);
     }
 
     for(unsigned int id = 0; id < module->getInputCount(); ++id)
@@ -110,19 +106,6 @@ void NoiseModule::setConnectors()
         float ys = (float)myPolygon.boundingRect().top();
         float y = ys + (h - (id + 1) * h / ((float)module->getInputCount() + 1));
         float x = myPolygon.boundingRect().left() - conn->polygon().boundingRect().width()/2.;
-
-        conn->setPos(x, y);
-    }
-
-    for(unsigned int id = 0; id < module->getControlCount(); ++id)
-    {
-        NoiseModuleConnector *conn = new NoiseModuleConnector(NoiseModuleConnector::ControlConnector, this);
-        conn->setConnectorId(id);
-
-        float w = (float)myPolygon.boundingRect().width();
-        float xs = (float)myPolygon.boundingRect().left();
-        float x = xs + (w - (id + 1) * w / ((float)module->getControlCount() + 1));
-        float y = myPolygon.boundingRect().bottom() + conn->polygon().boundingRect().height()/2.;
 
         conn->setPos(x, y);
     }
@@ -193,8 +176,3 @@ void NoiseModule::setInput(int id, NoiseModule *input)
     module->setInput(id, input->getNoiseModule());
 }
 
-void NoiseModule::setControl(int id, NoiseModule *control)
-{
-    if(!module || !control || !control->getNoiseModule())return;
-    module->setControl(id, control->getNoiseModule());
-}

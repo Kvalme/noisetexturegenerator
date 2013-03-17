@@ -5,7 +5,7 @@
 #include <QTime>
 #include "previewrenderer.h"
 #include "ui_previewrenderer.h"
-#include "clnoisemap.h"
+#include "clnoise/noisemap.h"
 #include <fstream>
 
 PreviewRenderer::PreviewRenderer(QWidget *parent):

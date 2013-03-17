@@ -5,8 +5,8 @@
 #include <QTimer>
 #include "QLinearGradient"
 #include "QProgressBar"
-#include "clnoise.h"
-#include "clnoiseoutput.h"
+#include "clnoise/noise.h"
+#include "clnoise/output.h"
 
 namespace Ui {
     class PreviewRenderer;

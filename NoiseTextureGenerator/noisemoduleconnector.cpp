@@ -71,10 +71,6 @@ void NoiseModuleConnector::addArrow(Arrow *arrow)
     {
         parent->setInput(connectorId, source);
     }
-    else if(connectorType == ControlConnector)
-    {
-        parent->setControl(connectorId, source);
-    }
 
     arrows.push_back(arrow);
     setPen(QPen(QBrush(Qt::green), 1));

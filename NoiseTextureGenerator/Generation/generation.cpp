@@ -76,21 +76,21 @@ void NoiseXMLGenerator::writeModule(NoiseModule *m, TiXmlElement *xmlModule)
 {
     if(!m || !xmlModule)return;
 
-    CLNoise::Module *module = m->getNoiseModule();
+    CLNoise::BaseModule*module = m->getNoiseModule();
     xmlModule->SetAttribute("name", module->getName().c_str());
     xmlModule->SetAttribute("type", module->getType());
 
-    for(CLNoise::ModuleAttribute att : module->getAttributes())
+    for(CLNoise::Attribute att : module->getAttributes())
     {
         TiXmlElement *xmlAtt = new TiXmlElement("Attribute");
         xmlAtt->SetAttribute("name", att.getName().c_str());
         xmlAtt->SetAttribute("type", att.getType());
         switch(att.getType())
         {
-            case CLNoise::ModuleAttribute::FLOAT:
+            case CLNoise::Attribute::FLOAT:
                 xmlAtt->SetDoubleAttribute("value", att.getFloat());
                 break;
-            case CLNoise::ModuleAttribute::INT:
+            case CLNoise::Attribute::INT:
                 xmlAtt->SetAttribute("value", att.getInt());
                 break;
             default:
@@ -108,8 +108,7 @@ void NoiseXMLGenerator::generateLinks(NoiseModule *module)
         if(child->type() != NoiseModuleScene::ConnectorModule)continue;
         NoiseModuleConnector *connector = dynamic_cast<NoiseModuleConnector*>(child);
         if(!connector)continue;
-        if(connector->getConnectorType() != NoiseModuleConnector::InputConnector &&
-           connector->getConnectorType() != NoiseModuleConnector::ControlConnector) continue;
+        if(connector->getConnectorType() != NoiseModuleConnector::InputConnector) continue;
 
         QList<Arrow*> arrows = connector->getArrows();
         int destId = allModules[module];
@@ -132,7 +131,6 @@ void NoiseXMLGenerator::writeLink(int src, int dst, int srcSlot, int dstSlot, No
     TiXmlElement *xmlLink = new TiXmlElement("Link");
     xmlLink->SetAttribute("source", src);
     xmlLink->SetAttribute("destination", dst);
-    xmlLink->SetAttribute("isControl", type == NoiseModuleConnector::ControlConnector);
     xmlLink->SetAttribute("sourceSlot", srcSlot);
     xmlLink->SetAttribute("destinationSlot", dstSlot);
     xmlLinks->LinkEndChild(xmlLink);

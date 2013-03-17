@@ -3,26 +3,25 @@
 
 #include <QGraphicsPolygonItem>
 #include "arrow.h"
-#include "clnoisemodule.h"
-#include "clnoise.h"
+#include "clnoise/basemodule.h"
+#include "clnoise/noise.h"
 #include "noisemoduleconnector.h"
 
 class NoiseModule : public QGraphicsPolygonItem
 {
 public:
     NoiseModule();
-    enum ModuleType { BaseModule, OutputModule, ModifierModule};
+    enum ModuleType { GeneratorModule, OutputModule, ModifierModule};
 
-    NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::Module *mod = 0, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::BaseModule *mod = 0, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
 
     ModuleType moduleType() const { return myModuleType; }
     QPolygonF polygon() const { return myPolygon; }
     virtual int type() const;
     void setConnectors();
-    CLNoise::Module* getNoiseModule() { return module;}
+    CLNoise::BaseModule* getNoiseModule() { return module;}
 
     void setInput(int id, NoiseModule *input);
-    void setControl(int id, NoiseModule *control);
 
     NoiseModuleConnector* getConnector(int slotId, NoiseModuleConnector::ConnectorType type);
 
@@ -40,7 +39,7 @@ protected:
     QGraphicsTextItem text;
 
     CLNoise::Noise *noiseLibrary;
-    CLNoise::Module *module;
+    CLNoise::BaseModule *module;
 };
 
 #endif // NOISEMODULE_H

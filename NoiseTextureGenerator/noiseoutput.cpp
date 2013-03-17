@@ -1,9 +1,9 @@
 #include <QMessageBox>
 #include "noiseoutput.h"
 #include "noisemodulescene.h"
-#include "clnoiseoutput.h"
+#include "clnoise/output.h"
 
-NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::Module *mod, QGraphicsItem *parent, QGraphicsScene *scene) :
+NoiseOutputModule::NoiseOutputModule(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::BaseModule *mod, QGraphicsItem *parent, QGraphicsScene *scene) :
     NoiseModule(contextMenu, noise, typeStr, mod, parent, scene)
 {
     int hw = 50, hh=25;

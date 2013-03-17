@@ -3,7 +3,7 @@
 
 #include <QGraphicsScene>
 #include <QAction>
-#include "clnoise.h"
+#include "clnoise/noise.h"
 #include "noisemodule.h"
 #include "noisemoduleconnector.h"
 
@@ -16,7 +16,7 @@ public:
 
     explicit NoiseModuleScene(QObject *parent = 0);
     void addModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, QString text);
-    NoiseModule *addModule(CLNoise::Noise *noise, CLNoise::Module *mod, QString text);
+    NoiseModule *addModule(CLNoise::Noise *noise, CLNoise::BaseModule *mod, QString text);
 
 public slots:
     void setMode(Mode mode, NoiseModuleConnector *item);
@@ -33,7 +33,7 @@ protected:
 
 private:
     bool isItemChange(int type);
-    NoiseModule* createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, CLNoise::Module *mod = 0, QString text = "");
+    NoiseModule* createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, CLNoise::BaseModule *mod = 0, QString text = "");
 
     NoiseModule::ModuleType myItemType;
     QMenu *myItemMenu;

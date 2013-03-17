@@ -10,7 +10,7 @@ NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     QGraphicsScene(parent)
 {
     myMode = MoveItem;
-    myItemType = NoiseModule::BaseModule;
+    myItemType = NoiseModule::GeneratorModule;
     line = 0;
     myItemColor = Qt::white;
     myTextColor = Qt::black;
@@ -21,18 +21,18 @@ NoiseModuleScene::NoiseModuleScene(QObject *parent) :
     startConnector = endConnector = 0;
 }
 
-NoiseModule* NoiseModuleScene::addModule(CLNoise::Noise *noise, CLNoise::Module *mod, QString text)
+NoiseModule* NoiseModuleScene::addModule(CLNoise::Noise *noise, CLNoise::BaseModule *mod, QString text)
 {
     NoiseModule::ModuleType type;
     switch(mod->getType())
     {
-        case CLNoise::Module::BASE:
-            type = NoiseModule::BaseModule;
+        case CLNoise::BaseModule::GENERATOR:
+            type = NoiseModule::GeneratorModule;
             break;
-        case CLNoise::Module::OUTPUT:
+        case CLNoise::BaseModule::OUTPUT:
             type = NoiseModule::OutputModule;
             break;
-        case CLNoise::Module::MODIFIER:
+        case CLNoise::BaseModule::FILTER:
             type = NoiseModule::ModifierModule;
             break;
         default:
@@ -49,11 +49,11 @@ NoiseModule* NoiseModuleScene::addModule(CLNoise::Noise *noise, CLNoise::Module 
 }
 
 
-NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, CLNoise::Module *mod, QString text)
+NoiseModule* NoiseModuleScene::createModule(NoiseModule::ModuleType type, CLNoise::Noise *noise, CLNoise::BaseModule *mod, QString text)
 {
     switch(type)
     {
-        case NoiseModule::BaseModule:
+        case NoiseModule::GeneratorModule:
             return new NoiseModule(myItemMenu, noise, text, mod);
         case NoiseModule::OutputModule:
             return new NoiseOutputModule(myItemMenu, noise, text, mod);
