@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QGraphicsItem>
 #include <QString>
+#include <QTreeWidgetItem>
 #include "PreviewRenderer/previewrenderer.h"
 #include "clnoise/noise.h"
 
@@ -40,15 +41,10 @@ private slots:
     void on_action_New_project_triggered();
     void onAttributeValueChanged(int value);
 
-    void on_modulesToolbox_itemDoubleClicked(QListWidgetItem *item);
-
-    void on_outputToolbox_itemDoubleClicked(QListWidgetItem *item);
-
-    void on_modifiersToolbox_itemDoubleClicked(QListWidgetItem *item);
-
     void on_clPlatform_currentIndexChanged(int index);
-
     void on_clDevice_currentIndexChanged(int index);
+
+    void on_modulesTree_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
 private:
     void populateOpenCLPlatforms();

@@ -55,22 +55,40 @@ MainWindow::MainWindow(QWidget *parent) :
     try
     {
         noise = new CLNoise::Noise;
-        ui->modulesToolbox->clear();
+        ui->modulesTree->clear();
 
+        QTreeWidgetItem *parent = new QTreeWidgetItem(QStringList(tr("Generators")));
+        ui->modulesTree->addTopLevelItem(parent);
         for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::GENERATOR))
         {
-            ui->modulesToolbox->addItem(new QListWidgetItem(str.c_str()));
+            QTreeWidgetItem *item = new QTreeWidgetItem();
+            item->setText(0, str.c_str());
+            item->setData(0, Qt::UserRole, NoiseModule::GeneratorModule);
+            parent->addChild(item);
         }
 
-        for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::OUTPUT))
-        {
-            ui->outputToolbox->addItem(new QListWidgetItem(str.c_str()));
-        }
-
+        parent = new QTreeWidgetItem(QStringList(tr("Filters")));
+        ui->modulesTree->addTopLevelItem(parent);
         for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::FILTER))
         {
-            ui->modifiersToolbox->addItem(new QListWidgetItem(str.c_str()));
+            QTreeWidgetItem *item = new QTreeWidgetItem();
+            item->setText(0, str.c_str());
+            item->setData(0, Qt::UserRole, NoiseModule::ModifierModule);
+            parent->addChild(item);
         }
+
+        parent = new QTreeWidgetItem(QStringList(tr("Outputs")));
+        ui->modulesTree->addTopLevelItem(parent);
+        for(std::string &str : noise->getModulesOfType(CLNoise::BaseModule::OUTPUT))
+        {
+            QTreeWidgetItem *item = new QTreeWidgetItem();
+            item->setText(0, str.c_str());
+            item->setData(0, Qt::UserRole, NoiseModule::OutputModule);
+            parent->addChild(item);
+        }
+
+        ui->modulesTree->expandAll();
+        ui->modulesTree->resizeColumnToContents(0);
 
     }
     catch(CLNoise::Error &error)
@@ -344,45 +362,6 @@ void MainWindow::onAttributeValueChanged(int value)
     }
 }
 
-void MainWindow::on_modulesToolbox_itemDoubleClicked(QListWidgetItem *item)
-{
-    try
-    {
-        nmScene->addModule(NoiseModule::GeneratorModule, noise, item->text());
-    }
-    catch(CLNoise::Error &error)
-    {
-        QMessageBox::critical(this, "Error in libclnoise", error.what());
-        return;
-    }
-}
-
-void MainWindow::on_outputToolbox_itemDoubleClicked(QListWidgetItem *item)
-{
-    try
-    {
-        nmScene->addModule(NoiseModule::OutputModule, noise, item->text());
-    }
-    catch(CLNoise::Error &error)
-    {
-        QMessageBox::critical(this, "Error in libclnoise", error.what());
-        return;
-    }
-}
-
-void MainWindow::on_modifiersToolbox_itemDoubleClicked(QListWidgetItem *item)
-{
-    try
-    {
-        nmScene->addModule(NoiseModule::ModifierModule, noise, item->text());
-    }
-    catch(CLNoise::Error &error)
-    {
-        QMessageBox::critical(this, "Error in libclnoise", error.what());
-        return;
-    }
-}
-
 void MainWindow::populateOpenCLPlatforms()
 {
     ui->clPlatform->clear();
@@ -432,6 +411,23 @@ void MainWindow::on_clDevice_currentIndexChanged(int index)
         noise->setCLDevice(device, clContext);
     }
     catch (CLNoise::Error &error)
+    {
+        QMessageBox::critical(this, "Error in libclnoise", error.what());
+        return;
+    }
+}
+
+void MainWindow::on_modulesTree_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    bool isOk = true;
+    int type = item->data(0, Qt::UserRole).toInt(&isOk);
+    if (!isOk)return;
+
+    try
+    {
+        nmScene->addModule((NoiseModule::ModuleType)type, noise, item->text(0));
+    }
+    catch(CLNoise::Error &error)
     {
         QMessageBox::critical(this, "Error in libclnoise", error.what());
         return;
