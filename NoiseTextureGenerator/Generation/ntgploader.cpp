@@ -2,6 +2,7 @@
 #include "noiseoutput.h"
 #include "noisemodifier.h"
 #include "arrow.h"
+#include "clnoise/gradientattribute.h"
 
 NTGPLoader::NTGPLoader()
 {
@@ -54,11 +55,34 @@ NoiseModule* NTGPLoader::readModule(TiXmlElement *src, NoiseModuleScene *scene, 
         switch(type)
         {
             case CLNoise::Attribute::FLOAT:
-                module->setAttribute(CLNoise::Attribute(attName, (float)atof(xmlAtt->Attribute("value")), 0.f, 0.f));
+            {
+                CLNoise::Attribute att = module->getAttribute(std::string(attName));
+                att.setValue((float)atof(xmlAtt->Attribute("value")));
+                module->setAttribute(att);
                 break;
+            }
             case CLNoise::Attribute::INT:
-                module->setAttribute(CLNoise::Attribute(attName, atoi(xmlAtt->Attribute("value")), 0, 0));
+            {
+                CLNoise::Attribute att = module->getAttribute(std::string(attName));
+                att.setValue(atoi(xmlAtt->Attribute("value")));
+                module->setAttribute(att);
                 break;
+            }
+            case CLNoise::Attribute::GRADIENT:
+            {
+                CLNoise::GradientAttribute g_a(attName);
+                for(TiXmlElement *grad = xmlAtt->FirstChildElement("Gradient"); grad; grad = grad->NextSiblingElement("Gradient"))
+                {
+                    float pos = atof(grad->Attribute("pos"));
+                    float r = atof(grad->Attribute("r"));
+                    float g = atof(grad->Attribute("g"));
+                    float b = atof(grad->Attribute("b"));
+                    float a = atof(grad->Attribute("a"));
+                    g_a.addPoint(pos, CLNoise::GradientAttribute::GradientPoint(r, g, b, a));
+                }
+                module->setAttribute(g_a);
+                break;
+            }
             default:
                 break;
         }

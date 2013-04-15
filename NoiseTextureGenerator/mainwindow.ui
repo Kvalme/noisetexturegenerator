@@ -164,7 +164,7 @@
              <x>0</x>
              <y>0</y>
              <width>1059</width>
-             <height>74</height>
+             <height>113</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -192,19 +192,6 @@
          </widget>
         </item>
        </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="GradientEditor" name="gradientEditor">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>39</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
       </widget>
      </item>
     </layout>
@@ -286,13 +273,6 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>GradientEditor</class>
-   <extends>QLabel</extends>
-   <header>GradientEditor/gradienteditor.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

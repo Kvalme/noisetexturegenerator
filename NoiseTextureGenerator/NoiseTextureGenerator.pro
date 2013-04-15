@@ -33,7 +33,9 @@ SOURCES += main.cpp\
     libclnoise/src/generator.cpp \
     libclnoise/src/function.cpp \
     libclnoise/src/filter.cpp \
-    libclnoise/src/basemodule.cpp
+    libclnoise/src/basemodule.cpp \
+    libclnoise/src/gradientattribute.cpp \
+    libclnoise/src/attribute.cpp
 
 HEADERS  += mainwindow.h \
     noisemodulescene.h \

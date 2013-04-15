@@ -1,5 +1,6 @@
 #include "generation.h"
 #include "noisemodulescene.h"
+#include "clnoise/gradientattribute.h"
 
 void NoiseXMLGenerator::prepareModules(const std::set<NoiseModule*> &modules)
 {
@@ -80,19 +81,37 @@ void NoiseXMLGenerator::writeModule(NoiseModule *m, TiXmlElement *xmlModule)
     xmlModule->SetAttribute("name", module->getName().c_str());
     xmlModule->SetAttribute("type", module->getType());
 
-    for(CLNoise::Attribute att : module->getAttributes())
+    for(CLNoise::Attribute *att : module->getAttributes())
     {
         TiXmlElement *xmlAtt = new TiXmlElement("Attribute");
-        xmlAtt->SetAttribute("name", att.getName().c_str());
-        xmlAtt->SetAttribute("type", att.getType());
-        switch(att.getType())
+        xmlAtt->SetAttribute("name", att->getName().c_str());
+        xmlAtt->SetAttribute("type", att->getType());
+        switch(att->getType())
         {
             case CLNoise::Attribute::FLOAT:
-                xmlAtt->SetDoubleAttribute("value", att.getFloat());
+                xmlAtt->SetDoubleAttribute("value", att->getFloat());
                 break;
             case CLNoise::Attribute::INT:
-                xmlAtt->SetAttribute("value", att.getInt());
+                xmlAtt->SetAttribute("value", att->getInt());
                 break;
+            case CLNoise::Attribute::GRADIENT:
+            {
+                CLNoise::GradientAttribute *grad = static_cast<CLNoise::GradientAttribute*>(att);
+                for (int a = 0; a < grad->getPointCount(); ++a)
+                {
+                    TiXmlElement *gradient = new TiXmlElement("Gradient");
+                    float pos;
+                    CLNoise::GradientAttribute::GradientPoint point(0, 0, 0, 0);
+                    grad->getPoint(a, &pos, &point);
+                    gradient->SetDoubleAttribute("pos", pos);
+                    gradient->SetDoubleAttribute("r", point.r);
+                    gradient->SetDoubleAttribute("g", point.g);
+                    gradient->SetDoubleAttribute("b", point.b);
+                    gradient->SetDoubleAttribute("a", point.a);
+                    xmlAtt->LinkEndChild(gradient);
+                }
+                break;
+            }
             default:
                 break;
         }

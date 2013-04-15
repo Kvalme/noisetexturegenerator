@@ -27,7 +27,7 @@ public:
 protected:
     void changeEvent(QEvent *e);
     void exportSceneData(const char *fname, bool isExport = false);
-
+    void closeEvent(QCloseEvent *);
 
 
 public slots:
@@ -40,11 +40,12 @@ private slots:
     void on_action_Export_noise_description_triggered();
     void on_action_New_project_triggered();
     void onAttributeValueChanged(int value);
+    void on_attribute_gradient_changed();
 
     void on_clPlatform_currentIndexChanged(int index);
     void on_clDevice_currentIndexChanged(int index);
 
-    void on_modulesTree_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_modulesTree_itemDoubleClicked(QTreeWidgetItem *item, int);
 
 private:
     void populateOpenCLPlatforms();

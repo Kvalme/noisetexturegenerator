@@ -33,6 +33,7 @@ GradientEditor::~GradientEditor()
 void GradientEditor::paintEvent ( QPaintEvent *event )
 {
     rebuildGradient();
+    emit valueChanged();
     QLabel::paintEvent(event);
 }
 

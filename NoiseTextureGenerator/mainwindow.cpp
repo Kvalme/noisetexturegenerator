@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSettings>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -17,6 +18,8 @@
 #include "PreviewRenderer/previewrenderer.h"
 
 #include "oclutils.h"
+#include "clnoise/error.h"
+#include "clnoise/gradientattribute.h"
 
 class AttributeData : public QObjectUserData
 {
@@ -34,6 +37,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    QSettings settings;
+    restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+
+
     nmScene = new NoiseModuleScene;
     ui->graphicsView->setScene(nmScene);
     connect(nmScene, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
@@ -41,7 +49,6 @@ MainWindow::MainWindow(QWidget *parent) :
     blockCurrentIndexChange = false;
     opt = 0;
     previewRenderer = new PreviewRenderer(this);
-    ui->gradientEditor->setVisible(false);
 
     foreach (QAction *action, ui->menu_File->actions())
     {
@@ -101,11 +108,20 @@ MainWindow::MainWindow(QWidget *parent) :
     populateOpenCLPlatforms();
 
     lastFileName = "";
+
+    restoreState(settings.value("mainWindowState").toByteArray());
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent*)
+{
+    QSettings settings;
+    settings.setValue("mainWindowGeometry", saveGeometry());
+    settings.setValue("mainWindowState", saveState());
 }
 
 void MainWindow::changeEvent(QEvent *e)
@@ -160,57 +176,86 @@ void MainWindow::buildModuleOptions(NoiseModule *module)
     ui->moduleOptionsFrame->setLayout(layout);
 
     int row = 1;
-    for(const CLNoise::Attribute &att : attributes)
+    for(const CLNoise::Attribute *att : attributes)
     {
         QString val;
-        QSlider *control = new QSlider(Qt::Horizontal);
-        AttributeData *data = new AttributeData(att.getName(), att.getType());
-        if(att.getType() == CLNoise::Attribute::FLOAT)
+        AttributeData *data = new AttributeData(att->getName(), att->getType());
+        if(att->getType() == CLNoise::Attribute::FLOAT)
         {
-            val = QString("%1").arg(att.getFloat());
-            control->setMinimum(att.getFloatMin() * 100.);
-            control->setMaximum(att.getFloatMax() * 100.);
+            QSlider *control = new QSlider(Qt::Horizontal);
+            val = QString("%1").arg(att->getFloat());
+            control->setMinimum(att->getFloatMin() * 100.);
+            control->setMaximum(att->getFloatMax() * 100.);
             control->setSingleStep(1);
             control->setTickInterval(100);
             control->setEnabled(true);
-            control->setValue(att.getFloat() * 100.);
+            control->setValue(att->getFloat() * 100.);
             control->activateWindow();
             control->setUserData(Qt::UserRole + 1, data);
+            control->setTickPosition(QSlider::TicksBothSides);
+            control->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+            connect(control, SIGNAL(valueChanged(int)), this, SLOT(onAttributeValueChanged(int)));
+            layout->addWidget(control, row, 2);
         }
-        else if(att.getType() == CLNoise::Attribute::INT)
+        else if(att->getType() == CLNoise::Attribute::INT)
         {
-            val = QString("%1").arg(att.getInt());
-            control->setMinimum(att.getIntMin());
-            control->setMaximum(att.getIntMax());
-            int range = att.getIntMax() - att.getIntMin();
+            QSlider *control = new QSlider(Qt::Horizontal);
+            val = QString("%1").arg(att->getInt());
+            control->setMinimum(att->getIntMin());
+            control->setMaximum(att->getIntMax());
+            int range = att->getIntMax() - att->getIntMin();
             control->setTickInterval( range > 100?range/100:1 );
             control->setSingleStep(1);
             control->setEnabled(true);
-            control->setValue(att.getInt());
+            control->setValue(att->getInt());
             control->activateWindow();
             control->setUserData(Qt::UserRole + 1, data);
+            control->setTickPosition(QSlider::TicksBothSides);
+            control->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+            connect(control, SIGNAL(valueChanged(int)), this, SLOT(onAttributeValueChanged(int)));
+            layout->addWidget(control, row, 2);
         }
-        control->setTickPosition(QSlider::TicksBothSides);
-        connect(control, SIGNAL(valueChanged(int)), this, SLOT(onAttributeValueChanged(int)));
+        else if(att->getType() == CLNoise::Attribute::GRADIENT)
+        {
+            GradientEditor *gradEditor = new GradientEditor();
+            gradEditor->setMinimumHeight(60);
+            gradEditor->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+            gradEditor->setUserData(Qt::UserRole + 1, data);
+
+            QVector<GradientEditor::GradientPoint> gradPoints;
+            const CLNoise::GradientAttribute *grad = static_cast<const CLNoise::GradientAttribute*>(att);
+            for (int a = 0; a < grad->getPointCount(); ++a)
+            {
+                float pos;
+                CLNoise::GradientAttribute::GradientPoint point(0, 0, 0, 0);
+                grad->getPoint(a, &pos, &point);
+
+                gradPoints.push_back(GradientEditor::GradientPoint(pos, QColor(point.r * 255., point.g*255., point.b*255., point.a*255.)));
+            }
+            gradEditor->setGradient(gradPoints);
+
+            layout->addWidget(gradEditor, row, 2);
+            connect(gradEditor, SIGNAL(valueChanged()), this, SLOT(on_attribute_gradient_changed()));
+        }
+
         QLabel *value = new QLabel(val);
         value->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        value->setObjectName(QString(att.getName().c_str()) + "Value");
-        value->setAlignment(Qt::AlignLeft);
+        value->setObjectName(QString(att->getName().c_str()) + "Value");
+        value->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
 
-        QLabel *valueName = new QLabel(QString(att.getName().c_str())+":");
+        QLabel *valueName = new QLabel(QString(att->getName().c_str())+":");
         valueName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        valueName->setAlignment(Qt::AlignRight);
-
-        control->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        valueName->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 
         layout->addWidget(valueName, row, 0);
         layout->addWidget(value, row, 1);
-        layout->addWidget(control, row, 2);
+
         row++;
     }
+    layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding), row, 0 );
 
     //Add Output special configuration
-    if(noiseModule->getType() == CLNoise::BaseModule::OUTPUT)
+    if (noiseModule->getType() == CLNoise::BaseModule::OUTPUT)
     {
         QPushButton *button = new QPushButton("Generate");
         button->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -237,6 +282,7 @@ void MainWindow::on_action_Save_project_triggered()
     dialog.setLabelText(QFileDialog::Accept, tr("Save"));
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setViewMode(QFileDialog::Detail);
+    dialog.setDirectory(qApp->applicationDirPath());
     QString saveFileName;
     if(lastFileName == "")
     {
@@ -265,7 +311,8 @@ void MainWindow::on_action_Load_project_triggered()
 {
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::AnyFile);
-    QString fileName = dialog.getOpenFileName(this, tr("Open project"), "", tr("NoiseTextureGenerator project (*.ntgp)"));
+
+    QString fileName = dialog.getOpenFileName(this, tr("Open project"), qApp->applicationDirPath(), tr("NoiseTextureGenerator project (*.ntgp)"));
     if(fileName.isEmpty())return;
 
     NTGPLoader loader;
@@ -273,10 +320,8 @@ void MainWindow::on_action_Load_project_triggered()
     doc.LoadFile(fileName.toUtf8().data());
 
     nmScene->clear();
-    QVector<GradientEditor::GradientPoint> gradient;
     loader.load(&doc, nmScene, noise);
 
-    ui->gradientEditor->setGradient(gradient);
     lastFileName = fileName;
 }
 
@@ -328,6 +373,36 @@ void MainWindow::exportSceneData(const char *fname, bool isExport)
 void MainWindow::on_action_New_project_triggered()
 {
     nmScene->clear();
+}
+
+void MainWindow::on_attribute_gradient_changed()
+{
+    if(!currentModule)return;
+    CLNoise::BaseModule *noiseModule = currentModule->getNoiseModule();
+    if(!noiseModule)return;
+
+    QObject *s = sender();
+    if(!s)return;
+    QWidget *w = dynamic_cast<QWidget*>(s);
+    AttributeData *a= dynamic_cast<AttributeData*>(w->userData(Qt::UserRole + 1));
+    if(!a)return;
+
+    std::string name = a->getAddName();
+
+    if(a->getType() == CLNoise::Attribute::GRADIENT)
+    {
+        GradientEditor *editor = static_cast<GradientEditor*>(s);
+        const QVector<GradientEditor::GradientPoint> &points = editor->getGradientPoints();
+        CLNoise::GradientAttribute att(name);
+
+        for(auto it = points.begin(); it != points.end(); ++it)
+        {
+            GradientEditor::GradientPoint point = *it;
+            att.addPoint(point.pos, CLNoise::GradientAttribute::GradientPoint(point.color.redF(), point.color.greenF(), point.color.blueF(), point.color.alphaF()));
+        }
+        noiseModule->setAttribute(att);
+    }
+
 }
 
 void MainWindow::onAttributeValueChanged(int value)
@@ -417,7 +492,7 @@ void MainWindow::on_clDevice_currentIndexChanged(int index)
     }
 }
 
-void MainWindow::on_modulesTree_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void MainWindow::on_modulesTree_itemDoubleClicked(QTreeWidgetItem *item, int)
 {
     bool isOk = true;
     int type = item->data(0, Qt::UserRole).toInt(&isOk);

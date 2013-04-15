@@ -6,6 +6,7 @@
 #include "previewrenderer.h"
 #include "ui_previewrenderer.h"
 #include "clnoise/noisemap.h"
+#include "clnoise/error.h"
 #include <fstream>
 
 PreviewRenderer::PreviewRenderer(QWidget *parent):
@@ -84,7 +85,16 @@ void PreviewRenderer::generateTexture()
 
 void PreviewRenderer::drawImage(const unsigned char *image)
 {
-    QImage img(image, textureWidth, textureHeight, QImage::Format_ARGB32);
+    QImage img(textureWidth, textureHeight, QImage::Format_ARGB32);
+    int point = 0;
+    for (int y = 0; y < textureHeight; ++y)
+    {
+        for (int x =0; x<textureWidth; ++x)
+        {
+            img.setPixel(x, y, qRgb(image[point*4], image[point*4+1], image[point*4+2]));
+            point++;
+        }
+    }
     QPixmap pix = QPixmap::fromImage(img);
     ui->previewPixmap->setPixmap(pix);
 }

@@ -41,6 +41,9 @@ public slots:
     void loadTerrainLibNoiseGradient();
     void clearGradient();
 
+signals:
+    void valueChanged();
+
 private:
     int findGradientPoint(float pos);
     void rebuildGradient();
