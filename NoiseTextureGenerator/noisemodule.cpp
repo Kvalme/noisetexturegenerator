@@ -43,11 +43,13 @@
 #include "noisemodule.h"
 #include "arrow.h"
 #include "noisemodulescene.h"
+#include "QMenu"
+#include "QGraphicsSceneContextMenuEvent"
 
 
 NoiseModule::NoiseModule(QMenu *contextMenu, CLNoise::Noise *noise, QString typeStr, CLNoise::BaseModule *mod,
          QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsPolygonItem(parent, scene)
+    : QGraphicsPolygonItem(parent)
 {
     myModuleType = GeneratorModule;
     myContextMenu = contextMenu;
