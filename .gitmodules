@@ -1,0 +1,3 @@
+[submodule "NoiseTextureGenerator/libclnoise"]
+	path = NoiseTextureGenerator/libclnoise
+	url = git@github.com:Kvalme/libclnoise.git
